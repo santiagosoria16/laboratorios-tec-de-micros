@@ -97,10 +97,24 @@ S1_RIGHT:
 
 ; SEQ 2: Sirena Intercalada (Pares e Impares)
 SEQ_2:
-    ldi r16, 0xAA           ; Activa LEDs pares
+    ldi r16, 0xAA
     out PORTD, r16
     rcall DELAY_SEQ
-    com r16                 ; Invierte a LEDs impares (0x55)
+    com r16
+    out PORTD, r16
+    rcall DELAY_SEQ
+    ret
+
+; SEQ 3: Carga de Barra (Llenado progresivo)
+SEQ_3:
+    clr r16
+S3_LOOP:
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsl r16
+    ori r16, 0x01
+    cpi r16, 0xFF
+    brne S3_LOOP
     out PORTD, r16
     rcall DELAY_SEQ
     ret
