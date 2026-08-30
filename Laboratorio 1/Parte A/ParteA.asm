@@ -63,3 +63,23 @@ CHECK_FIN:
     cpi estado, E_FIN
     brne MAIN_LOOP
     rjmp ST_FIN
+
+ST_STANDBY:
+    ; Enciende LED StandBy (PD2)
+    ldi temp, (1<<PD2)
+    out PORTD, temp
+
+    rcall MOSTRAR_LEDS_CARGA
+
+    sbis PINB, 1           
+    rcall CAMBIAR_CARGA
+
+    sbic PINB, 0            
+    rjmp MAIN_LOOP
+    sbic PINB, 2           
+    rjmp MAIN_LOOP
+    sbic PINC, 5           
+    rjmp MAIN_LOOP
+
+    ldi estado, E_LAVADO
+    rjmp MAIN_LOO
