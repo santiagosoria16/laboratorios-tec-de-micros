@@ -37,3 +37,7 @@ MAIN_LOOP:
     sbi PORTB, 3
     sbrs r16, 6
     cbi PORTB, 3
+
+    lsl r16                 
+    lsl r16                 
+    out PORTD, r16    
