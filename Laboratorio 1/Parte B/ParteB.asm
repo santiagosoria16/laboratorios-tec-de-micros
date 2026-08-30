@@ -41,3 +41,10 @@ MAIN_LOOP:
     lsl r16                 
     lsl r16                 
     out PORTD, r16    
+
+    in r17, PINB            
+
+    sbrs r17, 0             
+    rjmp BTN_INC            
+
+    sbrs r17, 1   
