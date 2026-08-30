@@ -36,4 +36,20 @@ SETUP:
     out PORTD, temp
 
     ldi estado, E_STANDBY
-    ldi carga, 0         
+    ldi carga, 0  
+
+
+MAIN_LOOP:
+    cpi estado, E_STANDBY
+    brne CHECK_LAVADO
+    rjmp ST_STANDBY
+
+CHECK_LAVADO:
+    cpi estado, E_LAVADO
+    brne CHECK_CENTRIFUGADO
+    rjmp ST_LAVADO
+
+CHECK_CENTRIFUGADO:
+    cpi estado, E_CENTRIFUGADO
+    brne CHECK_SECADO
+    rjmp ST_CENTRIFUGADO
