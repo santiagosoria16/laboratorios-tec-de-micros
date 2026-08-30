@@ -73,3 +73,8 @@ BTN_RESET:
     rcall DELAY_DEBOUNCE    
     clr r20                 
     rjmp WAIT_RELEASE
+
+WAIT_RELEASE:
+    in r17, PINB            
+    andi r17, 0x07          
+    cpi r17, 0x07   
