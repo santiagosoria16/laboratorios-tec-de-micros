@@ -204,8 +204,25 @@ CENT_18S:
 
 FIN_CENTRIFUGADO:
     ldi temp, 0x00
-    out PORTC, temp         ;
+    out PORTC, temp         
     ldi estado, E_SECADO
     rjmp MAIN_LOOP
+
+ST_SECADO:
+   
+    ldi temp, (1<<PD5)
+    out PORTD, temp
+
+    ldi temp, (1<<PC0)
+    out PORTC, temp
+    ldi timer_cnt, 5
+    rcall DELAY_MULTI_SEC
+
+    ldi temp, 0x00
+    out PORTC, temp
+    ldi timer_cnt, 3
+    rcall DELAY_MULTI_SEC
+
+
 
 
