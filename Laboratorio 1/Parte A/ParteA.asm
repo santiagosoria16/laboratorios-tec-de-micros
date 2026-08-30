@@ -101,3 +101,11 @@ WAIT_RELEASE_CARGA:
     rcall DELAY_200MS       
     ret
 
+MOSTRAR_LEDS_CARGA:
+    in temp, PORTB
+    andi temp, 0x07        
+    cpi carga, 0
+    breq L_LIGERA
+    cpi carga, 1
+    breq L_MEDIA
+    rjmp L_PESADA
