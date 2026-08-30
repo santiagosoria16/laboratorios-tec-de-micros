@@ -297,5 +297,18 @@ WAIT_PUERTA:
     pop temp
     ret
 
+DELAY_200MS:
+    push r20
+    push r21
+    ldi r20, 20
+    ldi r21, 0
+L_200MS:
+    dec r21
+    brne L_200MS
+    dec r20
+    brne L_200MS
+    pop r21
+    pop r20
+    ret
 
 
