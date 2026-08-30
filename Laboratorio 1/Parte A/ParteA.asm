@@ -83,3 +83,21 @@ ST_STANDBY:
 
     ldi estado, E_LAVADO
     rjmp MAIN_LOO
+
+
+    rcall DELAY_200MS      
+    inc carga
+    cpi carga, 3
+    brne MOSTRAR_CAMBIO
+    ldi carga, 0
+
+
+    rcall MOSTRAR_LEDS_CARGA
+
+WAIT_RELEASE_CARGA:
+    sbis PINB, 1           
+    rjmp WAIT_RELEASE_CARGA 
+
+    rcall DELAY_200MS       
+    ret
+
