@@ -23,3 +23,13 @@ START:
     out PORTB, r16          
 
     clr r20                 
+
+MAIN_LOOP:
+   
+    ldi ZH, high(TABLA_7SEG * 2) 
+    ldi ZL, low(TABLA_7SEG * 2)  
+    add ZL, r20             
+    clr r16                 
+    adc ZH, r16             
+    lpm r16, Z            
+     
