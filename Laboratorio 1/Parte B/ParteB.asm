@@ -86,3 +86,7 @@ DELAY_DEBOUNCE:
     ldi r18, 100          
 L1: ldi r19, 250         
 L2: dec r19      
+    brne L2                 
+    dec r18                 
+    brne L1                 
+    ret
