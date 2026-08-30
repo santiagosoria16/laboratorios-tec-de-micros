@@ -137,3 +137,17 @@ S4_LOOP:
     out PORTD, r16          ; Muestra choque en el centro
     rcall DELAY_SEQ
     ret
+
+; SEQ 5: Expansión desde el Centro
+SEQ_5:
+    ldi r17, 0x10
+    ldi r18, 0x08
+S5_LOOP:
+    mov r16, r17
+    or r16, r18
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsl r17
+    lsr r18
+    brne S5_LOOP
+    ret
