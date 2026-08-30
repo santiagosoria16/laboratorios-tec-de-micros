@@ -94,3 +94,13 @@ S1_RIGHT:
     cpi r16, 0x01
     brne S1_RIGHT
     ret
+
+; SEQ 2: Sirena Intercalada (Pares e Impares)
+SEQ_2:
+    ldi r16, 0xAA           ; Activa LEDs pares
+    out PORTD, r16
+    rcall DELAY_SEQ
+    com r16                 ; Invierte a LEDs impares (0x55)
+    out PORTD, r16
+    rcall DELAY_SEQ
+    ret
