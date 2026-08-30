@@ -219,3 +219,15 @@ WAIT_RELEASE:
     brne WAIT_RELEASE
     rcall DELAY_DEBOUNCE
     rjmp MAIN_LOOP
+
+DELAY_SEQ:
+    ldi r21, 15
+D_L1: ldi r22, 200
+D_L2: ldi r23, 200
+D_L3: dec r23
+    brne D_L3
+    dec r22
+    brne D_L2
+    dec r21
+    brne D_L1
+    ret
