@@ -118,3 +118,22 @@ S3_LOOP:
     out PORTD, r16
     rcall DELAY_SEQ
     ret
+
+; SEQ 4: Choque de Extremos al Centro
+SEQ_4:
+    ldi r17, 0x80           ; LED izquierdo
+    ldi r18, 0x01           ; LED derecho
+S4_LOOP:
+    mov r16, r17
+    or r16, r18             ; Combina ambos extremos
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsr r17                 ; Mueve extremo izquierdo al centro
+    lsl r18                 ; Mueve extremo derecho al centro
+    cp r17, r18
+    brne S4_LOOP
+    mov r16, r17
+    or r16, r18
+    out PORTD, r16          ; Muestra choque en el centro
+    rcall DELAY_SEQ
+    ret
