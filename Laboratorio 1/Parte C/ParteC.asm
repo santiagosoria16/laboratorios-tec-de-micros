@@ -75,3 +75,22 @@ CHECK_BUTTONS:
     sbrs r17, 2 
     rjmp BTN_RESET
     rjmp MAIN_LOOP  
+
+; SECUENCIAS LUMINOSAS
+
+; SEQ 1: Auto Fantástico (Barrido de izquierda a derecha)
+SEQ_1:
+    ldi r16, 0x01
+S1_LEFT:
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsl r16
+    brne S1_LEFT
+    ldi r16, 0x40
+S1_RIGHT:
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsr r16
+    cpi r16, 0x01
+    brne S1_RIGHT
+    ret
