@@ -33,3 +33,7 @@ MAIN_LOOP:
     adc ZH, r16             
     lpm r16, Z            
      
+    sbrc r16, 6
+    sbi PORTB, 3
+    sbrs r16, 6
+    cbi PORTB, 3
