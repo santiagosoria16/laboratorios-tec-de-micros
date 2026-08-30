@@ -211,3 +211,11 @@ BTN_RESET:
     rcall DELAY_DEBOUNCE
     ldi r20, 1              ; Resetea a Secuencia 1
     rjmp WAIT_RELEASE
+
+WAIT_RELEASE:
+    in r17, PINB
+    andi r17, 0x07
+    cpi r17, 0x07           ; Espera que se suelten los 3 botones
+    brne WAIT_RELEASE
+    rcall DELAY_DEBOUNCE
+    rjmp MAIN_LOOP
