@@ -190,3 +190,13 @@ S8_RIGHT:
     cpi r16, 0x03
     brne S8_RIGHT
     ret
+
+; CONTROL DE BOTONES Y RETARDOS
+
+BTN_INC:
+    rcall DELAY_DEBOUNCE
+    cpi r20, 8              ; Nuevo límite superior (8 secuencias)
+    breq WAIT_RELEASE
+    inc r20
+    rjmp WAIT_RELEASE
+
