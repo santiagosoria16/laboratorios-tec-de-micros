@@ -311,4 +311,13 @@ L_200MS:
     pop r20
     ret
 
+DELAY_N_SEGUNDOS:
+    push timer_cnt
+    ldi timer_cnt, 5
+L_N_SEC:
+    rcall DELAY_1S
+    dec timer_cnt
+    brne L_N_SEC
+    pop timer_cnt
+    ret
 
