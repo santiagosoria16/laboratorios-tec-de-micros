@@ -64,3 +64,14 @@ RUN_SEQ7:
 RUN_SEQ8:
     rcall SEQ_8
     rjmp CHECK_BUTTONS
+
+CHECK_BUTTONS:
+    ; --- LECTURA DE BOTONES EN PORTB ---
+    in r17, PINB
+    sbrs r17, 0             ; ¿Botón Incrementar presionado? (PB0)
+    rjmp BTN_INC
+    sbrs r17, 1             ; ¿Botón Decrementar presionado? (PB1)
+    rjmp BTN_DEC
+    sbrs r17, 2             ; ¿Botón Reset presionado? (PB2)
+    rjmp BTN_RESET
+    rjmp MAIN_LOOP          ; Si nada se presiona, repite la secuencia actual
