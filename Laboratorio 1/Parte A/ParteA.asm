@@ -283,7 +283,19 @@ PAUSA_PUERTA:
     in temp, PORTC         
     push temp
     
+    ldi temp, 0x00
+    out PORTC, temp         
 
+WAIT_PUERTA:
+    sbic PINB, 2           
+    rjmp WAIT_PUERTA       
+
+    rcall DELAY_200MS       
+
+    pop temp
+    out PORTC, temp        
+    pop temp
+    ret
 
 
 
