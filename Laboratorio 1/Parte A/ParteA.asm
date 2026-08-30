@@ -234,5 +234,17 @@ ST_SECADO:
     ldi estado, E_FIN
     rjmp MAIN_LOOP
 
+ST_FIN:
+  
+    ldi temp, (1<<PD6)
+    out PORTD, temp
+    ldi temp, 0x00
+    out PORTC, temp        
+   
+    ldi timer_cnt, 25
+    rcall DELAY_MULTI_SEC
+
+    ldi estado, E_STANDBY
+    rjmp MAIN_LOOP
 
 
