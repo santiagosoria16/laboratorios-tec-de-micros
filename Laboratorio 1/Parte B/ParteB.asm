@@ -48,3 +48,9 @@ MAIN_LOOP:
     rjmp BTN_INC            
 
     sbrs r17, 1   
+    rjmp BTN_DEC            
+
+    sbrs r17, 2             
+    rjmp BTN_RESET          
+
+    rjmp MAIN_LOOP  
