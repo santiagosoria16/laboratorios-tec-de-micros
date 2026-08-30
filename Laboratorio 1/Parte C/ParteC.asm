@@ -12,16 +12,16 @@ START:
 
 
     ldi r16, 0xFF
-    out DDRD, r16           ; PORTD (PD0-PD7) como salidas para los 8 LEDs
+    out DDRD, r16 
     ldi r16, 0x00
-    out DDRB, r16           ; PORTB como entradas para botones
+    out DDRB, r16   
     ldi r16, 0x07
-    out PORTB, r16          ; Activa Pull-Up internas en PB0, PB1 y PB2
+    out PORTB, r16    
 
-    ldi r20, 1              ; El sistema arranca en la SECUENCIA 1
+    ldi r20, 1     
 
 MAIN_LOOP:
-    ; --- CONMUTADOR DE SECUENCIAS (1 a 8) ---
+
     cpi r20, 1
     breq RUN_SEQ1
     cpi r20, 2
@@ -66,12 +66,12 @@ RUN_SEQ8:
     rjmp CHECK_BUTTONS
 
 CHECK_BUTTONS:
-    ; --- LECTURA DE BOTONES EN PORTB ---
+
     in r17, PINB
-    sbrs r17, 0             ; ¿Botón Incrementar presionado? (PB0)
+    sbrs r17, 0 
     rjmp BTN_INC
-    sbrs r17, 1             ; ¿Botón Decrementar presionado? (PB1)
+    sbrs r17, 1 
     rjmp BTN_DEC
-    sbrs r17, 2             ; ¿Botón Reset presionado? (PB2)
+    sbrs r17, 2 
     rjmp BTN_RESET
-    rjmp MAIN_LOOP          ; Si nada se presiona, repite la secuencia actual
+    rjmp MAIN_LOOP  
