@@ -151,3 +151,15 @@ S5_LOOP:
     lsr r18
     brne S5_LOOP
     ret
+
+; SEQ 6: Sombra Desplazándose (1 LED apagado recorriendo la barra)
+SEQ_6:
+    ldi r17, 0x01
+S6_LOOP:
+    mov r16, r17
+    com r16
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsl r17
+    brne S6_LOOP
+    ret
