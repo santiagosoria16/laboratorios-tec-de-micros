@@ -200,3 +200,9 @@ BTN_INC:
     inc r20
     rjmp WAIT_RELEASE
 
+BTN_DEC:
+    rcall DELAY_DEBOUNCE
+    cpi r20, 1              ; Límite inferior
+    breq WAIT_RELEASE
+    dec r20
+    rjmp WAIT_RELEASE
