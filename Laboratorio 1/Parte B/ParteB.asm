@@ -78,3 +78,6 @@ WAIT_RELEASE:
     in r17, PINB            
     andi r17, 0x07          
     cpi r17, 0x07   
+    brne WAIT_RELEASE       
+    rcall DELAY_DEBOUNCE    
+    rjmp MAIN_LOOP 
