@@ -121,3 +121,17 @@ L_PESADA:
 OUT_CARGA:
     out PORTB, temp
     ret
+; ESTADO 1: LAVADO
+
+ST_LAVADO:
+    ; Enciende LED Lavado (PD3)
+    ldi temp, (1<<PD3)
+    out PORTD, temp
+
+   
+    ldi timer_cnt, 5
+CICLO_LAVADO:
+
+    ldi temp, (1<<PC0)
+    out PORTC, temp
+    
