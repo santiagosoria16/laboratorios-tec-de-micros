@@ -53,3 +53,13 @@ CHECK_CENTRIFUGADO:
     cpi estado, E_CENTRIFUGADO
     brne CHECK_SECADO
     rjmp ST_CENTRIFUGADO
+
+CHECK_SECADO:
+    cpi estado, E_SECADO
+    brne CHECK_FIN
+    rjmp ST_SECADO
+
+CHECK_FIN:
+    cpi estado, E_FIN
+    brne MAIN_LOOP
+    rjmp ST_FIN
