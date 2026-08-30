@@ -206,3 +206,8 @@ BTN_DEC:
     breq WAIT_RELEASE
     dec r20
     rjmp WAIT_RELEASE
+
+BTN_RESET:
+    rcall DELAY_DEBOUNCE
+    ldi r20, 1              ; Resetea a Secuencia 1
+    rjmp WAIT_RELEASE
