@@ -231,3 +231,12 @@ D_L3: dec r23
     dec r21
     brne D_L1
     ret
+
+DELAY_DEBOUNCE:
+    ldi r18, 100
+L1: ldi r19, 250
+L2: dec r19
+    brne L2
+    dec r18
+    brne L1
+    ret
