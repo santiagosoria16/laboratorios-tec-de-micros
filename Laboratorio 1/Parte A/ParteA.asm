@@ -223,6 +223,16 @@ ST_SECADO:
     ldi timer_cnt, 3
     rcall DELAY_MULTI_SEC
 
+    ldi temp, (1<<PC1)
+    out PORTC, temp
+    ldi timer_cnt, 5
+    rcall DELAY_MULTI_SEC
+
+    ldi temp, 0x00
+    out PORTC, temp        
+
+    ldi estado, E_FIN
+    rjmp MAIN_LOOP
 
 
 
