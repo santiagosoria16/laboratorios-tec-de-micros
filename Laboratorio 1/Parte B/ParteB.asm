@@ -68,3 +68,8 @@ BTN_DEC:
     breq WAIT_RELEASE       
     dec r20                 
     rjmp WAIT_RELEASE      
+
+BTN_RESET:
+    rcall DELAY_DEBOUNCE    
+    clr r20                 
+    rjmp WAIT_RELEASE
