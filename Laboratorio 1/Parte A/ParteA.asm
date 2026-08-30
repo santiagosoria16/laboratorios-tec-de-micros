@@ -134,4 +134,55 @@ CICLO_LAVADO:
 
     ldi temp, (1<<PC0)
     out PORTC, temp
+
+
+    cpi carga, 0
+    breq LAV_15S
+    cpi carga, 1
+    breq LAV_25S
     
+ 
+    rcall DELAY_N_SEGUNDOS
+    ldi temp, 0x00
+    out PORTC, temp
+    rcall DELAY_1S
+    rcall DELAY_1S
+    rjmp SIGUIENTE_LAVADO
+
+
+LAV_15S: 
+    rcall DELAY_1S
+    rcall DELAY_1S
+    ldi temp, 0x00
+    out PORTC, temp
+    rcall DELAY_1S
+    rjmp SIGUIENTE_LAVADO
+
+LAV_25S: 
+    rcall DELAY_1S
+    rcall DELAY_1S
+    rcall DELAY_1S
+    ldi temp, 0x00
+    out PORTC, temp
+    rcall DELAY_1S
+    rcall DELAY_1S
+
+SIGUIENTE_LAVADO:
+    dec timer_cnt
+    brne CICLO_LAVADO
+
+    ldi estado, E_CENTRIFUGADO
+    rjmp MAIN_LOOP
+
+ST_CENTRIFUGADO:
+ 
+    ldi temp, (1<<PD4)
+    out PORTD, temp
+
+    ldi temp, (1<<PC2)
+    out PORTC, temp
+
+    cpi carga, 0
+    breq CENT_15S
+    cpi carga, 1
+    breq CENT_18S
