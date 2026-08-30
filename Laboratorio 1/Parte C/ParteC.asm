@@ -173,3 +173,20 @@ SEQ_7:
     out PORTD, r16
     rcall DELAY_SEQ
     ret
+
+; SEQ 8: Rebote en Parejas (2 LEDs encendidos rodando de extremo a extremo)
+SEQ_8:
+    ldi r16, 0x03           ; 0b00000011
+S8_LEFT:
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsl r16
+    cpi r16, 0xC0           ; 0b11000000
+    brne S8_LEFT
+S8_RIGHT:
+    out PORTD, r16
+    rcall DELAY_SEQ
+    lsr r16
+    cpi r16, 0x03
+    brne S8_RIGHT
+    ret
