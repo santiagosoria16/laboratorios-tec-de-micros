@@ -186,3 +186,26 @@ ST_CENTRIFUGADO:
     breq CENT_15S
     cpi carga, 1
     breq CENT_18S
+
+
+
+    ldi timer_cnt, 21
+    rcall DELAY_MULTI_SEC
+    rjmp FIN_CENTRIFUGADO
+
+CENT_15S:
+    ldi timer_cnt, 15
+    rcall DELAY_MULTI_SEC
+    rjmp FIN_CENTRIFUGADO
+
+CENT_18S:
+    ldi timer_cnt, 18
+    rcall DELAY_MULTI_SEC
+
+FIN_CENTRIFUGADO:
+    ldi temp, 0x00
+    out PORTC, temp         ;
+    ldi estado, E_SECADO
+    rjmp MAIN_LOOP
+
+
