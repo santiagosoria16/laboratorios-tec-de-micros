@@ -163,3 +163,13 @@ S6_LOOP:
     lsl r17
     brne S6_LOOP
     ret
+
+; SEQ 7: Bloques Alternados (4 Superiores / 4 Inferiores)
+SEQ_7:
+    ldi r16, 0xF0 
+    out PORTD, r16
+    rcall DELAY_SEQ
+    com r16
+    out PORTD, r16
+    rcall DELAY_SEQ
+    ret
