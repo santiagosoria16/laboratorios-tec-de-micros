@@ -266,6 +266,23 @@ L_1S:
     sbic PINB, 2
     rcall PAUSA_PUERTA
 
+    dec r22
+    brne L_1S
+    dec r21
+    brne L_1S
+    dec r20
+    brne L_1S
+    pop r22
+    pop r21
+    pop r20
+    ret
+
+
+PAUSA_PUERTA:
+    push temp
+    in temp, PORTC         
+    push temp
+    
 
 
 
