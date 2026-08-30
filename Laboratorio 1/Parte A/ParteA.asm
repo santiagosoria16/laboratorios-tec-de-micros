@@ -247,4 +247,26 @@ ST_FIN:
     ldi estado, E_STANDBY
     rjmp MAIN_LOOP
 
+DELAY_MULTI_SEC:
+    rcall DELAY_1S
+    dec timer_cnt
+    brne DELAY_MULTI_SEC
+    ret
+
+
+DELAY_1S:
+    push r20
+    push r21
+    push r22
+    ldi r20, 16
+    ldi r21, 43
+    ldi r22, 0
+L_1S:
+  
+    sbic PINB, 2
+    rcall PAUSA_PUERTA
+
+
+
+
 
