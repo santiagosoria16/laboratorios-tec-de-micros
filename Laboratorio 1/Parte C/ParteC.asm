@@ -20,3 +20,23 @@ START:
 
     ldi r20, 1              ; El sistema arranca en la SECUENCIA 1
 
+MAIN_LOOP:
+    ; --- CONMUTADOR DE SECUENCIAS (1 a 8) ---
+    cpi r20, 1
+    breq RUN_SEQ1
+    cpi r20, 2
+    breq RUN_SEQ2
+    cpi r20, 3
+    breq RUN_SEQ3
+    cpi r20, 4
+    breq RUN_SEQ4
+    cpi r20, 5
+    breq RUN_SEQ5
+    cpi r20, 6
+    breq RUN_SEQ6
+    cpi r20, 7
+    breq RUN_SEQ7
+    cpi r20, 8
+    breq RUN_SEQ8
+    rjmp CHECK_BUTTONS
+
