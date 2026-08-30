@@ -14,3 +14,19 @@
 .org 0x0000
  rjmp SETUP
 
+SETUP:
+    ldi temp, HIGH(RAMEND)
+    out SPH, temp
+    ldi temp, LOW(RAMEND)
+    out SPL, temp
+  
+    ldi temp, 0x38        
+    out DDRB, temp
+    ldi temp, 0x07          
+    out PORTB, temp
+
+    ldi temp, 0x07         
+    out DDRC, temp
+    ldi temp, (1<<PC5)      
+    out PORTC, temp
+
