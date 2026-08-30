@@ -109,3 +109,15 @@ MOSTRAR_LEDS_CARGA:
     cpi carga, 1
     breq L_MEDIA
     rjmp L_PESADA
+
+L_LIGERA:
+    ori temp, (1<<PB3)
+    rjmp OUT_CARGA
+L_MEDIA:
+    ori temp, (1<<PB4)
+    rjmp OUT_CARGA
+L_PESADA:
+    ori temp, (1<<PB5)
+OUT_CARGA:
+    out PORTB, temp
+    ret
