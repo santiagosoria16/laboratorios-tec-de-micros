@@ -40,3 +40,27 @@ MAIN_LOOP:
     breq RUN_SEQ8
     rjmp CHECK_BUTTONS
 
+RUN_SEQ1:
+    rcall SEQ_1
+    rjmp CHECK_BUTTONS
+RUN_SEQ2:
+    rcall SEQ_2
+    rjmp CHECK_BUTTONS
+RUN_SEQ3:
+    rcall SEQ_3
+    rjmp CHECK_BUTTONS
+RUN_SEQ4:
+    rcall SEQ_4
+    rjmp CHECK_BUTTONS
+RUN_SEQ5:
+    rcall SEQ_5
+    rjmp CHECK_BUTTONS
+RUN_SEQ6:
+    rcall SEQ_6
+    rjmp CHECK_BUTTONS
+RUN_SEQ7:
+    rcall SEQ_7
+    rjmp CHECK_BUTTONS
+RUN_SEQ8:
+    rcall SEQ_8
+    rjmp CHECK_BUTTONS
