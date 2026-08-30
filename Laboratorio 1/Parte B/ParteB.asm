@@ -54,3 +54,10 @@ MAIN_LOOP:
     rjmp BTN_RESET          
 
     rjmp MAIN_LOOP  
+
+BTN_INC:
+    rcall DELAY_DEBOUNCE    
+    cpi r20, 9              
+    breq WAIT_RELEASE       
+    inc r20                 
+    rjmp WAIT_RELEASE  
