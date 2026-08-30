@@ -30,3 +30,10 @@ SETUP:
     ldi temp, (1<<PC5)      
     out PORTC, temp
 
+    ldi temp, 0x7C        
+    out DDRD, temp
+    ldi temp, 0x00
+    out PORTD, temp
+
+    ldi estado, E_STANDBY
+    ldi carga, 0         
