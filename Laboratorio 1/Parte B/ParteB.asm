@@ -19,6 +19,7 @@ START:
     ldi r16, 0xFC           
     out DDRD, r16           
 
+ ; PB3 como salida (segmento g); PB0, PB1 y PB2 como entradas (botones)
     ldi r16, 0x08           
     out DDRB, r16           
     ldi r16, 0x07           
