@@ -95,6 +95,7 @@ WAIT_RELEASE:
     rjmp MAIN_LOOP 
 
 DELAY_DEBOUNCE:
+    ; Retardo de alrededor de 20 ms
     ldi r18, 100          
 L1: ldi r19, 250         
 L2: dec r19      
