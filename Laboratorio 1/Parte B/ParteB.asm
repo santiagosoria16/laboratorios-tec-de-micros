@@ -21,7 +21,9 @@ START:
 
  ; PB3 como salida (segmento g); PB0, PB1 y PB2 como entradas (botones)
     ldi r16, 0x08           
-    out DDRB, r16           
+    out DDRB, r16     
+
+   ; Resistencias Pull-up en PB0, PB1 y PB2
     ldi r16, 0x07           
     out PORTB, r16          
 
