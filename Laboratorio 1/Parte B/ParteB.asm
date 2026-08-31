@@ -39,7 +39,8 @@ MAIN_LOOP:
     clr r16                 
     adc ZH, r16             
     lpm r16, Z    ; r16 contiene los bits (0b0gfedcba)           
-     
+
+    ; Asigna el segmento 'g' a PB3 (Pin 11)
     sbrc r16, 6
     sbi PORTB, 3
     sbrs r16, 6
