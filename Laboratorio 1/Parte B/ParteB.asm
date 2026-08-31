@@ -31,13 +31,14 @@ START:
     clr r20                 
 
 MAIN_LOOP:
-   
+
+    ; --- MOSTRAR VALOR EN DISPLAY ---
     ldi ZH, high(TABLA_7SEG * 2) 
     ldi ZL, low(TABLA_7SEG * 2)  
     add ZL, r20             
     clr r16                 
     adc ZH, r16             
-    lpm r16, Z            
+    lpm r16, Z    ; r16 contiene los bits (0b0gfedcba)           
      
     sbrc r16, 6
     sbi PORTB, 3
