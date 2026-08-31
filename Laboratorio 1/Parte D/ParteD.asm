@@ -31,3 +31,17 @@ SETUP:
 
     clr R_TEMP1
     out DDRB, R_TEMP1
+
+MAIN_LOOP:
+
+    in R_TEMP1, PINC
+
+    mov R_A, R_TEMP1
+    andi R_A, 0x0F
+
+    mov R_SEL, R_TEMP1
+    lsr R_SEL
+    lsr R_SEL
+    lsr R_SEL
+    lsr R_SEL
+    andi R_SEL, 0x03   
