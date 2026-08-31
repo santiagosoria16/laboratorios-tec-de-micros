@@ -143,3 +143,14 @@ EXEC_INC:
 INC_NO_CARRY:
     andi R_F, 0x0F
     rjmp CALC_FLAGS
+
+CALC_FLAGS:
+   
+    clr FLAG_N
+    sbrc R_F, 3
+    ldi FLAG_N, 1
+
+    clr FLAG_Z
+    tst R_F
+    brne UPDATE_OUTPUT
+    ldi FLAG_Z, 1
