@@ -132,3 +132,14 @@ EXEC_SHL:
     lsl R_F
     andi R_F, 0x0F
     rjmp CALC_FLAGS
+
+EXEC_INC:
+    mov R_F, R_A
+    inc R_F
+    clr FLAG_C
+    cpi R_F, 16
+    brlo INC_NO_CARRY
+    ldi FLAG_C, 1      
+INC_NO_CARRY:
+    andi R_F, 0x0F
+    rjmp CALC_FLAGS
