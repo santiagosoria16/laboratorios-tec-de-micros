@@ -164,3 +164,12 @@ UPDATE_OUTPUT:
 
     sbrc FLAG_N, 0
     sbr R_OUT, (1<<5)
+
+    sbrc FLAG_Z, 0
+    sbr R_OUT, (1<<6)
+
+    sbr R_OUT, (1<<7)
+
+    out PORTD, R_OUT
+
+    rjmp MAIN_LOOP
