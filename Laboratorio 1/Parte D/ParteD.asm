@@ -45,3 +45,11 @@ MAIN_LOOP:
     lsr R_SEL
     lsr R_SEL
     andi R_SEL, 0x03   
+
+    in R_TEMP2, PINB
+
+    mov R_B, R_TEMP2
+    andi R_B, 0x0F
+
+    sbrc R_TEMP2, 4
+    ori R_SEL, 0x04     ; R_SEL = [0000 0 S2 S1 S0] (Valor 0 a 7)
