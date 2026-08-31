@@ -89,3 +89,23 @@ EXEC_SUB:
 SUB_NO_CARRY:
     andi R_F, 0x0F
     rjmp CALC_FLAGS
+
+
+EXEC_ADD:
+    mov R_F, R_A
+    add R_F, R_B
+    clr FLAG_C
+    cpi R_F, 16
+    brlo ADD_NO_CARRY
+    ldi FLAG_C, 1       
+ADD_NO_CARRY:
+    andi R_F, 0x0F
+    rjmp CALC_FLAGS
+
+
+EXEC_XOR:
+    mov R_F, R_A
+    eor R_F, R_B
+    andi R_F, 0x0F
+    clr FLAG_C
+    rjmp CALC_FLAGS
