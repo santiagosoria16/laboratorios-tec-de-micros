@@ -20,3 +20,14 @@ SETUP:
     out SPL, R_TEMP1
     ldi R_TEMP1, HIGH(RAMEND)
     out SPH, R_TEMP1
+
+    ldi R_TEMP1, 0xFF
+    out DDRD, R_TEMP1
+    clr R_TEMP1
+    out PORTD, R_TEMP1
+
+    clr R_TEMP1
+    out DDRC, R_TEMP1
+
+    clr R_TEMP1
+    out DDRB, R_TEMP1
