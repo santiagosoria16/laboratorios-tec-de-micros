@@ -14,6 +14,8 @@ START:
     ldi r16, HIGH(RAMEND)  
     out SPH, r16            
 
+  ; --- CONFIGURACIÓN DE PUERTOS ---
+  ; PD2 a PD7 como salidas (segmentos a-f)
     ldi r16, 0xFC           
     out DDRD, r16           
 
