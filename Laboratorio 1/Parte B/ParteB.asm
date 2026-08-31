@@ -8,7 +8,7 @@ TABLA_7SEG:
     .db 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F  
 
 START:
-    
+; --- INICIALIZACIÓN DE LA PILA (STACK POINTER) ---    
     ldi r16, LOW(RAMEND)    
     out SPL, r16            
     ldi r16, HIGH(RAMEND)  
