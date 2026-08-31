@@ -10,3 +10,13 @@
 .def R_OUT    = r23  
 .def R_TEMP1  = r24  
 .def R_TEMP2  = r25 
+
+.org 0x0000
+    rjmp SETUP
+
+SETUP:
+
+    ldi R_TEMP1, LOW(RAMEND)
+    out SPL, R_TEMP1
+    ldi R_TEMP1, HIGH(RAMEND)
+    out SPH, R_TEMP1
