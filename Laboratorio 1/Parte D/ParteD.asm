@@ -154,3 +154,13 @@ CALC_FLAGS:
     tst R_F
     brne UPDATE_OUTPUT
     ldi FLAG_Z, 1
+
+UPDATE_OUTPUT:
+
+    mov R_OUT, R_F
+
+    sbrc FLAG_C, 0
+    sbr R_OUT, (1<<4)
+
+    sbrc FLAG_N, 0
+    sbr R_OUT, (1<<5)
