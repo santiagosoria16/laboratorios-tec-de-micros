@@ -73,3 +73,19 @@ MAIN_LOOP:
     breq EXEC_INC
 
     rjmp MAIN_LOOP
+
+EXEC_CLEAR:
+    clr R_F
+    clr FLAG_C
+    rjmp CALC_FLAGS
+
+EXEC_SUB:
+    mov R_F, R_A
+    sub R_F, R_B
+    clr FLAG_C
+    brcc SUB_NO_CARRY
+    ldi FLAG_C, 1      
+
+SUB_NO_CARRY:
+    andi R_F, 0x0F
+    rjmp CALC_FLAGS
