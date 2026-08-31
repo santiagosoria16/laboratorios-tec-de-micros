@@ -27,6 +27,7 @@ START:
     ldi r16, 0x07           
     out PORTB, r16          
 
+  ; Inicializa contador en 0
     clr r20                 
 
 MAIN_LOOP:
