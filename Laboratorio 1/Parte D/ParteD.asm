@@ -53,3 +53,23 @@ MAIN_LOOP:
 
     sbrc R_TEMP2, 4
     ori R_SEL, 0x04     ; R_SEL = [0000 0 S2 S1 S0] (Valor 0 a 7)
+
+
+    cpi R_SEL, 0
+    breq EXEC_CLEAR
+    cpi R_SEL, 1
+    breq EXEC_SUB
+    cpi R_SEL, 2
+    breq EXEC_ADD
+    cpi R_SEL, 3
+    breq EXEC_XOR
+    cpi R_SEL, 4
+    breq EXEC_AND
+    cpi R_SEL, 5
+    breq EXEC_OR
+    cpi R_SEL, 6
+    breq EXEC_SHL
+    cpi R_SEL, 7
+    breq EXEC_INC
+
+    rjmp MAIN_LOOP
