@@ -109,3 +109,26 @@ EXEC_XOR:
     andi R_F, 0x0F
     clr FLAG_C
     rjmp CALC_FLAGS
+
+EXEC_AND:
+    mov R_F, R_A
+    and R_F, R_B
+    andi R_F, 0x0F
+    clr FLAG_C
+    rjmp CALC_FLAGS
+
+EXEC_OR:
+    mov R_F, R_A
+    or R_F, R_B
+    andi R_F, 0x0F
+    clr FLAG_C
+    rjmp CALC_FLAGS
+
+EXEC_SHL:
+    clr FLAG_C
+    sbrc R_A, 3         
+    ldi FLAG_C, 1
+    mov R_F, R_A
+    lsl R_F
+    andi R_F, 0x0F
+    rjmp CALC_FLAGS
