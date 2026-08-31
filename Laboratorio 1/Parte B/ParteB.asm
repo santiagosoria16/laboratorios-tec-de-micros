@@ -46,10 +46,12 @@ MAIN_LOOP:
     sbrs r16, 6
     cbi PORTB, 3
 
+    ; Desplaza y asigna los segmentos 'a'..'f' a PD2..PD7 (Pines 2..7)
     lsl r16                 
     lsl r16                 
     out PORTD, r16    
 
+    ; --- LECTURA DE BOTONES ---
     in r17, PINB            
 
     sbrs r17, 0             
