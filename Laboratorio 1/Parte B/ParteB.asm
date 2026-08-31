@@ -85,6 +85,8 @@ BTN_RESET:
     rjmp WAIT_RELEASE
 
 WAIT_RELEASE:
+
+    ; Espera a que se liberen todos los botones
     in r17, PINB            
     andi r17, 0x07          
     cpi r17, 0x07   
