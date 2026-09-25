@@ -136,3 +136,18 @@ STATE_ABIERTA:
 STATE_CERRANDO:
     sbic PINC, 1        
     rjmp MAIN_LOOP
+
+  
+    ldi STATE, ST_CERRADA
+    cbi PORTD, PD5     
+    cbi PORTD, PD6   
+
+    ldi ZL, LOW(MSG_CERRADA << 1)
+    ldi ZH, HIGH(MSG_CERRADA << 1)
+    rcall PRINT_STRING
+    rjmp MAIN_LOOP
+
+
+STATE_INT_ABRIENDO:
+    sbic PINC, 2        
+    rjmp MAIN_LOOP
