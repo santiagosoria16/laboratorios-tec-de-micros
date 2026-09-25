@@ -151,3 +151,28 @@ STATE_CERRANDO:
 STATE_INT_ABRIENDO:
     sbic PINC, 2        
     rjmp MAIN_LOOP
+
+
+    ldi STATE, ST_ABRIENDO
+    sbi PORTD, PD4       
+    sbi PORTD, PD6     
+
+    ldi ZL, LOW(MSG_ABRIENDO << 1)
+    ldi ZH, HIGH(MSG_ABRIENDO << 1)
+    rcall PRINT_STRING
+    rjmp MAIN_LOOP
+
+
+STATE_INT_CERRANDO:
+    sbic PINC, 3       
+    rjmp MAIN_LOOP
+
+ 
+    ldi STATE, ST_CERRANDO
+    sbi PORTD, PD5     
+    sbi PORTD, PD6    
+
+    ldi ZL, LOW(MSG_CERRANDO << 1)
+    ldi ZH, HIGH(MSG_CERRANDO << 1)
+    rcall PRINT_STRING
+    rjmp MAIN_LOOP
