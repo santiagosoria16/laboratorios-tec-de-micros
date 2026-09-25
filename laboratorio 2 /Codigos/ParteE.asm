@@ -176,3 +176,18 @@ STATE_INT_CERRANDO:
     ldi ZH, HIGH(MSG_CERRANDO << 1)
     rcall PRINT_STRING
     rjmp MAIN_LOOP
+
+ISR_PCINT0:
+    push TEMP
+    in TEMP, SREG
+    push TEMP
+
+    sbic PINB, 0
+    rjmp EXIT_ISR      
+
+    cpi STATE, ST_ABRIENDO
+    breq INT_DESDE_ABRIENDO
+
+    cpi STATE, ST_CERRANDO
+    breq INT_DESDE_CERRANDO
+    rjmp EXIT_ISR
