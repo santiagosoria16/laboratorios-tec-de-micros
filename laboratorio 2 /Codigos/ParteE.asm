@@ -47,6 +47,27 @@ RESET:
     sts UBRR0H, TEMP
     ldi TEMP, 103
     sts UBRR0L, TEMP
+
+
+    ldi STATE, ST_CERRADA
+    clr OBS_FLAG
+    sei 
+
+
+    ldi ZL, LOW(MSG_CERRADA << 1)
+    ldi ZH, HIGH(MSG_CERRADA << 1)
+    rcall PRINT_STRING
+
+
+MAIN_LOOP:
+
+    tst OBS_FLAG
+    breq CHECK_FSM
+    clr OBS_FLAG
+
+    ldi ZL, LOW(MSG_OBSTACULO << 1)
+    ldi ZH, HIGH(MSG_OBSTACULO << 1)
+    rcall PRINT_STRING
     ldi TEMP, (1<<TXEN0)
     sts UCSR0B, TEMP     
     ldi TEMP, (1<<UCSZ01) | (1<<UCSZ00)
