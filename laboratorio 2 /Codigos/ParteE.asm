@@ -93,3 +93,28 @@ CHECK_FSM:
 STATE_CERRADA:
     sbic PINC, 2 
     rjmp MAIN_LOOP
+
+
+    ldi STATE, ST_ABRIENDO
+    sbi PORTD, PD4      
+    sbi PORTD, PD6     
+
+    ldi ZL, LOW(MSG_ABRIENDO << 1)
+    ldi ZH, HIGH(MSG_ABRIENDO << 1)
+    rcall PRINT_STRING
+    rjmp MAIN_LOOP
+
+
+STATE_ABRIENDO:
+    sbic PINC, 0        
+    rjmp MAIN_LOOP
+
+
+    ldi STATE, ST_ABIERTA
+    cbi PORTD, PD4       
+    cbi PORTD, PD6      
+
+    ldi ZL, LOW(MSG_ABIERTA << 1)
+    ldi ZH, HIGH(MSG_ABIERTA << 1)
+    rcall PRINT_STRING
+    rjmp MAIN_LOOP
