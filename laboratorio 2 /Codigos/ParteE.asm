@@ -191,3 +191,22 @@ ISR_PCINT0:
     cpi STATE, ST_CERRANDO
     breq INT_DESDE_CERRANDO
     rjmp EXIT_ISR
+
+INT_DESDE_ABRIENDO:
+    ldi STATE, ST_INT_ABRIENDO
+    rjmp DETENER_TODO
+
+INT_DESDE_CERRANDO:
+    ldi STATE, ST_INT_CERRANDO
+
+DETENER_TODO:
+    cbi PORTD, PD4     
+    cbi PORTD, PD5       
+    cbi PORTD, PD6      
+    ldi OBS_FLAG, 1  
+
+EXIT_ISR:
+    pop TEMP
+    out SREG, TEMP
+    pop TEMP
+    reti
