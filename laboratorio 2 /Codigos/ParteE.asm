@@ -72,3 +72,24 @@ MAIN_LOOP:
     sts UCSR0B, TEMP     
     ldi TEMP, (1<<UCSZ01) | (1<<UCSZ00)
     sts UCSR0C, TEMP   
+
+CHECK_FSM:
+    cpi STATE, ST_CERRADA
+    breq STATE_CERRADA
+    cpi STATE, ST_ABRIENDO
+    breq STATE_ABRIENDO
+    cpi STATE, ST_ABIERTA
+    breq STATE_ABIERTA
+    cpi STATE, ST_CERRANDO
+    breq STATE_CERRANDO
+    cpi STATE, ST_INT_ABRIENDO
+    breq STATE_INT_ABRIENDO
+    cpi STATE, ST_INT_CERRANDO
+    breq STATE_INT_CERRANDO
+
+    rjmp MAIN_LOOP
+
+
+STATE_CERRADA:
+    sbic PINC, 2 
+    rjmp MAIN_LOOP
