@@ -210,3 +210,23 @@ EXIT_ISR:
     out SREG, TEMP
     pop TEMP
     reti
+
+PRINT_STRING:
+    lpm TEMP, Z+
+    tst TEMP
+    breq END_PRINT
+SEND_WAIT:
+    lds TEMP2, UCSR0A
+    sbrs TEMP2, UDRE0
+    rjmp SEND_WAIT
+    sts UDR0, TEMP
+    rjmp PRINT_STRING
+END_PRINT:
+    ret
+
+
+MSG_CERRADA:   .db "Puerta cerrada.", 13, 10, 0      
+MSG_ABRIENDO:  .db "Puerta abriendo.", 13, 10, 0, 0     
+MSG_ABIERTA:   .db "Puerta abierta.", 13, 10, 0      
+MSG_CERRANDO:  .db "Puerta cerrando.", 13, 10, 0, 0  
+MSG_OBSTACULO: .db "Obstaculo detectado. Movimiento detenido por seguridad.", 13, 10, 0 ; 58 bytes (Par)
