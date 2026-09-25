@@ -118,3 +118,21 @@ STATE_ABRIENDO:
     ldi ZH, HIGH(MSG_ABIERTA << 1)
     rcall PRINT_STRING
     rjmp MAIN_LOOP
+
+STATE_ABIERTA:
+    sbic PINC, 3         
+    rjmp MAIN_LOOP
+
+    ldi STATE, ST_CERRANDO
+    sbi PORTD, PD5       
+    sbi PORTD, PD6      
+
+    ldi ZL, LOW(MSG_CERRANDO << 1)
+    ldi ZH, HIGH(MSG_CERRANDO << 1)
+    rcall PRINT_STRING
+    rjmp MAIN_LOOP
+
+
+STATE_CERRANDO:
+    sbic PINC, 1        
+    rjmp MAIN_LOOP
