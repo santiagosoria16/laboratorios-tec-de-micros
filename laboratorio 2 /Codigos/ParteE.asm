@@ -12,3 +12,17 @@
 .equ ST_INT_ABRIENDO = 4
 .equ ST_INT_CERRANDO = 5
 
+.org 0x0000
+    rjmp RESET
+.org 0x0006             
+    rjmp ISR_PCINT0
+
+RESET:
+
+    ldi TEMP, HIGH(RAMEND)
+    out SPH, TEMP
+    ldi TEMP, LOW(RAMEND)
+    out SPL, TEMP
+
+    cbi DDRB, 0
+    sbi PORTB, 0
