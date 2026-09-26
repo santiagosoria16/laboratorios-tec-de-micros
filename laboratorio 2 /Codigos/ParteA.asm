@@ -261,3 +261,19 @@ D2: dec r25
     pop r25
     pop r24
     ret
+
+INIT_UART:
+    ldi r16, 0
+    sts UBRR0H, r16
+    ldi r16, 103        
+    sts UBRR0L, r16
+    ldi r16, (1<<RXEN0) | (1<<TXEN0)
+    sts UCSR0B, r16
+    ldi r16, (1<<UCSZ01) | (1<<UCSZ00)
+    sts UCSR0C, r16
+    ret
+
+READ_UART:
+    lds r24, UCSR0A
+    sbrs r24, RXC0
+    ret            
