@@ -234,3 +234,17 @@ DISP_ROW_B:
     swap r23
     andi r23, 0x0F
     out PORTC, r23
+
+    rcall DELAY_SHORT
+    rcall READ_UART
+
+    lsl r20
+    sbrc r20, 1
+    rjmp DISP_ROW_B
+
+    dec r25
+    brne FRAME_REFRESH
+
+DISPLAY_ABORT:
+    pop r25
+    ret
