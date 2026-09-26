@@ -184,3 +184,21 @@ DISP_ROW_D:
     out PORTB, r16
 
     ld r21, Y+
+
+    mov r22, r21
+    andi r22, 0x0F
+    lsl r22
+    lsl r22
+    in r16, PORTB
+    andi r16, 0x03
+    or r16, r22
+    out PORTB, r16
+
+    mov r23, r21
+    swap r23
+    andi r23, 0x0F
+    out PORTC, r23
+
+    mov r16, r20
+    com r16
+    out PORTD, r16
