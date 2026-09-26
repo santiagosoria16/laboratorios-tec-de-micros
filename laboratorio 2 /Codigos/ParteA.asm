@@ -202,3 +202,18 @@ DISP_ROW_D:
     mov r16, r20
     com r16
     out PORTD, r16
+
+    rcall DELAY_SHORT
+    rcall READ_UART
+
+    lsl r20
+    brne DISP_ROW_D
+
+    ldi r20, 0x01
+
+DISP_ROW_B:
+    ldi r16, 0xFC
+    out PORTD, r16
+    in r16, PORTB
+    ori r16, 0x03
+    out PORTB, r16
