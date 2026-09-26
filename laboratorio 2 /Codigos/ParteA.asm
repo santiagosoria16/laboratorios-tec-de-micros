@@ -312,3 +312,23 @@ CHECK_STATIC_CMD:
     subi r22, '1'  
     cpi r22, 6
     brcc READ_UART_END
+
+    ldi r19, 1  
+    mov r17, r22
+    rcall PRINT_ACK
+    ret
+
+TRIGGER_MENU:
+    rcall PRINT_MENU
+    ret
+
+READ_UART_END:
+    ret
+
+SPEED_UP:
+    cpi r18, 5         
+    brcs SPEED_UP_END
+    subi r18, 5
+SPEED_UP_END:
+    ret
+
