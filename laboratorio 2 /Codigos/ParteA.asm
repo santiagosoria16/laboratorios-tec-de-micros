@@ -38,3 +38,15 @@ CLR_RAM:
     st Y+, r16
     dec r17
     brne CLR_RAM
+
+    clr r19      
+    clr r17        
+    ldi r18, 35       
+
+
+    rcall PRINT_MENU
+
+MAIN_LOOP:
+    cpi r19, 0
+    breq DO_MARQUEE      
+    rjmp DO_STATIC
