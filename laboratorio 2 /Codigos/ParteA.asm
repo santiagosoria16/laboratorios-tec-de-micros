@@ -95,3 +95,26 @@ DO_STATIC:
     adc ZH, r0
 
     ldi r20, 0x04
+
+ROW_LOOP_D:
+    ldi r16, 0xFC
+    out PORTD, r16
+    in r16, PORTB
+    ori r16, 0x03
+    out PORTB, r16
+
+    lpm r21, Z+
+
+    mov r22, r21
+    andi r22, 0x0F
+    lsl r22
+    lsl r22
+    in r16, PORTB
+    andi r16, 0x03
+    or r16, r22
+    out PORTB, r16
+
+    mov r23, r21
+    swap r23
+    andi r23, 0x0F
+    out PORTC, r23
