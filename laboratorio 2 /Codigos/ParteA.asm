@@ -369,3 +369,10 @@ PRINT_STRING_FLASH:
 PRINT_STRING_END:
     ret
 
+UART_TRANSMIT:
+    lds r16, UCSR0A
+    sbrs r16, UDRE0
+    rjmp UART_TRANSMIT
+    sts UDR0, r24
+    ret
+
