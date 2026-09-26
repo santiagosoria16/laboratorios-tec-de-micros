@@ -118,3 +118,22 @@ ROW_LOOP_D:
     swap r23
     andi r23, 0x0F
     out PORTC, r23
+
+    mov r16, r20
+    com r16
+    out PORTD, r16
+
+    rcall DELAY_SHORT
+    rcall READ_UART
+
+    lsl r20
+    brne ROW_LOOP_D
+
+    ldi r20, 0x01
+
+ROW_LOOP_B:
+    ldi r16, 0xFC
+    out PORTD, r16
+    in r16, PORTB
+    ori r16, 0x03
+    out PORTB, r16
