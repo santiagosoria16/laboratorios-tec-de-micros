@@ -277,3 +277,22 @@ READ_UART:
     lds r24, UCSR0A
     sbrs r24, RXC0
     ret            
+
+    lds r24, UDR0
+
+    cpi r24, '+'
+    breq CMD_SPEED_UP
+
+    cpi r24, '-'
+    breq CMD_SPEED_DOWN
+
+    cpi r24, 'm'
+    breq TRIGGER_MENU
+    cpi r24, 'M'
+    breq TRIGGER_MENU
+
+    cpi r24, '0'
+    brne CHECK_STATIC_CMD
+    clr r19  
+    rcall PRINT_ACK
+    ret
