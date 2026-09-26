@@ -248,3 +248,16 @@ DISP_ROW_B:
 DISPLAY_ABORT:
     pop r25
     ret
+
+DELAY_SHORT:
+    push r24             
+    push r25
+    ldi r24, 10
+D1: ldi r25, 200
+D2: dec r25
+    brne D2
+    dec r24
+    brne D1
+    pop r25
+    pop r24
+    ret
