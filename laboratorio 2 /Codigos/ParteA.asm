@@ -50,3 +50,19 @@ MAIN_LOOP:
     cpi r19, 0
     breq DO_MARQUEE      
     rjmp DO_STATIC
+
+DO_MARQUEE:
+    ldi ZL, LOW(TEXT_SCROLL_DATA * 2)
+    ldi ZH, HIGH(TEXT_SCROLL_DATA * 2)
+
+SCROLL_NEXT_COL:
+    cpi r19, 0
+    brne MAIN_LOOP    
+
+    lpm r21, Z+        
+    cpi r21, 0xFF       
+    breq DO_MARQUEE  
+
+    ldi YL, LOW(FRAME_BUF)
+    ldi YH, HIGH(FRAME_BUF)
+    ldi r16, 8
