@@ -171,3 +171,16 @@ FRAME_REFRESH:
     cpi r19, 0
     brne DISPLAY_ABORT 
 
+    ldi YL, LOW(FRAME_BUF)
+    ldi YH, HIGH(FRAME_BUF)
+
+    ldi r20, 0x04
+
+DISP_ROW_D:
+    ldi r16, 0xFC
+    out PORTD, r16
+    in r16, PORTB
+    ori r16, 0x03
+    out PORTB, r16
+
+    ld r21, Y+
