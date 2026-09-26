@@ -296,3 +296,19 @@ READ_UART:
     clr r19  
     rcall PRINT_ACK
     ret
+
+CMD_SPEED_UP:
+    rcall SPEED_UP
+    rcall PRINT_ACK
+    ret
+
+CMD_SPEED_DOWN:
+    rcall SPEED_DOWN
+    rcall PRINT_ACK
+    ret
+
+CHECK_STATIC_CMD:
+    mov r22, r24
+    subi r22, '1'  
+    cpi r22, 6
+    brcc READ_UART_END
