@@ -66,3 +66,18 @@ SCROLL_NEXT_COL:
     ldi YL, LOW(FRAME_BUF)
     ldi YH, HIGH(FRAME_BUF)
     ldi r16, 8
+
+SHIFT_ROWS_LOOP:
+    ld r22, Y
+    lsr r22
+    sbrc r21, 0
+    ori r22, 0x80
+    st Y+, r22
+    lsr r21
+    dec r16
+    brne SHIFT_ROWS_LOOP
+
+    mov r25, r18
+    rcall DISPLAY_FRAME
+
+    rjmp SCROLL_NEXT_COL
