@@ -350,3 +350,22 @@ PRINT_ACK:
     pop ZL
     ret
 
+PRINT_MENU:
+    push ZL
+    push ZH
+    ldi ZL, LOW(MENU_TEXT * 2)
+    ldi ZH, HIGH(MENU_TEXT * 2)
+    rcall PRINT_STRING_FLASH
+    pop ZH
+    pop ZL
+    ret
+
+PRINT_STRING_FLASH:
+    lpm r24, Z+
+    tst r24
+    breq PRINT_STRING_END
+    rcall UART_TRANSMIT
+    rjmp PRINT_STRING_FLASH
+PRINT_STRING_END:
+    ret
+
