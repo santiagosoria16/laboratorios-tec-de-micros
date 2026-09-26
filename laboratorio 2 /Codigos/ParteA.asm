@@ -1,35 +1,46 @@
+; ==============================================================================
+; PROYECTO: MATRIZ DE LEDS 8x8 CON MENÚ UART Y MARQUESINA CONTINUA
+; Microcontrolador: ATmega328P
+; Baud Rate UART: 9600 bps @ 16 MHz
+; ==============================================================================
 .include "m328pdef.inc"
 
+; Dirección en RAM para el buffer de la marquesina (8 bytes: 1 por fila)
 .equ FRAME_BUF = 0x0100
 
 .org 0x0000
     rjmp RESET
 
 RESET:
-
+    ; 1. Inicializar Puntero de Pila (Stack Pointer)
     ldi r16, LOW(RAMEND)
     out SPL, r16
     ldi r16, HIGH(RAMEND)
     out SPH, r16
 
-    ldi r16, 0xFE        
+    ; 2. Configuración de Puertos E/S
+    ; PORTD: PD0 (RX), PD1 (TX), PD2..PD7 -> Filas 1 a 6 (Salidas)
+    ldi r16, 0xFE        ; PD1..PD7 salidas, PD0 entrada
     out DDRD, r16
-    ldi r16, 0xFC        
+    ldi r16, 0xFC        ; PD2..PD7 en HIGH (Filas apagadas)
     out PORTD, r16
 
-    ldi r16, 0x3F        
+    ; PORTB: PB0..PB1 -> Filas 7 y 8 | PB2..PB5 -> Cols 1 a 4
+    ldi r16, 0x3F        ; PB0..PB5 salidas
     out DDRB, r16
-    ldi r16, 0x03       
+    ldi r16, 0x03        ; PB0..PB1 en HIGH (Filas apagadas), Cols en LOW
     out PORTB, r16
 
-
-    ldi r16, 0x0F     
+    ; PORTC: PC0..PC3 -> Cols 5 a 8 (Salidas)
+    ldi r16, 0x0F        ; PC0..PC3 salidas
     out DDRC, r16
     clr r16
-    out PORTC, r16     
+    out PORTC, r16       ; Cols en LOW
 
+    ; 3. Inicializar UART
     rcall INIT_UART
 
+    ; 4. Limpiar buffer de pantalla en SRAM (8 bytes a cero)
     ldi YL, LOW(FRAME_BUF)
     ldi YH, HIGH(FRAME_BUF)
     clr r16
@@ -39,30 +50,38 @@ CLR_RAM:
     dec r17
     brne CLR_RAM
 
-    clr r19      
-    clr r17        
-    ldi r18, 35       
+    ; 5. Inicializar Variables de Estado
+    clr r19              ; r19 = Modo actual (0: Marquesina, 1: Patrón estático)
+    clr r17              ; r17 = Índice de patrón estático (0 a 5)
+    ldi r18, 35          ; r18 = Valor de velocidad/retardo inicial (35 refrescos)
 
-
+    ; 6. Imprimir menú e iniciar
     rcall PRINT_MENU
 
+; ==============================================================================
+; BUCLE PRINCIPAL / MÁQUINA DE ESTADOS
+; ==============================================================================
 MAIN_LOOP:
     cpi r19, 0
-    breq DO_MARQUEE      
-    rjmp DO_STATIC
+    breq DO_MARQUEE      ; Si Modo = 0 -> Marquesina
+    rjmp DO_STATIC       ; Si Modo = 1 -> Patrón estático
 
+; ==============================================================================
+; MODO 0: MARQUESINA CONTINUA
+; ==============================================================================
 DO_MARQUEE:
     ldi ZL, LOW(TEXT_SCROLL_DATA * 2)
     ldi ZH, HIGH(TEXT_SCROLL_DATA * 2)
 
 SCROLL_NEXT_COL:
     cpi r19, 0
-    brne MAIN_LOOP    
+    brne MAIN_LOOP      ; Si cambió de modo por UART, abortar inmediatamente
 
-    lpm r21, Z+        
-    cpi r21, 0xFF       
-    breq DO_MARQUEE  
+    lpm r21, Z+          ; Leer byte de la columna entrante desde Flash
+    cpi r21, 0xFF        ; ¿Fin del texto?
+    breq DO_MARQUEE      ; Al terminar, reinicia el texto para bucle infinito
 
+    ; Desplazar buffer 1 píxel a la izquierda e insertar nueva columna por la derecha
     ldi YL, LOW(FRAME_BUF)
     ldi YH, HIGH(FRAME_BUF)
     ldi r16, 8
@@ -77,16 +96,20 @@ SHIFT_ROWS_LOOP:
     dec r16
     brne SHIFT_ROWS_LOOP
 
+    ; Mostrar fotograma utilizando la velocidad configurada en r18
     mov r25, r18
     rcall DISPLAY_FRAME
 
     rjmp SCROLL_NEXT_COL
 
+; ==============================================================================
+; MODO 1: PATRÓN ESTÁTICO (OPCIONES 1 A 6)
+; ==============================================================================
 DO_STATIC:
     mov r16, r17
     lsl r16
     lsl r16
-    lsl r16             
+    lsl r16              ; r17 * 8
 
     ldi ZL, LOW(PATTERNS * 2)
     ldi ZH, HIGH(PATTERNS * 2)
@@ -94,6 +117,7 @@ DO_STATIC:
     add ZL, r16
     adc ZH, r0
 
+    ; --- Refresco Filas 1 a 6 (PD2..PD7) ---
     ldi r20, 0x04
 
 ROW_LOOP_D:
@@ -129,6 +153,7 @@ ROW_LOOP_D:
     lsl r20
     brne ROW_LOOP_D
 
+    ; --- Refresco Filas 7 y 8 (PB0..PB1) ---
     ldi r20, 0x01
 
 ROW_LOOP_B:
@@ -164,16 +189,20 @@ ROW_LOOP_B:
 
     rjmp MAIN_LOOP
 
+; ==============================================================================
+; RUTINA DE VISUALIZACIÓN DE MARQUESINA
+; ==============================================================================
 DISPLAY_FRAME:
     push r25
 
 FRAME_REFRESH:
     cpi r19, 0
-    brne DISPLAY_ABORT 
+    brne DISPLAY_ABORT  ; Salir si cambió de modo por UART
 
     ldi YL, LOW(FRAME_BUF)
     ldi YH, HIGH(FRAME_BUF)
 
+    ; Filas 1 a 6 (PD2..PD7)
     ldi r20, 0x04
 
 DISP_ROW_D:
@@ -209,6 +238,7 @@ DISP_ROW_D:
     lsl r20
     brne DISP_ROW_D
 
+    ; Filas 7 y 8 (PB0..PB1)
     ldi r20, 0x01
 
 DISP_ROW_B:
@@ -249,8 +279,11 @@ DISPLAY_ABORT:
     pop r25
     ret
 
+; ==============================================================================
+; RETARDO Y CONTROL UART
+; ==============================================================================
 DELAY_SHORT:
-    push r24             
+    push r24             ; Proteger registros
     push r25
     ldi r24, 10
 D1: ldi r25, 200
@@ -265,7 +298,7 @@ D2: dec r25
 INIT_UART:
     ldi r16, 0
     sts UBRR0H, r16
-    ldi r16, 103        
+    ldi r16, 103         ; 9600 baudios @ 16 MHz
     sts UBRR0L, r16
     ldi r16, (1<<RXEN0) | (1<<TXEN0)
     sts UCSR0B, r16
@@ -276,7 +309,7 @@ INIT_UART:
 READ_UART:
     lds r24, UCSR0A
     sbrs r24, RXC0
-    ret            
+    ret                  ; Sin datos recibidos
 
     lds r24, UDR0
 
@@ -293,7 +326,7 @@ READ_UART:
 
     cpi r24, '0'
     brne CHECK_STATIC_CMD
-    clr r19  
+    clr r19              ; Activar Modo 0 (Marquesina)
     rcall PRINT_ACK
     ret
 
@@ -309,11 +342,11 @@ CMD_SPEED_DOWN:
 
 CHECK_STATIC_CMD:
     mov r22, r24
-    subi r22, '1'  
+    subi r22, '1'        ; Convertir ASCII '1'..'6' a 0..5
     cpi r22, 6
     brcc READ_UART_END
 
-    ldi r19, 1  
+    ldi r19, 1          ; Activar Modo 1 (Estático)
     mov r17, r22
     rcall PRINT_ACK
     ret
@@ -325,17 +358,19 @@ TRIGGER_MENU:
 READ_UART_END:
     ret
 
+; --- Control de Velocidad (Ajuste de r18) ---
 SPEED_UP:
-    cpi r18, 5         
+    cpi r18, 5            ; Límite mínimo (Velocidad máxima)
     brcs SPEED_UP_END
     subi r18, 5
 SPEED_UP_END:
     ret
+
 SPEED_DOWN:
-    cpi r18, 95         
+    cpi r18, 95           ; Límite máximo (Velocidad mínima)
     brcc SPEED_DOWN_END
     ldi r16, 5
-    add r18, r16      
+    add r18, r16          ; Incrementa retardo en 5
 SPEED_DOWN_END:
     ret
 
@@ -376,7 +411,9 @@ UART_TRANSMIT:
     sts UDR0, r24
     ret
 
-
+; ==============================================================================
+; CADENAS DE TEXTO PARA UART (Alineadas estrictamente a número par de bytes)
+; ==============================================================================
 .align 2
 MENU_TEXT:
     .db 0x0D, 0x0A, "==================================", 0x0D, 0x0A
@@ -396,6 +433,9 @@ MENU_TEXT:
 ACK_TEXT:
     .db " -> OK!", 0x0D, 0x0A, 0x00
 
+; ==============================================================================
+; DATOS DE COLUMNAS DE MARQUESINA ("CUANTO FALTA PARA DICIEMBRE?")
+; ==============================================================================
 .align 2
 TEXT_SCROLL_DATA:
     .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -421,7 +461,9 @@ TEXT_SCROLL_DATA:
     .db 0x09, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     .db 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00
 
-
+; ==============================================================================
+; TABLA DE PATRONES ESTÁTICOS
+; ==============================================================================
 .align 2
 PATTERNS:
     .db 0x00, 0xE7, 0xE7, 0xE7, 0x00, 0x81, 0x7E, 0x00
