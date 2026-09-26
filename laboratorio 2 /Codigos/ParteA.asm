@@ -154,3 +154,20 @@ ROW_LOOP_B:
     swap r23
     andi r23, 0x0F
     out PORTC, r23
+
+    rcall DELAY_SHORT
+    rcall READ_UART
+
+    lsl r20
+    sbrc r20, 1
+    rjmp ROW_LOOP_B
+
+    rjmp MAIN_LOOP
+
+DISPLAY_FRAME:
+    push r25
+
+FRAME_REFRESH:
+    cpi r19, 0
+    brne DISPLAY_ABORT 
+
