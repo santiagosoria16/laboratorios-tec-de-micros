@@ -81,3 +81,17 @@ SHIFT_ROWS_LOOP:
     rcall DISPLAY_FRAME
 
     rjmp SCROLL_NEXT_COL
+
+DO_STATIC:
+    mov r16, r17
+    lsl r16
+    lsl r16
+    lsl r16             
+
+    ldi ZL, LOW(PATTERNS * 2)
+    ldi ZH, HIGH(PATTERNS * 2)
+    clr r0
+    add ZL, r16
+    adc ZH, r0
+
+    ldi r20, 0x04
