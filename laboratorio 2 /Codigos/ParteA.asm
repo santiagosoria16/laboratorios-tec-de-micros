@@ -137,3 +137,20 @@ ROW_LOOP_B:
     in r16, PORTB
     ori r16, 0x03
     out PORTB, r16
+
+    lpm r21, Z+
+
+    mov r22, r21
+    andi r22, 0x0F
+    lsl r22
+    lsl r22
+    mov r16, r20
+    com r16
+    andi r16, 0x03
+    or r16, r22
+    out PORTB, r16
+
+    mov r23, r21
+    swap r23
+    andi r23, 0x0F
+    out PORTC, r23
