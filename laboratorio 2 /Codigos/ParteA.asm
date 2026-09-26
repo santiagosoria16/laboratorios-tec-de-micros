@@ -376,3 +376,23 @@ UART_TRANSMIT:
     sts UDR0, r24
     ret
 
+
+.align 2
+MENU_TEXT:
+    .db 0x0D, 0x0A, "==================================", 0x0D, 0x0A
+    .db "    MENU MATRIZ DE LEDS 8x8     ", 0x0D, 0x0A
+    .db "==================================", 0x0D, 0x0A
+    .db "0: Marquesina (CUANTO FALTA... )", 0x0D, 0x0A
+    .db "1: Carita Sonriendo ", 0x0D, 0x0A
+    .db "2: Carita Guinando  ", 0x0D, 0x0A
+    .db "3: Corazon          ", 0x0D, 0x0A
+    .db "4: Cara :3          ", 0x0D, 0x0A
+    .db "5: Asterisco        ", 0x0D, 0x0A
+    .db "6: Cara XD          ", 0x0D, 0x0A
+    .db "+ / -: Aumentar / Disminuir Vel.", 0x0D, 0x0A
+    .db "==================================", 0x0D, 0x0A
+    .db "Seleccione opcion: ", 0x00
+
+ACK_TEXT:
+    .db " -> OK!", 0x0D, 0x0A, 0x00
+
