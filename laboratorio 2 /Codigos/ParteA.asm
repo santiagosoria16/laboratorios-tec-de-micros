@@ -331,4 +331,22 @@ SPEED_UP:
     subi r18, 5
 SPEED_UP_END:
     ret
+SPEED_DOWN:
+    cpi r18, 95         
+    brcc SPEED_DOWN_END
+    ldi r16, 5
+    add r18, r16      
+SPEED_DOWN_END:
+    ret
+
+PRINT_ACK:
+    push ZL
+    push ZH
+    rcall UART_TRANSMIT
+    ldi ZL, LOW(ACK_TEXT * 2)
+    ldi ZH, HIGH(ACK_TEXT * 2)
+    rcall PRINT_STRING_FLASH
+    pop ZH
+    pop ZL
+    ret
 
