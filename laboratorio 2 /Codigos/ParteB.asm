@@ -104,3 +104,22 @@ SELECT_SIG17:
     sei
     rcall USART_SendAck2
     rjmp MAIN_LOOP
+
+INC_FREQ:
+    lds temp, OCR2A
+    cpi temp, 25
+    brlo MAIN_LOOP
+    subi temp, 2 
+    sts OCR2A, temp
+    rcall USART_SendAckInc
+    rjmp MAIN_LOOP
+
+DEC_FREQ:
+    lds temp, OCR2A
+    cpi temp, 250
+    brsh MAIN_LOOP
+    subi temp, -2
+    sts OCR2A, temp
+    rcall USART_SendAckDec
+    rjmp MAIN_LOOP
+
