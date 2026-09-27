@@ -238,6 +238,9 @@ RETURN_TO_HOME_ROW2:
     ldi R_LOOP, 80
     rcall DO_N_STEPS
 
+; Ejecutar el regreso estándar a HOME
+    rcall RETURN_TO_HOME
+    ret
 
 
 
