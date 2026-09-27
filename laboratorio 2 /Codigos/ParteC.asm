@@ -1009,6 +1009,16 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+ ; --------------------------------------------------------------------------
+  ; 6. LENGUA GIGANTE (CENTRADA EN X = 0)
+ ; --------------------------------------------------------------------------
+    ; Ir a la esquina superior izquierda de la lengua (-8, -4)
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 21
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
 
 
 
