@@ -55,6 +55,8 @@ RESET:
     ldi R_TEMP, LOW(UBRR_VAL)
     sts UBRR0L, R_TEMP
 
+    ldi R_TEMP, (1 << RXEN0) | (1 << TXEN0)
+    sts UCSR0B, R_TEMP
 
 
 
