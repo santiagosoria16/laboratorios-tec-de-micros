@@ -1020,5 +1020,22 @@ DRAW_POKEMON:
     ldi R_LOOP, 6
     rcall DO_N_STEPS
 
+    rcall PEN_DOWN
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+    ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 4
+    rcall DO_N_STEPS
+    ldi R_TEMP, (MOVE_UP | MOVE_RIGHT)
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+    rcall PEN_UP
 
 
