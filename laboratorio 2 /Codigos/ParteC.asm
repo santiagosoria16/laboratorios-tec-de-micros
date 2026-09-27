@@ -203,6 +203,31 @@ G_LEFT_LOOP:
     rcall DELAY_RELAY
     ret
 
+; Subrutina de salto de Fila 1 a Fila 2 (Vuelve a la izquierda 20s y baja)
+MOVE_TO_ROW2:
+    rcall PEN_UP
+
+    ; Retorno hacia la izquierda (20s)
+    ldi R_TEMP, MOVE_LEFT
+    rcall MOVE_RAW_DIRECT
+
+    ldi R_LOOP, 8               ; 8 x 2.5s = 20 segundos exactos
+M_ROW2_LEFT:
+    rcall DELAY_FAR_LEFT
+    dec R_LOOP
+    brne M_ROW2_LEFT
+
+    ldi R_TEMP, 0x00
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_RELAY
+
+    ; Bajar a la Fila 2 (80 pasos en -Y para no encimar las figuras)
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 80
+    rcall DO_N_STEPS
+
+    rcall DELAY_MEDIUM
+    ret
 
 
 
