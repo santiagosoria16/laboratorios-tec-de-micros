@@ -640,6 +640,16 @@ ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
 
     ret
 
+; ------------------------------------------------------------------------------
+; SUBRUTINA AUXILIAR PARA PASOS REPETITIVOS
+; ------------------------------------------------------------------------------
+DO_N_STEPS:
+    push R_TEMP
+    rcall MOVE_SUPER_SHORT_STEP
+    pop R_TEMP
+    dec R_LOOP
+    brne DO_N_STEPS
+    ret
 
 
 
