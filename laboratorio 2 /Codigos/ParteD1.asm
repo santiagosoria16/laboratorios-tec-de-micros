@@ -9,3 +9,32 @@
 .org 0x0000
     rjmp reset
 
+reset:
+
+    ldi r16, HIGH(RAMEND)
+    out SPH, r16
+    ldi r16, LOW(RAMEND)
+    out SPL, r16
+
+
+    cbi DDRB, DDB0
+    cbi DDRB, DDB1
+    cbi DDRB, DDB2
+
+    sbi PORTB, PORTB0
+    sbi PORTB, PORTB1
+    sbi PORTB, PORTB2
+
+
+    ldi r16, HIGH(UBRR_VAL)
+    sts UBRR0H, r16
+    ldi r16, LOW(UBRR_VAL)
+    sts UBRR0L, r16
+
+
+    ldi r16, (1<<TXEN0)
+    sts UCSR0B, r16
+
+    ldi r16, (1<<UCSZ01) | (1<<UCSZ00)
+    sts UCSR0C, r16
+
