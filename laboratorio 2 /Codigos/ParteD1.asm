@@ -51,3 +51,15 @@ main_loop:
     rcall delay_ms
 
     rjmp main_loop
+
+; --------------------------------------------------------------------
+; Subrutina: Transmision USART
+; --------------------------------------------------------------------
+usart_transmit:
+    lds r17, UCSR0A
+    sbrs r17, UDRE0
+    rjmp usart_transmit
+
+    sts UDR0, r16
+    ret
+
