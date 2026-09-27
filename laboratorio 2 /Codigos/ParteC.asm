@@ -99,6 +99,11 @@ WAIT_COMMAND:
 ; RUTINAS INTERMEDIAS DE SALTO
 ; ------------------------------------------------------------------------------
 
+DO_TRIANGLE:
+    rcall GO_TO_CENTER
+    rcall DRAW_TRIANGLE
+    rcall RETURN_TO_HOME
+    rjmp MAIN_LOOP
 
 
 
