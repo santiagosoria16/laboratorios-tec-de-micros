@@ -1052,4 +1052,53 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+ ; --------------------------------------------------------------------------
+    ; 7. CONCHA INFERIOR / FALDA LATERAL
+    ; --------------------------------------------------------------------------
+    ; Lado Izquierdo (-24, 0)
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 24
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 26
+    rcall DO_N_STEPS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
