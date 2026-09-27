@@ -1122,6 +1122,58 @@ DRAW_POKEMON:
 ; ==============================================================================
 ; CONTROL DE ACTUADORES Y TIEMPOS DE CONMUTACIÓN
 ; ==============================================================================
+PEN_DOWN:
+    ldi R_TEMP, PEN_DOWN_BIT
+    out PORTD, R_TEMP
+    rcall DELAY_RELAY
+    ret
+
+PEN_UP:
+    ldi R_TEMP, PEN_UP_BIT
+    out PORTD, R_TEMP
+    rcall DELAY_RELAY
+    ret
+
+MOVE_STEP:
+    in R_DELAY2, PORTD
+    andi R_DELAY2, (PEN_DOWN_BIT | PEN_UP_BIT)
+    or R_TEMP, R_DELAY2
+    out PORTD, R_TEMP
+    rcall DELAY_MEDIUM
+    out PORTD, R_DELAY2
+    rcall DELAY_RELAY
+    ret
+
+MOVE_SHORT_STEP:
+    in R_DELAY2, PORTD
+    andi R_DELAY2, (PEN_DOWN_BIT | PEN_UP_BIT)
+    or R_TEMP, R_DELAY2
+    out PORTD, R_TEMP
+    rcall DELAY_SHORT
+    out PORTD, R_DELAY2
+    rcall DELAY_RELAY
+    ret
+
+MOVE_SUPER_SHORT_STEP:
+    in R_DELAY2, PORTD
+    andi R_DELAY2, (PEN_DOWN_BIT | PEN_UP_BIT)
+    or R_TEMP, R_DELAY2
+    out PORTD, R_TEMP
+    rcall DELAY_SUPER_SHORT
+    out PORTD, R_DELAY2
+    rcall DELAY_RELAY
+    ret
+
+MOVE_STEP_LONG:
+    in R_DELAY2, PORTD
+    andi R_DELAY2, (PEN_DOWN_BIT | PEN_UP_BIT)
+    or R_TEMP, R_DELAY2
+    out PORTD, R_TEMP
+    rcall DELAY_LONG
+    out PORTD, R_DELAY2
+    rcall DELAY_RELAY
+    ret
+
 
 
 
