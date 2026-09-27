@@ -38,3 +38,16 @@ reset:
     ldi r16, (1<<UCSZ01) | (1<<UCSZ00)
     sts UCSR0C, r16
 
+main_loop:
+
+    in r16, PINB
+    andi r16, 0x07
+
+    com r16             
+    andi r16, 0x07
+
+    rcall usart_transmit
+
+    rcall delay_ms
+
+    rjmp main_loop
