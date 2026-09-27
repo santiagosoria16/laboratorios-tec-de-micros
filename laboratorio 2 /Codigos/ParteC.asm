@@ -908,6 +908,13 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+ ; --------------------------------------------------------------------------
+    ; 4. CAVIDAD DE LA CARA (JUSTO DEBAJO DE LA VISERA)
+    ; --------------------------------------------------------------------------
+    ; Ir a (-24, 8)
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 40
+    rcall DO_N_STEPS
 
 
 
