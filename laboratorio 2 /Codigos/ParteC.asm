@@ -179,6 +179,18 @@ GO_TO_CENTER:
     ret
 
 ; Posiciona en el tope izquierdo (8 ciclos x 2.5s = EXATOS 20s)
+GO_TO_FAR_LEFT:
+    rcall PEN_UP
+
+    ldi R_TEMP, (MOVE_LEFT | MOVE_DOWN)
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_CENTER_Y
+    ldi R_TEMP, 0x00
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_RELAY
+
+    ldi R_TEMP, MOVE_LEFT
+    rcall MOVE_RAW_DIRECT
 
 
 
