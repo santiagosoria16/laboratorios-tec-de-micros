@@ -53,3 +53,18 @@ usart_receive:
 
     lds r16, UDR0
     ret
+
+; --------------------------------------------------------------------
+; Subrutina: Decodificador 1 de 8 (Activa un solo LED)
+; --------------------------------------------------------------------
+decode_and_display:
+    clr r17
+    clr r18
+
+    cpi r16, 6
+    brsh output_portc
+
+output_portb:
+    ldi r17, 1
+    tst r16
+    breq set_ports
