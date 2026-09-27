@@ -1260,7 +1260,18 @@ PRINT_LOOP:
 PRINT_END:
     ret
 
-
+; ------------------------------------------------------------------------------
+; CADENA DE TEXTO EN MEMORIA FLASH
+; ------------------------------------------------------------------------------
+STR_MENU:
+    .db 0x0D, 0x0A, "=== MENU PLOTTER MECATRONICA ===", 0x0D, 0x0A
+    .db "1. Triangulo", 0x0D, 0x0A
+    .db "2. Circulo (Grande) ", 0x0D, 0x0A
+    .db "3. Pentagrama ", 0x0D, 0x0A
+    .db "4. Figura Libre (Casa)", 0x0D, 0x0A
+    .db "P. Pokemon (Shellder #090)", 0x0D, 0x0A
+    .db "T. Dibujar Todas", 0x0D, 0x0A
+    .db "Opcion:  ", 0
 
 
 
