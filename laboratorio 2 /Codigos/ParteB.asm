@@ -197,3 +197,12 @@ USART_SendAckInc:
 USART_SendAckDec:
     ldi ZL, LOW(msg_ack_dec * 2)
     ldi ZH, HIGH(msg_ack_dec * 2)
+
+USART_SendString:
+    lpm temp, Z+
+    tst temp
+    breq USART_SendString_Done
+    rcall USART_TxChar
+    rjmp USART_SendString
+USART_SendString_Done:
+    ret
