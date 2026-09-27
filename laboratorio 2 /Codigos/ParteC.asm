@@ -403,6 +403,40 @@ ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
     ldi R_LOOP, 5
     rcall DO_N_STEPS
 
+ ; CUADRANTE 2
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 5
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 3
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 3
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 2
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 2
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 2
+    rcall DO_N_STEPS
 
 
 
