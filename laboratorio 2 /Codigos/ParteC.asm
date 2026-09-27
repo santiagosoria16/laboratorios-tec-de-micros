@@ -960,6 +960,26 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+  ; Pupila Izquierda (-12, 2)
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 3
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 3
+    rcall DO_N_STEPS
+    rcall PEN_DOWN
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    rcall PEN_UP
+
+    ; Ojo Derecho (+9, 5)
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 3
+    rcall DO_N_STEPS
 
 
 
