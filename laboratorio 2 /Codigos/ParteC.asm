@@ -229,6 +229,14 @@ M_ROW2_LEFT:
     rcall DELAY_MEDIUM
     ret
 
+; Regreso a HOME desde la Fila 2
+RETURN_TO_HOME_ROW2:
+    rcall PEN_UP
+
+    ; Compensar la bajada de la Fila 2 subiendo 80 pasos
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 80
+    rcall DO_N_STEPS
 
 
 
