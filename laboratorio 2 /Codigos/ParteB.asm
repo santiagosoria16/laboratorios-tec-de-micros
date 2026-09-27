@@ -206,3 +206,34 @@ USART_SendString:
     rjmp USART_SendString
 USART_SendString_Done:
     ret
+
+msg_menu:
+    .db 13, 10
+    .db "+------------------------------------------+", 13, 10
+    .db "|       GENERADOR DE SE~ALES DAC R-2R      |", 13, 10
+    .db "+------------------------------------------+", 13, 10
+    .db "| SELECCION DE SE~AL:                      |", 13, 10
+    .db "|   [ 1 ]  -> Seno del Senoidal            |", 13, 10
+    .db "|   [ 2 ]  -> Onda Escalonada              |", 13, 10
+    .db "|                                          |", 13, 10
+    .db "| CONTROL DE FRECUENCIA:                   |", 13, 10
+    .db "|   [ + ]  -> Aumentar Frecuencia          |", 13, 10
+    .db "|   [ - ]  -> Disminuir Frecuencia         |", 13, 10
+    .db "|                                          |", 13, 10
+    .db "| OTROS COMANDOS:                          |", 13, 10
+    .db "|   [ m ]  -> Reimprimir este menu         |", 13, 10
+    .db "+------------------------------------------+", 13, 10
+    .db " Ingrese opcion > ", 0, 0
+
+msg_ack1:
+    .db 13, 10, "[OK] Senal 1 (Senoidal) activa.", 13, 10, 0
+
+msg_ack2:
+    .db 13, 10, "[OK] Senal 17 (Escalonada) activa.", 13, 10, 0, 0
+
+msg_ack_inc:
+    .db 13, 10, "[+] Frecuencia AUMENTADA", 13, 10, 0, 0
+
+msg_ack_dec:
+    .db 13, 10, "[-] Frecuencia DISMINUIDA", 13, 10, 0
+
