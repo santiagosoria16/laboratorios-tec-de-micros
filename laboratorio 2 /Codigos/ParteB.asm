@@ -83,3 +83,15 @@ MAIN_LOOP:
 
     rjmp MAIN_LOOP
 
+SHOW_MENU:
+    rcall USART_SendMenu
+    rjmp MAIN_LOOP
+
+SELECT_SIG1:
+    cli
+    ldi tbl_base_l, LOW(signal_1 * 2)
+    ldi tbl_base_h, HIGH(signal_1 * 2)
+    clr sample_idx
+    sei
+    rcall USART_SendAck1
+    rjmp MAIN_LOOP
