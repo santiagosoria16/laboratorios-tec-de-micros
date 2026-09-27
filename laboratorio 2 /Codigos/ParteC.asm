@@ -80,6 +80,20 @@ WAIT_COMMAND:
     cpi R_DATA, '3'
     breq DO_PENTAGRAM
 
+    cpi R_DATA, '4'
+    breq DO_FREE_FIG
+
+    cpi R_DATA, 'P'
+    breq DO_POKEMON
+    cpi R_DATA, 'p'
+    breq DO_POKEMON
+
+    cpi R_DATA, 'T'
+    breq DO_ALL
+    cpi R_DATA, 't'
+    breq DO_ALL
+
+    rjmp WAIT_COMMAND
 
 
 
