@@ -49,3 +49,38 @@ RESET:
     out DDRD, R_TEMP
     ldi R_TEMP, PEN_UP_BIT       ; Estado inicial: Lápiz arriba
     out PORTD, R_TEMP
+
+    ldi R_TEMP, HIGH(UBRR_VAL)
+    sts UBRR0H, R_TEMP
+    ldi R_TEMP, LOW(UBRR_VAL)
+    sts UBRR0L, R_TEMP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
