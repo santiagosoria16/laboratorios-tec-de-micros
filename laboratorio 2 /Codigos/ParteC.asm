@@ -170,6 +170,13 @@ GO_TO_CENTER:
     rcall MOVE_RAW_DIRECT
     rcall DELAY_RELAY
 
+    ldi R_TEMP, MOVE_LEFT
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_CENTER_X_EXTRA
+    ldi R_TEMP, 0x00
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_RELAY
+    ret
 
 
 
