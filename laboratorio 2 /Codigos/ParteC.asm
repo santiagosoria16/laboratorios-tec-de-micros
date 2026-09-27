@@ -58,6 +58,8 @@ RESET:
     ldi R_TEMP, (1 << RXEN0) | (1 << TXEN0)
     sts UCSR0B, R_TEMP
 
+    ldi R_TEMP, (1 << UCSZ01) | (1 << UCSZ00)
+    sts UCSR0C, R_TEMP
 
 
 
