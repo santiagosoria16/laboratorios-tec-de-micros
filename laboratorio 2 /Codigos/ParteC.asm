@@ -768,6 +768,34 @@ DRAW_FREE_FIG:
 ; POKÉMON: SHELLDER (#090) - VERSIÓN CORREGIDA Y ALINEADA (ESCALA GRANDE)
 ; Centrado exacto en (0,0)
 ; ==============================================================================
+DRAW_POKEMON:
+    rcall PEN_UP
+
+    ; --------------------------------------------------------------------------
+    ; 1. CORONA / BISAGRA SUPERIOR (X: -10 a +10, Y: +30 a +36)
+    ; --------------------------------------------------------------------------
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 10
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 30
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+    rcall PEN_UP
+
 
 
 
