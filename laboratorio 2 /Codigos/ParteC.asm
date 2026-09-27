@@ -242,6 +242,47 @@ RETURN_TO_HOME_ROW2:
     rcall RETURN_TO_HOME
     ret
 
+RETURN_TO_HOME:
+    rcall PEN_UP
+
+    ldi R_TEMP, MOVE_RIGHT
+    rcall MOVE_RAW_DIRECT
+
+    ldi R_LOOP, 8               ; 8 x 2.5s = 20 segundos exactos
+R_HOME_LOOP:
+    rcall DELAY_FAR_LEFT
+    dec R_LOOP
+    brne R_HOME_LOOP
+
+    ldi R_TEMP, 0x00
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_RELAY
+
+    ldi R_TEMP, (MOVE_RIGHT | MOVE_UP)
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_CENTER_Y
+    ldi R_TEMP, 0x00
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_RELAY
+    ret
+
+SHIFT_RIGHT_3CM:
+    rcall PEN_UP
+    ldi R_LOOP, 85              ; ~3.2 cm de separación a la derecha
+S_RIGHT_LOOP:
+    ldi R_TEMP, MOVE_RIGHT
+    rcall MOVE_SUPER_SHORT_STEP
+    dec R_LOOP
+    brne S_RIGHT_LOOP
+    rcall DELAY_MEDIUM
+    ret
+
+MOVE_RAW_DIRECT:
+    in R_DELAY2, PORTD
+    andi R_DELAY2, (PEN_DOWN_BIT | PEN_UP_BIT)
+    or R_TEMP, R_DELAY2
+    out PORTD, R_TEMP
+    ret
 
 
 
