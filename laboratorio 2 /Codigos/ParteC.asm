@@ -29,3 +29,9 @@
 .equ MOVE_UP      = (1 << PD5)  ; D5 -> X6: Mover hacia arriba (+Y)
 .equ MOVE_LEFT    = (1 << PD7)  ; D6 -> X7: Mover hacia la izquierda (-X)
 .equ MOVE_RIGHT   = (1 << PD6)  ; D7 -> X10: Mover hacia la derecha (+X)
+
+; ------------------------------------------------------------------------------
+; VECTOR DE INTERRUPCIONES
+; ------------------------------------------------------------------------------
+.org 0x0000
+    rjmp RESET
