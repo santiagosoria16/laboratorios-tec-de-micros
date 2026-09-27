@@ -123,6 +123,11 @@ DO_FREE_FIG:
     rcall RETURN_TO_HOME
     rjmp MAIN_LOOP
 
+DO_POKEMON:
+    rcall GO_TO_CENTER
+    rcall DRAW_POKEMON
+    rcall RETURN_TO_HOME
+    rjmp MAIN_LOOP
 
 
 
