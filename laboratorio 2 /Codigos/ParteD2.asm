@@ -68,3 +68,15 @@ output_portb:
     ldi r17, 1
     tst r16
     breq set_ports
+
+shift_b:
+    lsl r17
+    dec r16
+    brne shift_b
+    rjmp set_ports
+
+output_portc:
+    subi r16, 6
+    ldi r18, 1
+    tst r16
+    breq set_ports
