@@ -144,6 +144,18 @@ DO_ALL:
 
     rcall DRAW_PENTAGRAM
 
+    ; --- SALTO A FILA 2 (RETORNO A LA IZQUIERDA Y BAJADA) ---
+    rcall MOVE_TO_ROW2
+
+    ; --- FILA 2 (ABAJO) ---
+    rcall DRAW_FREE_FIG
+    rcall SHIFT_RIGHT_3CM
+
+    rcall DRAW_POKEMON
+
+    ; --- REGRESO A HOME DESDE FILA 2 ---
+    rcall RETURN_TO_HOME_ROW2
+    rjmp MAIN_LOOP
 
 
 
