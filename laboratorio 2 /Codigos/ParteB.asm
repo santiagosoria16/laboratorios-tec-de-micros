@@ -174,6 +174,16 @@ USART_TxChar:
     sts UDR0, temp
     ret
 
+USART_SendAck1:
+    ldi ZL, LOW(msg_ack1 * 2)
+    ldi ZH, HIGH(msg_ack1 * 2)
+    rjmp USART_SendString
+
+USART_SendAck2:
+    ldi ZL, LOW(msg_ack2 * 2)
+    ldi ZH, HIGH(msg_ack2 * 2)
+    rjmp USART_SendString
+
 USART_SendMenu:
     ldi ZL, LOW(msg_menu * 2)
     ldi ZH, HIGH(msg_menu * 2)
