@@ -44,3 +44,8 @@ RESET:
     out SPH, R_TEMP
     ldi R_TEMP, LOW(RAMEND)
     out SPL, R_TEMP
+
+    ldi R_TEMP, 0xFC             ; Bits 2-7 como salidas
+    out DDRD, R_TEMP
+    ldi R_TEMP, PEN_UP_BIT       ; Estado inicial: Lápiz arriba
+    out PORTD, R_TEMP
