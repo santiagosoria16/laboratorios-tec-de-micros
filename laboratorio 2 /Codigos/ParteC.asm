@@ -318,6 +318,74 @@ T_STEP3:
     rcall PEN_UP
     ret
 
+; ==============================================================================
+; CÍRCULO MINECRAFT PERFECTO (R = 30 pasos, 30x30 por cuadrante)
+; ==============================================================================
+DRAW_CIRCLE:
+    rcall PEN_UP
+
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 30
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+
+    ; CUADRANTE 1
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 5
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 4
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 2
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 3
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 1
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 2
+    rcall DO_N_STEPS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
