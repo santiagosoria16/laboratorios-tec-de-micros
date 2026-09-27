@@ -166,3 +166,15 @@ TIMER2_COMPA_ISR:
     out SREG, temp
     pop temp
     reti
+
+USART_TxChar:
+    lds temp2, UCSR0A
+    sbrs temp2, UDRE0
+    rjmp USART_TxChar
+    sts UDR0, temp
+    ret
+
+USART_SendMenu:
+    ldi ZL, LOW(msg_menu * 2)
+    ldi ZH, HIGH(msg_menu * 2)
+    rjmp USART_SendString
