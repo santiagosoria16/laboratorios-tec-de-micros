@@ -105,6 +105,11 @@ DO_TRIANGLE:
     rcall RETURN_TO_HOME
     rjmp MAIN_LOOP
 
+DO_CIRCLE:
+    rcall GO_TO_CENTER
+    rcall DRAW_CIRCLE
+    rcall RETURN_TO_HOME
+    rjmp MAIN_LOOP
 
 
 
