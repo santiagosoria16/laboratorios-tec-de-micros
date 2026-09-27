@@ -117,6 +117,11 @@ DO_PENTAGRAM:
     rcall RETURN_TO_HOME
     rjmp MAIN_LOOP
 
+DO_FREE_FIG:
+    rcall GO_TO_CENTER
+    rcall DRAW_FREE_FIG
+    rcall RETURN_TO_HOME
+    rjmp MAIN_LOOP
 
 
 
