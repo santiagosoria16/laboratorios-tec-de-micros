@@ -860,6 +860,53 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+  ; --------------------------------------------------------------------------
+    ; 3. CRESTAS VERTICALES DE LA CONCHA
+    ; --------------------------------------------------------------------------
+    ; Cresta Central (0, 28) -> (0, 8)
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 16
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+    rcall PEN_UP
+
+    ; Cresta Izquierda (-10, 26) -> (-16, 8)
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 10
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 18
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+    ldi R_TEMP, (MOVE_DOWN | MOVE_LEFT)
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 12
+    rcall DO_N_STEPS
+    rcall PEN_UP
+
+    ; Cresta Derecha (+10, 26) -> (+16, 8)
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 26
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 18
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+    ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 12
+    rcall DO_N_STEPS
+    rcall PEN_UP
 
 
 
