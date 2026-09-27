@@ -192,6 +192,16 @@ GO_TO_FAR_LEFT:
     ldi R_TEMP, MOVE_LEFT
     rcall MOVE_RAW_DIRECT
 
+  ldi R_LOOP, 8               ; 8 x 2.5s = 20 segundos exactos
+G_LEFT_LOOP:
+    rcall DELAY_FAR_LEFT
+    dec R_LOOP
+    brne G_LEFT_LOOP
+
+    ldi R_TEMP, 0x00
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_RELAY
+    ret
 
 
 
