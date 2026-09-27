@@ -132,6 +132,17 @@ DO_POKEMON:
 ; ------------------------------------------------------------------------------
 ; SECUENCIA COMPLETA EN 2 FILAS
 ; ------------------------------------------------------------------------------
+DO_ALL:
+    rcall GO_TO_FAR_LEFT        ; Posiciona en el tope izquierdo (Fila 1)
+
+    ; --- FILA 1 (ARRIBA) ---
+    rcall DRAW_TRIANGLE
+    rcall SHIFT_RIGHT_3CM
+
+    rcall DRAW_CIRCLE
+    rcall SHIFT_RIGHT_3CM
+
+    rcall DRAW_PENTAGRAM
 
 
 
