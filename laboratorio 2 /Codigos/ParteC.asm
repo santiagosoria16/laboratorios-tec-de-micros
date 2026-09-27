@@ -1230,6 +1230,35 @@ D10_INNER:
     brne D10_OUTER
     ret
 
+; ==============================================================================
+; COMUNICACIÓN SERIAL USART
+; ==============================================================================
+USART_RECEIVE:
+    lds R_TEMP, UCSR0A
+    sbrs R_TEMP, RXC0
+    rjmp USART_RECEIVE
+    lds R_DATA, UDR0
+    ret
+
+USART_TRANSMIT:
+    lds R_TEMP, UCSR0A
+    sbrs R_TEMP, UDRE0
+    rjmp USART_TRANSMIT
+    sts UDR0, R_DATA
+    ret
+
+PRINT_MENU:
+    ldi ZL, LOW(STR_MENU * 2)
+    ldi ZH, HIGH(STR_MENU * 2)
+
+PRINT_LOOP:
+    lpm R_DATA, Z+
+    cpi R_DATA, 0
+    breq PRINT_END
+    rcall USART_TRANSMIT
+    rjmp PRINT_LOOP
+PRINT_END:
+    ret
 
 
 
