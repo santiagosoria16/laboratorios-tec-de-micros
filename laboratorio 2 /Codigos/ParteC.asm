@@ -687,6 +687,30 @@ L_HORIZ_R:
     dec R_LOOP
     brne L_HORIZ_R
 
+  ldi R_LOOP, 27
+L_SHALLOW_DL:
+    ldi R_TEMP, (MOVE_DOWN | MOVE_LEFT)
+    rcall MOVE_SUPER_SHORT_STEP
+    ldi R_TEMP, (MOVE_DOWN | MOVE_LEFT)
+    rcall MOVE_SUPER_SHORT_STEP
+    ldi R_TEMP, MOVE_LEFT
+    rcall MOVE_SUPER_SHORT_STEP
+    dec R_LOOP
+    brne L_SHALLOW_DL
+
+    ldi R_LOOP, 31
+L_STEEP_UR:
+    ldi R_TEMP, MOVE_UP
+    rcall MOVE_SUPER_SHORT_STEP
+    ldi R_TEMP, MOVE_UP
+    rcall MOVE_SUPER_SHORT_STEP
+    ldi R_TEMP, (MOVE_UP | MOVE_RIGHT)
+    rcall MOVE_SUPER_SHORT_STEP
+    dec R_LOOP
+    brne L_STEEP_UR
+
+    rcall PEN_UP
+    ret
 
 
 
