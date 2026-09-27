@@ -1038,4 +1038,18 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+    ; Línea central de la lengua (0, -6) -> (0, -26)
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 8
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 2
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+    rcall PEN_UP
+
 
