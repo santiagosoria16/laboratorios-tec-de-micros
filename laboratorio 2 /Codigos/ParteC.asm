@@ -716,6 +716,26 @@ L_STEEP_UR:
 ; FIGURA LIBRE: LA CASITA
 ; ------------------------------------------------------------------------------
 
+DRAW_FREE_FIG:
+    rcall PEN_UP
+
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 40
+    rcall DO_N_STEPS
+
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 30
+    rcall DO_N_STEPS
 
 
 
