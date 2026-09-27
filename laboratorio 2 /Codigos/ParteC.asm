@@ -65,7 +65,20 @@ RESET:
 ; BUCLE PRINCIPAL Y MENÚ DE COMANDOS
 ; ------------------------------------------------------------------------------
 
+MAIN_LOOP:
+    rcall PRINT_MENU
 
+WAIT_COMMAND:
+    rcall USART_RECEIVE
+
+    cpi R_DATA, '1'
+    breq DO_TRIANGLE
+
+    cpi R_DATA, '2'
+    breq DO_CIRCLE
+
+    cpi R_DATA, '3'
+    breq DO_PENTAGRAM
 
 
 
