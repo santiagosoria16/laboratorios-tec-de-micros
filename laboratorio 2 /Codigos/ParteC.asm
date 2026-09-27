@@ -937,6 +937,28 @@ DRAW_POKEMON:
  ; --------------------------------------------------------------------------
 ; 5. OJOS Y PUPILAS (SIMÉTRICOS)
 ; --------------------------------------------------------------------------
+; Ojo Izquierdo (-15, 5)
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 39
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 3
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    rcall PEN_UP
 
 
 
