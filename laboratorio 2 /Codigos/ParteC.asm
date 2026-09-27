@@ -737,6 +737,33 @@ DRAW_FREE_FIG:
     ldi R_LOOP, 30
     rcall DO_N_STEPS
 
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 40
+    rcall DO_N_STEPS
+
+    ldi R_TEMP, MOVE_UP
+    ldi R_LOOP, 30
+    rcall DO_N_STEPS
+
+    ldi R_TEMP, (MOVE_UP | MOVE_RIGHT)
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+
+    ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+
+    rcall PEN_UP
+
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 20
+    rcall DO_N_STEPS
+
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 10
+    rcall DO_N_STEPS
+
+    ret
 
 
 
