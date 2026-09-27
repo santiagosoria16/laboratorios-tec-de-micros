@@ -1177,6 +1177,59 @@ MOVE_STEP_LONG:
 ; ==============================================================================
 ; SUBRUTINAS DE RETARDO
 ; ==============================================================================
+DELAY_RELAY:
+    ldi R_DELAY1, 10
+DELAY_R_LOOP:
+    rcall DELAY_10MS
+    dec R_DELAY1
+    brne DELAY_R_LOOP
+    ret
+
+DELAY_SUPER_SHORT:
+    ldi R_DELAY1, 4
+    rjmp DELAY_MULTI
+
+DELAY_SHORT:
+    ldi R_DELAY1, 15
+    rjmp DELAY_MULTI
+
+DELAY_MEDIUM:
+    ldi R_DELAY1, 150
+    rjmp DELAY_MULTI
+
+DELAY_LONG:
+    ldi R_DELAY1, 240
+    rjmp DELAY_MULTI
+
+DELAY_CENTER_Y:
+    ldi R_DELAY1, 80
+    rjmp DELAY_MULTI
+
+DELAY_CENTER_X_EXTRA:
+    ldi R_DELAY1, 150
+    rjmp DELAY_MULTI
+
+DELAY_FAR_LEFT:
+    ldi R_DELAY1, 250          ; 250 x 10ms = 2.5 segundos por iteración
+    rjmp DELAY_MULTI
+
+DELAY_MULTI:
+    rcall DELAY_10MS
+    dec R_DELAY1
+    brne DELAY_MULTI
+    ret
+
+DELAY_10MS:
+    ldi R_DELAY2, 213
+D10_OUTER:
+    ldi R_DELAY3, 250
+D10_INNER:
+    dec R_DELAY3
+    brne D10_INNER
+    dec R_DELAY2
+    brne D10_OUTER
+    ret
+
 
 
 
