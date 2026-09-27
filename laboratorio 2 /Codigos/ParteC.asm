@@ -796,6 +796,69 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+  ; --------------------------------------------------------------------------
+    ; 2. CONCHA SUPERIOR Y CUERNOS GRANDES
+    ; --------------------------------------------------------------------------
+    ; Ir al inicio del domo superior (-16, 28)
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_DOWN
+    ldi R_LOOP, 2
+    rcall DO_N_STEPS
+
+    rcall PEN_DOWN
+
+    ; Arco a la base del cuerno izquierdo
+    ldi R_TEMP, (MOVE_DOWN | MOVE_LEFT)
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+
+    ; Cuerno Izquierdo (Punta hacia afuera)
+    ldi R_TEMP, (MOVE_UP | MOVE_LEFT)
+    ldi R_LOOP, 12
+    rcall DO_N_STEPS
+    ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
+    ldi R_LOOP, 14
+    rcall DO_N_STEPS
+
+    ; Borde exterior izquierdo
+    ldi R_TEMP, (MOVE_DOWN | MOVE_LEFT)
+    ldi R_LOOP, 8
+    rcall DO_N_STEPS
+
+    ; Visera / Borde inferior curvo de la concha (Cubre la cara)
+    ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
+    ldi R_LOOP, 4
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_RIGHT
+    ldi R_LOOP, 48
+    rcall DO_N_STEPS
+    ldi R_TEMP, (MOVE_UP | MOVE_RIGHT)
+    ldi R_LOOP, 4
+    rcall DO_N_STEPS
+
+    ; Borde exterior derecho
+    ldi R_TEMP, (MOVE_UP | MOVE_LEFT)
+    ldi R_LOOP, 8
+    rcall DO_N_STEPS
+
+    ; Cuerno Derecho (Punta hacia afuera)
+    ldi R_TEMP, (MOVE_UP | MOVE_RIGHT)
+    ldi R_LOOP, 14
+    rcall DO_N_STEPS
+    ldi R_TEMP, (MOVE_DOWN | MOVE_LEFT)
+    ldi R_LOOP, 12
+    rcall DO_N_STEPS
+
+    ; Domo superior
+    ldi R_TEMP, (MOVE_UP | MOVE_LEFT)
+    ldi R_LOOP, 6
+    rcall DO_N_STEPS
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 32
+    rcall DO_N_STEPS
+    rcall PEN_UP
 
 
 
