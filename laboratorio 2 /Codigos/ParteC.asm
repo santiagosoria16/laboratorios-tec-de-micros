@@ -178,7 +178,7 @@ GO_TO_CENTER:
     rcall DELAY_RELAY
     ret
 
-
+; Posiciona en el tope izquierdo (8 ciclos x 2.5s = EXATOS 20s)
 
 
 
