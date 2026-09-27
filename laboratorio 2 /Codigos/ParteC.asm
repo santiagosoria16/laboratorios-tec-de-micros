@@ -655,6 +655,19 @@ DO_N_STEPS:
 ; PENTAGRAMA
 ; ------------------------------------------------------------------------------
 
+DRAW_PENTAGRAM:
+    rcall PEN_DOWN
+
+    ldi R_LOOP, 31
+L_STEEP_DR:
+    ldi R_TEMP, MOVE_DOWN
+    rcall MOVE_SUPER_SHORT_STEP
+    ldi R_TEMP, MOVE_DOWN
+    rcall MOVE_SUPER_SHORT_STEP
+    ldi R_TEMP, (MOVE_DOWN | MOVE_RIGHT)
+    rcall MOVE_SUPER_SHORT_STEP
+    dec R_LOOP
+    brne L_STEEP_DR
 
 
 
