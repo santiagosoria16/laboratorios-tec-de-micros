@@ -37,3 +37,19 @@ reset:
     ldi r16, (1<<UCSZ01) | (1<<UCSZ00)
     sts UCSR0C, r16
 
+main_loop:
+    rcall usart_receive
+    andi r16, 0x07
+    rcall decode_and_display
+    rjmp main_loop
+
+; --------------------------------------------------------------------
+; Subrutina: Recepcion USART
+; --------------------------------------------------------------------
+usart_receive:
+    lds r17, UCSR0A
+    sbrs r17, RXC0
+    rjmp usart_receive
+
+    lds r16, UDR0
+    ret
