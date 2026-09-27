@@ -188,3 +188,12 @@ USART_SendMenu:
     ldi ZL, LOW(msg_menu * 2)
     ldi ZH, HIGH(msg_menu * 2)
     rjmp USART_SendString
+
+USART_SendAckInc:
+    ldi ZL, LOW(msg_ack_inc * 2)
+    ldi ZH, HIGH(msg_ack_inc * 2)
+    rjmp USART_SendString
+
+USART_SendAckDec:
+    ldi ZL, LOW(msg_ack_dec * 2)
+    ldi ZH, HIGH(msg_ack_dec * 2)
