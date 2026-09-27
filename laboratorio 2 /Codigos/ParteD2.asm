@@ -80,3 +80,13 @@ output_portc:
     ldi r18, 1
     tst r16
     breq set_ports
+
+shift_c:
+    lsl r18
+    dec r16
+    brne shift_c
+
+set_ports:
+    out PORTB, r17
+    out PORTC, r18
+    ret
