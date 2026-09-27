@@ -1110,7 +1110,14 @@ DRAW_POKEMON:
     rcall DO_N_STEPS
     rcall PEN_UP
 
+   ; --------------------------------------------------------------------------
+    ; RETORNO EXACTO AL CENTRO (0,0)
+    ; --------------------------------------------------------------------------
+    ldi R_TEMP, MOVE_LEFT
+    ldi R_LOOP, 24
+    rcall DO_N_STEPS
 
+    ret
 
 
 
