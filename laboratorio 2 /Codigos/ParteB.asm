@@ -123,3 +123,46 @@ DEC_FREQ:
     rcall USART_SendAckDec
     rjmp MAIN_LOOP
 
+TIMER2_COMPA_ISR:
+    push temp
+    in temp, SREG
+    push temp
+    push ZL
+    push ZH
+    push temp2
+
+    mov ZL, tbl_base_l
+    mov ZH, tbl_base_h
+    add ZL, sample_idx
+    adc ZH, r1
+
+    lpm dac_val, Z
+    inc sample_idx
+
+    mov temp, dac_val
+    lsl temp
+    lsl temp
+    in temp2, PORTD
+    andi temp2, 0x03
+    or temp, temp2
+    out PORTD, temp
+
+    mov temp, dac_val
+    lsr temp
+    lsr temp
+    lsr temp
+    lsr temp
+    lsr temp
+    lsr temp
+    in temp2, PORTB
+    andi temp2, 0xFC
+    or temp, temp2
+    out PORTB, temp
+
+    pop temp2
+    pop ZH
+    pop ZL
+    pop temp
+    out SREG, temp
+    pop temp
+    reti
