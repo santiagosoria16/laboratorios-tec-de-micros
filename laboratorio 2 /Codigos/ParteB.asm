@@ -61,3 +61,25 @@ RESET:
     sei
     rcall USART_SendMenu
 
+MAIN_LOOP:
+    lds temp, UCSR0A
+    sbrs temp, RXC0
+    rjmp MAIN_LOOP
+
+    lds temp, UDR0
+
+    cpi temp, '1'
+    breq SELECT_SIG1
+    cpi temp, '2'
+    breq SELECT_SIG17
+    cpi temp, '+'
+    breq INC_FREQ
+    cpi temp, '-'
+    breq DEC_FREQ
+    cpi temp, 'm'
+    breq SHOW_MENU
+    cpi temp, 'M'
+    breq SHOW_MENU
+
+    rjmp MAIN_LOOP
+
