@@ -95,3 +95,12 @@ SELECT_SIG1:
     sei
     rcall USART_SendAck1
     rjmp MAIN_LOOP
+
+SELECT_SIG17:
+    cli
+    ldi tbl_base_l, LOW(signal_17 * 2)
+    ldi tbl_base_h, HIGH(signal_17 * 2)
+    clr sample_idx
+    sei
+    rcall USART_SendAck2
+    rjmp MAIN_LOOP
