@@ -764,6 +764,10 @@ DRAW_FREE_FIG:
     rcall DO_N_STEPS
 
     ret
+; ==============================================================================
+; POKÉMON: SHELLDER (#090) - VERSIÓN CORREGIDA Y ALINEADA (ESCALA GRANDE)
+; Centrado exacto en (0,0)
+; ==============================================================================
 
 
 
