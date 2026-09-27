@@ -17,3 +17,15 @@
 .def R_DELAY2 = r19    ; Contador Nivel 2 para subrutinas de retardo
 .def R_DELAY3 = r20    ; Contador Nivel 3 para subrutinas de retardo
 .def R_LOOP   = r21    ; Contador de repeticiones de pasos
+
+; ------------------------------------------------------------------------------
+; CONSTANTES Y MÁSCARAS DE PINES
+; ------------------------------------------------------------------------------
+.equ UBRR_VAL = 103
+
+.equ PEN_DOWN_BIT = (1 << PD2)  ; D2 -> X0: Bajar solenoide / Habilitar trazo
+.equ PEN_UP_BIT   = (1 << PD3)  ; D3 -> X1: Subir solenoide / Deshabilitar trazo
+.equ MOVE_DOWN    = (1 << PD4)  ; D4 -> X5: Mover hacia abajo (-Y)
+.equ MOVE_UP      = (1 << PD5)  ; D5 -> X6: Mover hacia arriba (+Y)
+.equ MOVE_LEFT    = (1 << PD7)  ; D6 -> X7: Mover hacia la izquierda (-X)
+.equ MOVE_RIGHT   = (1 << PD6)  ; D7 -> X10: Mover hacia la derecha (+X)
