@@ -160,6 +160,15 @@ DO_ALL:
 ; ==============================================================================
 ; POSICIONAMIENTO Y DESPLAZAMIENTOS
 ; ==============================================================================
+GO_TO_CENTER:
+    rcall PEN_UP
+
+    ldi R_TEMP, (MOVE_LEFT | MOVE_DOWN)
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_CENTER_Y
+    ldi R_TEMP, 0x00
+    rcall MOVE_RAW_DIRECT
+    rcall DELAY_RELAY
 
 
 
