@@ -284,6 +284,39 @@ MOVE_RAW_DIRECT:
     out PORTD, R_TEMP
     ret
 
+; ==============================================================================
+; SUBRUTINAS DE DIBUJO DE FIGURAS
+; ==============================================================================
+
+; ------------------------------------------------------------------------------
+; TRIÁNGULO
+; ------------------------------------------------------------------------------
+DRAW_TRIANGLE:
+    rcall PEN_DOWN
+
+    ldi R_LOOP, 54
+T_STEP1:
+    ldi R_TEMP, MOVE_DOWN
+    rcall MOVE_SUPER_SHORT_STEP
+    dec R_LOOP
+    brne T_STEP1
+
+    ldi R_LOOP, 54
+T_STEP2:
+    ldi R_TEMP, MOVE_RIGHT
+    rcall MOVE_SUPER_SHORT_STEP
+    dec R_LOOP
+    brne T_STEP2
+
+    ldi R_LOOP, 54
+T_STEP3:
+    ldi R_TEMP, (MOVE_UP | MOVE_LEFT)
+    rcall MOVE_SUPER_SHORT_STEP
+    dec R_LOOP
+    brne T_STEP3
+
+    rcall PEN_UP
+    ret
 
 
 
