@@ -110,3 +110,24 @@ void lcd_print(const char *str)
 	while (*str)
 	lcd_char(*str++);
 }
+
+#define RGB_PORT PORTB
+#define RGB_DDR  DDRB
+
+#define LED_R PB2
+#define LED_G PB3
+#define LED_B PB4
+
+#define SERVO_DDR DDRB
+#define SERVO_PIN PB1
+
+typedef struct {
+	const char *nombre;
+	uint16_t r_ref;
+	uint16_t g_ref;
+	uint16_t b_ref;
+	uint8_t angulo_servo;
+	uint8_t r_out;
+	uint8_t g_out;
+	uint8_t b_out;
+} PatronColor;
