@@ -10,3 +10,22 @@
 #define LCD_ENABLE    0x04
 #define LCD_RS        0x01
 
+uint8_t twi_wait(void)
+{
+	uint32_t timeout = 60000UL;
+
+	while (!(TWCR & (1 << TWINT))) {
+		if (--timeout == 0)
+		return 0;
+	}
+
+	return 1;
+}
+
+void twi_init(void)
+{
+	TWSR = 0x00;
+	TWBR = 72;
+	TWCR = (1 << TWEN);
+}
+
