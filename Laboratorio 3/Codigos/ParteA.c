@@ -6,23 +6,35 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdio.h>
-#define CALEFACTOR PB0 
-#define VENTILADOR PB1    
 
+// =========================================================
+// PINES Y DEFINICIONES DE HARDWARE
+// =========================================================
 
+#define CALEFACTOR PB0       // Pin digital 8
+#define VENTILADOR PB1       // Pin digital 9 - OC1A
+
+// DHT11
 #define DHT_PORT PORTC
 #define DHT_DDR  DDRC
 #define DHT_PIN  PINC
-#define DHT_BIT  PC0      
+#define DHT_BIT  PC0         // A0
 
-
-#define SDA PC4           
-#define SCL PC5      
+// LCD I2C
+#define SDA PC4              // A4
+#define SCL PC5              // A5
 #define LCD_ADDR 0x27
 
+// =========================================================
+// LIMITES DEL PUNTO MEDIO
+// =========================================================
 
 #define PM_MAX_PERMITIDO 25
 #define PM_MIN_PERMITIDO 10
+
+// =========================================================
+// VARIABLES GLOBALES
+// =========================================================
 
 volatile uint8_t flag_medir = 0;
 volatile uint16_t contador_ms = 0;
@@ -31,6 +43,10 @@ uint8_t temperatura = 0;
 uint8_t humedad = 0;
 
 int8_t punto_medio = 20;
+
+// =========================================================
+// UART
+// =========================================================
 
 void uart_init(void)
 {
@@ -79,6 +95,11 @@ void mostrar_menu_uart(void)
 	uart_print("----------------------------------------\r\n");
 }
 
+// =========================================================
+// FUNCION AUXILIAR DHT11
+// Espera que DATA alcance el nivel indicado
+// =========================================================
+
 uint8_t dht_wait_level(uint8_t nivel, uint16_t timeout_us)
 {
 	while ((((DHT_PIN & (1 << DHT_BIT)) != 0) ? 1 : 0) != nivel)
@@ -94,56 +115,80 @@ uint8_t dht_wait_level(uint8_t nivel, uint16_t timeout_us)
 	return 1;
 }
 
+// =========================================================
+// LECTURA DHT11
+// =========================================================
+
 uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 {
 	uint8_t data[5] = {0, 0, 0, 0, 0};
 	uint8_t i, j;
 	uint16_t ancho;
 
-
+	// Deshabilitar interrupciones durante la comunicación
 	cli();
 
-	DHT_DDR |= (1 << DHT_BIT); 
-	DHT_PORT &= ~(1 << DHT_BIT);
+	// ---------------------------------------------------------
+	// 1. SEÑAL DE START
+	// ---------------------------------------------------------
+
+	DHT_DDR |= (1 << DHT_BIT);      // DATA como salida
+	DHT_PORT &= ~(1 << DHT_BIT);    // LOW
 
 	_delay_ms(20);
 
-
+	// Subir DATA
 	DHT_PORT |= (1 << DHT_BIT);
 	_delay_us(30);
 
-	DHT_DDR &= ~(1 << DHT_BIT);
-	DHT_PORT |= (1 << DHT_BIT);
+	// ---------------------------------------------------------
+	// 2. LIBERAR LA LINEA
+	// ---------------------------------------------------------
 
+	DHT_DDR &= ~(1 << DHT_BIT);     // DATA como entrada
+	DHT_PORT |= (1 << DHT_BIT);     // Pull-up interno
 
+	// ---------------------------------------------------------
+	// 3. RESPUESTA DEL DHT11
+	// ---------------------------------------------------------
 
+	// El DHT11 lleva DATA a LOW
 	if (!dht_wait_level(0, 200))
 	{
 		sei();
 		return 1;
 	}
 
+	// El DHT11 lleva DATA a HIGH
 	if (!dht_wait_level(1, 200))
 	{
 		sei();
 		return 2;
 	}
 
+	// El DHT11 baja nuevamente para comenzar los datos
 	if (!dht_wait_level(0, 200))
 	{
 		sei();
 		return 3;
 	}
 
+	// ---------------------------------------------------------
+	// 4. LEER LOS 40 BITS
+	// ---------------------------------------------------------
+
 	for (j = 0; j < 5; j++)
 	{
 		for (i = 0; i < 8; i++)
 		{
+			// Esperar comienzo del HIGH
 			if (!dht_wait_level(1, 100))
 			{
 				sei();
 				return 4;
 			}
+
+			// Medir duración del HIGH
 			ancho = 0;
 
 			while (DHT_PIN & (1 << DHT_BIT))
@@ -155,6 +200,10 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 				break;
 			}
 
+			// Aproximadamente:
+			// 26 us -> 0
+			// 70 us -> 1
+
 			if (ancho > 40)
 			{
 				data[j] |= (1 << (7 - i));
@@ -164,16 +213,28 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 
 	sei();
 
+	// ---------------------------------------------------------
+	// 5. CHECKSUM
+	// ---------------------------------------------------------
+
 	if ((uint8_t)(data[0] + data[1] + data[2] + data[3]) != data[4])
 	{
 		return 6;
 	}
+
+	// ---------------------------------------------------------
+	// 6. GUARDAR RESULTADOS
+	// ---------------------------------------------------------
 
 	*hum = data[0];
 	*temp = data[2];
 
 	return 0;
 }
+
+// =========================================================
+// I2C
+// =========================================================
 
 void i2c_init(void)
 {
@@ -222,6 +283,10 @@ void i2c_write_timeout(uint8_t data)
 		break;
 	}
 }
+
+// =========================================================
+// LCD
+// =========================================================
 
 void lcd_write(uint8_t data)
 {
@@ -316,6 +381,10 @@ void lcd_init(void)
 	lcd_clear();
 }
 
+// =========================================================
+// LCD - MOSTRAR ESTADO
+// =========================================================
+
 void actualizar_pantalla_lcd_estado(uint8_t temp, int8_t pm, uint8_t status)
 {
 	char line1[17];
@@ -347,6 +416,10 @@ void actualizar_pantalla_lcd_estado(uint8_t temp, int8_t pm, uint8_t status)
 	lcd_print_str(line2);
 }
 
+// =========================================================
+// PWM TIMER1
+// =========================================================
+
 void pwm_timer1_init(void)
 {
 	DDRB |= (1 << VENTILADOR);
@@ -367,6 +440,10 @@ void set_ventilador_speed(uint8_t duty_cycle)
 {
 	OCR1A = duty_cycle;
 }
+
+// =========================================================
+// TIMER2 - MEDICION CADA 5 SEGUNDOS
+// =========================================================
 
 void timer2_init(void)
 {
@@ -390,6 +467,10 @@ ISR(TIMER2_COMPA_vect)
 	}
 }
 
+// =========================================================
+// CONTROL DE TEMPERATURA
+// =========================================================
+
 void procesar_control_temperatura(uint8_t temp)
 {
 	char buffer_uart[100];
@@ -398,6 +479,10 @@ void procesar_control_temperatura(uint8_t temp)
 	int8_t t_max_ideal     = punto_medio + 5;
 	int8_t t_max_low_fan   = punto_medio + 15;
 	int8_t t_max_med_fan   = punto_medio + 25;
+
+	// ---------------------------------------------------------
+	// CALEFACTOR
+	// ---------------------------------------------------------
 
 	if (temp <= t_min_calefactor)
 	{
@@ -411,6 +496,10 @@ void procesar_control_temperatura(uint8_t temp)
 		temp,
 		punto_medio);
 	}
+
+	// ---------------------------------------------------------
+	// RANGO IDEAL
+	// ---------------------------------------------------------
 
 	else if (temp > t_min_calefactor &&
 	temp <= t_max_ideal)
@@ -426,6 +515,10 @@ void procesar_control_temperatura(uint8_t temp)
 		punto_medio);
 	}
 
+	// ---------------------------------------------------------
+	// VENTILADOR BAJO
+	// ---------------------------------------------------------
+
 	else if (temp > t_max_ideal &&
 	temp <= t_max_low_fan)
 	{
@@ -440,6 +533,10 @@ void procesar_control_temperatura(uint8_t temp)
 		punto_medio);
 	}
 
+	// ---------------------------------------------------------
+	// VENTILADOR MEDIO
+	// ---------------------------------------------------------
+
 	else if (temp > t_max_low_fan &&
 	temp <= t_max_med_fan)
 	{
@@ -453,6 +550,10 @@ void procesar_control_temperatura(uint8_t temp)
 		temp,
 		punto_medio);
 	}
+
+	// ---------------------------------------------------------
+	// VENTILADOR ALTO
+	// ---------------------------------------------------------
 
 	else
 	{
@@ -470,16 +571,20 @@ void procesar_control_temperatura(uint8_t temp)
 	uart_print(buffer_uart);
 }
 
+// =========================================================
+// MAIN
+// =========================================================
+
 int main(void)
 {
-
+	// Inicializaciones
 	uart_init();
 	i2c_init();
 	lcd_init();
 	pwm_timer1_init();
 	timer2_init();
 
-
+	// Mensaje inicial
 	lcd_goto(0, 0);
 	lcd_print_str("Iniciando...");
 
@@ -495,14 +600,21 @@ int main(void)
 	99
 	);
 
+	// =====================================================
+	// LOOP PRINCIPAL
+	// =====================================================
+
 	while (1)
 	{
-	
+		// -------------------------------------------------
+		// COMANDOS UART
+		// -------------------------------------------------
+
 		if (uart_available())
 		{
 			char rx = uart_getchar();
 
-	
+			// Incrementar PM
 			if (rx == '+' || rx == 'u' || rx == 'U')
 			{
 				if ((punto_medio + 1) <= PM_MAX_PERMITIDO)
@@ -521,6 +633,7 @@ int main(void)
 				}
 			}
 
+			// Decrementar PM
 			else if (rx == '-' || rx == 'd' || rx == 'D')
 			{
 				if ((punto_medio - 1) >= PM_MIN_PERMITIDO)
@@ -539,6 +652,7 @@ int main(void)
 				}
 			}
 
+			// Mostrar menu
 			else if (rx == 'm' || rx == 'M')
 			{
 				mostrar_menu_uart();
@@ -551,6 +665,10 @@ int main(void)
 			);
 		}
 
+		// -------------------------------------------------
+		// MEDICION CADA 5 SEGUNDOS
+		// -------------------------------------------------
+
 		if (flag_medir)
 		{
 			flag_medir = 0;
@@ -558,6 +676,7 @@ int main(void)
 			uint8_t status =
 			dht11_read(&humedad, &temperatura);
 
+			// Lectura correcta
 			if (status == 0)
 			{
 				procesar_control_temperatura(
@@ -565,6 +684,7 @@ int main(void)
 				);
 			}
 
+			// Error
 			else
 			{
 				char err_msg[40];
