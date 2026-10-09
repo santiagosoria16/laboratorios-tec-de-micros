@@ -411,3 +411,31 @@ void procesar_control_temperatura(uint8_t temp)
 		temp,
 		punto_medio);
 	}
+
+	else if (temp > t_min_calefactor &&
+	temp <= t_max_ideal)
+	{
+		PORTB &= ~(1 << CALEFACTOR);
+
+		set_ventilador_speed(0);
+
+		snprintf(buffer_uart,
+		sizeof(buffer_uart),
+		"[SISTEMA] Temp: %d C | Accion: RANGO IDEAL (APAGADO) | PM: %d C\r\n",
+		temp,
+		punto_medio);
+	}
+
+	else if (temp > t_max_ideal &&
+	temp <= t_max_low_fan)
+	{
+		PORTB &= ~(1 << CALEFACTOR);
+
+		set_ventilador_speed(85);
+
+		snprintf(buffer_uart,
+		sizeof(buffer_uart),
+		"[SISTEMA] Temp: %d C | Accion: VENTILADOR BAJA VELOCIDAD | PM: %d C\r\n",
+		temp,
+		punto_medio);
+	}
