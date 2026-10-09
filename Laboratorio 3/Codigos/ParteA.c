@@ -105,3 +105,20 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 
 	DHT_DDR |= (1 << DHT_BIT); 
 	DHT_PORT &= ~(1 << DHT_BIT);
+
+	_delay_ms(20);
+
+
+	DHT_PORT |= (1 << DHT_BIT);
+	_delay_us(30);
+
+	DHT_DDR &= ~(1 << DHT_BIT);
+	DHT_PORT |= (1 << DHT_BIT);
+
+
+
+	if (!dht_wait_level(0, 200))
+	{
+		sei();
+		return 1;
+	}
