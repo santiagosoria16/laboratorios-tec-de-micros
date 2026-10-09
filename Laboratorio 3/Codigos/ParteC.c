@@ -47,3 +47,29 @@ void twi_write(uint8_t data)
 	TWCR = (1 << TWINT) | (1 << TWEN);
 	twi_wait();
 }
+
+void lcd_i2c_write_byte(uint8_t data)
+{
+	twi_start();
+	twi_write(LCD_I2C_ADDR);
+	twi_write(data | LCD_BACKLIGHT);
+	twi_stop();
+}
+
+void lcd_send_nibble(uint8_t nibble, uint8_t mode)
+{
+	uint8_t data = (nibble & 0xF0) | mode | LCD_BACKLIGHT;
+
+	lcd_i2c_write_byte(data);
+	lcd_i2c_write_byte(data | LCD_ENABLE);
+	_delay_us(1);
+	lcd_i2c_write_byte(data & ~LCD_ENABLE);
+	_delay_us(50);
+}
+
+void lcd_command(uint8_t cmd)
+{
+	lcd_send_nibble(cmd & 0xF0, 0);
+	lcd_send_nibble((cmd << 4) & 0xF0, 0);
+	_delay_ms(2);
+}
