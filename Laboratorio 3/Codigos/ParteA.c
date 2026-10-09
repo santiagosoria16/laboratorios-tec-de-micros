@@ -346,3 +346,24 @@ void actualizar_pantalla_lcd_estado(uint8_t temp, int8_t pm, uint8_t status)
 	lcd_goto(1, 0);
 	lcd_print_str(line2);
 }
+
+void pwm_timer1_init(void)
+{
+	DDRB |= (1 << VENTILADOR);
+	DDRB |= (1 << CALEFACTOR);
+
+	PORTB &= ~(1 << CALEFACTOR);
+
+	TCCR1A = (1 << COM1A1) | (1 << WGM10);
+
+	TCCR1B = (1 << WGM12) |
+	(1 << CS11) |
+	(1 << CS10);
+
+	OCR1A = 0;
+}
+
+void set_ventilador_speed(uint8_t duty_cycle)
+{
+	OCR1A = duty_cycle;
+}
