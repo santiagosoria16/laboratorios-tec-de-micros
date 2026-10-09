@@ -194,3 +194,18 @@ uint16_t adc_read(uint8_t canal)
 
 	return ADC;
 }
+
+uint16_t adc_read_promedio(uint8_t canal)
+{
+	adc_read(canal);
+	_delay_ms(2);
+
+	uint32_t suma = 0;
+
+	for (uint8_t i = 0; i < 8; i++) {
+		suma += adc_read(canal);
+		_delay_ms(2);
+	}
+
+	return (uint16_t)(suma / 8);
+}
