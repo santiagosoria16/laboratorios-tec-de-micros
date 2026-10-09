@@ -48,3 +48,22 @@ void uart_putchar(char c)
 	while (!(UCSR0A & (1 << UDRE0)));
 	UDR0 = c;
 }
+
+void uart_print(const char *texto)
+{
+	while (*texto)
+	{
+		uart_putchar(*texto++);
+	}
+}
+
+uint8_t uart_available(void)
+{
+	return (UCSR0A & (1 << RXC0));
+}
+
+char uart_getchar(void)
+{
+	while (!uart_available());
+	return UDR0;
+}
