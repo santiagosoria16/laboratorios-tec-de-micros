@@ -340,3 +340,36 @@ int main(void)
 
 			estado = ESTADO_MEDICION_AZUL;
 			break;
+
+			case ESTADO_MEDICION_AZUL:
+			set_rgb_color(0, 0, 1);
+			_delay_ms(150);
+
+			b_med = adc_read_promedio(0);
+
+			estado = ESTADO_PROCESAMIENTO;
+			break;
+
+
+			case ESTADO_PROCESAMIENTO: {
+				uint32_t dist_minima_sq = 0xFFFFFFFFUL;
+				idx_detectado = 0;
+
+				for (uint8_t i = 0; i < NUM_COLORES; i++) {
+					int32_t dr =
+					(int32_t)r_med - BANCO_COLORES[i].r_ref;
+
+					int32_t dg =
+					(int32_t)g_med - BANCO_COLORES[i].g_ref;
+
+					int32_t db =
+					(int32_t)b_med - BANCO_COLORES[i].b_ref;
+
+					uint32_t dist_sq =
+					(uint32_t)(dr * dr + dg * dg + db * db);
+
+					if (dist_sq < dist_minima_sq) {
+						dist_minima_sq = dist_sq;
+						idx_detectado = i;
+					}
+				}
