@@ -29,3 +29,21 @@ void twi_init(void)
 	TWCR = (1 << TWEN);
 }
 
+void twi_start(void)
+{
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	twi_wait();
+}
+
+void twi_stop(void)
+{
+	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+	_delay_us(100);
+}
+
+void twi_write(uint8_t data)
+{
+	TWDR = data;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	twi_wait();
+}
