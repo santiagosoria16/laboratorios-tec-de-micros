@@ -439,3 +439,33 @@ void procesar_control_temperatura(uint8_t temp)
 		temp,
 		punto_medio);
 	}
+
+	else if (temp > t_max_low_fan &&
+	temp <= t_max_med_fan)
+	{
+		PORTB &= ~(1 << CALEFACTOR);
+
+		set_ventilador_speed(170);
+
+		snprintf(buffer_uart,
+		sizeof(buffer_uart),
+		"[SISTEMA] Temp: %d C | Accion: VENTILADOR MEDIA VELOCIDAD | PM: %d C\r\n",
+		temp,
+		punto_medio);
+	}
+
+	else
+	{
+		PORTB &= ~(1 << CALEFACTOR);
+
+		set_ventilador_speed(255);
+
+		snprintf(buffer_uart,
+		sizeof(buffer_uart),
+		"[SISTEMA] Temp: %d C | Accion: VENTILADOR ALTA VELOCIDAD | PM: %d C\r\n",
+		temp,
+		punto_medio);
+	}
+
+	uart_print(buffer_uart);
+}
