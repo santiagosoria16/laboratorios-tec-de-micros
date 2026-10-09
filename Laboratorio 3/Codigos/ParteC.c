@@ -73,3 +73,28 @@ void lcd_command(uint8_t cmd)
 	lcd_send_nibble((cmd << 4) & 0xF0, 0);
 	_delay_ms(2);
 }
+
+void lcd_char(uint8_t data)
+{
+	lcd_send_nibble(data & 0xF0, LCD_RS);
+	lcd_send_nibble((data << 4) & 0xF0, LCD_RS);
+	_delay_us(100);
+}
+
+void lcd_init(void)
+{
+	twi_init();
+	_delay_ms(50);
+
+	lcd_send_nibble(0x30, 0);
+	_delay_ms(5);
+	lcd_send_nibble(0x30, 0);
+	_delay_us(150);
+	lcd_send_nibble(0x30, 0);
+	lcd_send_nibble(0x20, 0);
+
+	lcd_command(0x28);
+	lcd_command(0x0C);
+	lcd_command(0x01);
+	_delay_ms(2);
+}
