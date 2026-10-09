@@ -404,3 +404,29 @@ int main(void)
 				dist_minima
 				);
 				lcd_print(buffer);
+
+
+				uart_print("\r\n--- LECTURA COLOR ---\r\n");
+
+				sprintf(
+				buffer,
+				"ADC Medidos [R:%u, G:%u, B:%u]\r\n",
+				r_med, g_med, b_med
+				);
+				uart_print(buffer);
+
+				sprintf(
+				buffer,
+				"Color Detectado: %s\r\n",
+				detect.nombre
+				);
+				uart_print(buffer);
+
+				sprintf(
+				buffer,
+				"Patron Ref [R:%u, G:%u, B:%u]\r\n",
+				detect.r_ref,
+				detect.g_ref,
+				detect.b_ref
+				);
+				uart_print(buffer);
