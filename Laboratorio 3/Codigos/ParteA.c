@@ -295,3 +295,23 @@ void lcd_print_str(const char *str)
 		lcd_data(*str++);
 	}
 }
+
+void lcd_init(void)
+{
+	_delay_ms(50);
+
+	lcd_nibble(0x30, 0);
+	_delay_ms(5);
+
+	lcd_nibble(0x30, 0);
+	_delay_us(150);
+
+	lcd_nibble(0x30, 0);
+
+	lcd_nibble(0x20, 0);
+
+	lcd_command(0x28);
+	lcd_command(0x0C);
+
+	lcd_clear();
+}
