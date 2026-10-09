@@ -543,3 +543,49 @@ int main(void)
 			{
 				mostrar_menu_uart();
 			}
+
+			actualizar_pantalla_lcd_estado(
+			temperatura,
+			punto_medio,
+			0
+			);
+		}
+
+		if (flag_medir)
+		{
+			flag_medir = 0;
+
+			uint8_t status =
+			dht11_read(&humedad, &temperatura);
+
+			if (status == 0)
+			{
+				procesar_control_temperatura(
+				temperatura
+				);
+			}
+
+			else
+			{
+				char err_msg[40];
+
+				snprintf(
+				err_msg,
+				sizeof(err_msg),
+				"[ERROR DHT11] Codigo: %d\r\n",
+				status
+				);
+
+				uart_print(err_msg);
+			}
+
+			actualizar_pantalla_lcd_estado(
+			temperatura,
+			punto_medio,
+			status
+			);
+		}
+	}
+
+	return 0;
+}
