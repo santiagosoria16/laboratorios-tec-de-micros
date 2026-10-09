@@ -469,3 +469,28 @@ void procesar_control_temperatura(uint8_t temp)
 
 	uart_print(buffer_uart);
 }
+
+int main(void)
+{
+
+	uart_init();
+	i2c_init();
+	lcd_init();
+	pwm_timer1_init();
+	timer2_init();
+
+
+	lcd_goto(0, 0);
+	lcd_print_str("Iniciando...");
+
+	_delay_ms(2000);
+
+	sei();
+
+	mostrar_menu_uart();
+
+	actualizar_pantalla_lcd_estado(
+	temperatura,
+	punto_medio,
+	99
+	);
