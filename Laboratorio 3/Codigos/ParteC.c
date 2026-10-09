@@ -131,3 +131,22 @@ typedef struct {
 	uint8_t g_out;
 	uint8_t b_out;
 } PatronColor;
+
+#define NUM_COLORES 5
+
+const PatronColor BANCO_COLORES[NUM_COLORES] = {
+	{"ROJO",     720, 330, 280,  30, 1, 0, 0},
+	{"VERDE",    120, 470, 130,  70, 0, 1, 0},
+	{"AZUL",     260, 350, 539, 110, 0, 0, 1},
+	{"VIOLETA",  410, 180, 235, 130, 1, 0, 1},
+	{"AMARILLO", 690, 660, 276, 150, 1, 1, 0}
+};
+
+void rgb_init(void)
+{
+	RGB_DDR |= (1 << LED_R) | (1 << LED_G) | (1 << LED_B);
+
+	RGB_PORT &= ~((1 << LED_R) |
+	(1 << LED_G) |
+	(1 << LED_B));
+}
