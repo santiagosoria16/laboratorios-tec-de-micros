@@ -290,3 +290,31 @@ typedef enum {
 	ESTADO_ACTUACION,
 	ESTADO_ESPERA
 } EstadoSistema;
+
+int main(void)
+{
+	rgb_init();
+	adc_init();
+	uart_init(9600);
+	servo_init();
+	lcd_init();
+
+	lcd_set_cursor(0, 0);
+	lcd_print("CLASIFICADOR DE");
+
+	lcd_set_cursor(0, 1);
+	lcd_print("COLOR PLASTICOS");
+
+	_delay_ms(1500);
+	lcd_command(0x01);
+
+	EstadoSistema estado = ESTADO_MEDICION_ROJO;
+
+	uint16_t r_med = 0;
+	uint16_t g_med = 0;
+	uint16_t b_med = 0;
+
+	uint8_t idx_detectado = 0;
+	uint16_t dist_minima = 0;
+
+	char buffer[64];
