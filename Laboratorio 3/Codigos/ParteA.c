@@ -122,3 +122,15 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 		sei();
 		return 1;
 	}
+
+	if (!dht_wait_level(1, 200))
+	{
+		sei();
+		return 2;
+	}
+
+	if (!dht_wait_level(0, 200))
+	{
+		sei();
+		return 3;
+	}
