@@ -451,3 +451,17 @@ int main(void)
 				estado = ESTADO_ESPERA;
 				break;
 			}
+
+			case ESTADO_ESPERA:
+			_delay_ms(2000);
+			estado = ESTADO_MEDICION_ROJO;
+			break;
+
+			default:
+			estado = ESTADO_MEDICION_ROJO;
+			break;
+		}
+	}
+
+	return 0;
+}
