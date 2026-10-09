@@ -161,3 +161,16 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 			}
 		}
 	}
+
+	sei();
+
+	if ((uint8_t)(data[0] + data[1] + data[2] + data[3]) != data[4])
+	{
+		return 6;
+	}
+
+	*hum = data[0];
+	*temp = data[2];
+
+	return 0;
+}
