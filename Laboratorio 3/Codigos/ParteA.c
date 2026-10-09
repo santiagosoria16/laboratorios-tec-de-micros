@@ -31,3 +31,20 @@ uint8_t temperatura = 0;
 uint8_t humedad = 0;
 
 int8_t punto_medio = 20;
+
+void uart_init(void)
+{
+	uint16_t ubrr = (uint16_t)((F_CPU / (16UL * 9600UL)) - 1);
+
+	UBRR0H = (uint8_t)(ubrr >> 8);
+	UBRR0L = (uint8_t)ubrr;
+
+	UCSR0B = (1 << TXEN0) | (1 << RXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+
+void uart_putchar(char c)
+{
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = c;
+}
