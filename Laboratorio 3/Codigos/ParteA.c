@@ -271,3 +271,27 @@ void lcd_data(uint8_t data)
 {
 	lcd_send(data, 1);
 }
+
+void lcd_clear(void)
+{
+	lcd_command(0x01);
+
+	_delay_ms(2);
+}
+
+void lcd_goto(uint8_t fila, uint8_t columna)
+{
+	if (fila == 0)
+	lcd_command(0x80 + columna);
+
+	else if (fila == 1)
+	lcd_command(0xC0 + columna);
+}
+
+void lcd_print_str(const char *str)
+{
+	while (*str)
+	{
+		lcd_data(*str++);
+	}
+}
