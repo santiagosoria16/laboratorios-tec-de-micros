@@ -494,3 +494,52 @@ int main(void)
 	punto_medio,
 	99
 	);
+
+	while (1)
+	{
+	
+		if (uart_available())
+		{
+			char rx = uart_getchar();
+
+	
+			if (rx == '+' || rx == 'u' || rx == 'U')
+			{
+				if ((punto_medio + 1) <= PM_MAX_PERMITIDO)
+				{
+					punto_medio += 1;
+
+					uart_print(
+					"[CONFIG] PM incrementado.\r\n"
+					);
+				}
+				else
+				{
+					uart_print(
+					"[ALERTA] PM limite maximo alcanzado.\r\n"
+					);
+				}
+			}
+
+			else if (rx == '-' || rx == 'd' || rx == 'D')
+			{
+				if ((punto_medio - 1) >= PM_MIN_PERMITIDO)
+				{
+					punto_medio -= 1;
+
+					uart_print(
+					"[CONFIG] PM decrementado.\r\n"
+					);
+				}
+				else
+				{
+					uart_print(
+					"[ALERTA] PM limite minimo alcanzado.\r\n"
+					);
+				}
+			}
+
+			else if (rx == 'm' || rx == 'M')
+			{
+				mostrar_menu_uart();
+			}
