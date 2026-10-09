@@ -281,3 +281,12 @@ uint16_t integer_sqrt(uint32_t n)
 
 	return (uint16_t)root;
 }
+
+typedef enum {
+	ESTADO_MEDICION_ROJO,
+	ESTADO_MEDICION_VERDE,
+	ESTADO_MEDICION_AZUL,
+	ESTADO_PROCESAMIENTO,
+	ESTADO_ACTUACION,
+	ESTADO_ESPERA
+} EstadoSistema;
