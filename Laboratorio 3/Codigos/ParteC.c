@@ -168,3 +168,29 @@ void set_rgb_color(uint8_t r, uint8_t g, uint8_t b)
 	else
 	RGB_PORT &= ~(1 << LED_B);
 }
+
+void adc_init(void)
+{
+	ADMUX = (1 << REFS0);
+
+	ADCSRA = (1 << ADEN) |
+	(1 << ADPS2) |
+	(1 << ADPS1) |
+	(1 << ADPS0);
+}
+
+uint16_t adc_read(uint8_t canal)
+{
+	ADMUX = (ADMUX & 0xF0) | (canal & 0x0F);
+
+	ADCSRA |= (1 << ADSC);
+
+	uint32_t timeout = 60000UL;
+
+	while (ADCSRA & (1 << ADSC)) {
+		if (--timeout == 0)
+		return ADC;
+	}
+
+	return ADC;
+}
