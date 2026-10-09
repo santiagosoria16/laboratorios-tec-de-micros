@@ -98,3 +98,15 @@ void lcd_init(void)
 	lcd_command(0x01);
 	_delay_ms(2);
 }
+
+void lcd_set_cursor(uint8_t col, uint8_t row)
+{
+	uint8_t addr = (row == 0) ? (0x80 + col) : (0xC0 + col);
+	lcd_command(addr);
+}
+
+void lcd_print(const char *str)
+{
+	while (*str)
+	lcd_char(*str++);
+}
