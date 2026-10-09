@@ -430,3 +430,24 @@ int main(void)
 				detect.b_ref
 				);
 				uart_print(buffer);
+
+				sprintf(
+				buffer,
+				"Distancia Euclidiana: %u\r\n",
+				dist_minima
+				);
+				uart_print(buffer);
+
+				sprintf(
+				buffer,
+				"Angulo Servo: %u deg\r\n",
+				detect.angulo_servo
+				);
+				uart_print(buffer);
+
+				servo_set_angle(detect.angulo_servo);
+				_delay_ms(1000);
+
+				estado = ESTADO_ESPERA;
+				break;
+			}
