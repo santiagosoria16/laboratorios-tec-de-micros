@@ -230,3 +230,21 @@ void uart_print(const char *str)
 		UDR0 = *str++;
 	}
 }
+
+void servo_init(void)
+{
+	SERVO_DDR |= (1 << SERVO_PIN);
+
+	TCCR1A = 0;
+	TCCR1B = 0;
+	TCNT1 = 0;
+
+	ICR1 = 39999;
+	OCR1A = 3000;
+
+	TCCR1A = (1 << COM1A1) | (1 << WGM11);
+
+	TCCR1B = (1 << WGM13) |
+	(1 << WGM12) |
+	(1 << CS11);
+}
