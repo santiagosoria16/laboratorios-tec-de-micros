@@ -93,3 +93,15 @@ uint8_t dht_wait_level(uint8_t nivel, uint16_t timeout_us)
 
 	return 1;
 }
+
+uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
+{
+	uint8_t data[5] = {0, 0, 0, 0, 0};
+	uint8_t i, j;
+	uint16_t ancho;
+
+
+	cli();
+
+	DHT_DDR |= (1 << DHT_BIT); 
+	DHT_PORT &= ~(1 << DHT_BIT);
