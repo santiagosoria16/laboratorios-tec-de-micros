@@ -373,3 +373,34 @@ int main(void)
 						idx_detectado = i;
 					}
 				}
+
+				dist_minima = integer_sqrt(dist_minima_sq);
+				estado = ESTADO_ACTUACION;
+				break;
+			}
+
+	
+			case ESTADO_ACTUACION: {
+				PatronColor detect = BANCO_COLORES[idx_detectado];
+
+		
+				set_rgb_color(
+				detect.r_out,
+				detect.g_out,
+				detect.b_out
+				);
+
+				lcd_command(0x01);
+
+				lcd_set_cursor(0, 0);
+				sprintf(buffer, "Color:%s", detect.nombre);
+				lcd_print(buffer);
+
+				lcd_set_cursor(0, 1);
+				sprintf(
+				buffer,
+				"Ang:%u D:%u",
+				detect.angulo_servo,
+				dist_minima
+				);
+				lcd_print(buffer);
