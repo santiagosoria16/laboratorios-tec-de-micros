@@ -5,6 +5,10 @@
 #include <util/delay.h>
 #include <stdio.h>
 #include <stdint.h>
+
+// ============================================================
+// LCD I2C
+// ============================================================
 #define LCD_I2C_ADDR  (0x27 << 1)
 #define LCD_BACKLIGHT 0x08
 #define LCD_ENABLE    0x04
@@ -111,6 +115,9 @@ void lcd_print(const char *str)
 	lcd_char(*str++);
 }
 
+// ============================================================
+// RGB Y SERVO
+// ============================================================
 #define RGB_PORT PORTB
 #define RGB_DDR  DDRB
 
@@ -142,6 +149,9 @@ const PatronColor BANCO_COLORES[NUM_COLORES] = {
 	{"AMARILLO", 690, 660, 276, 150, 1, 1, 0}
 };
 
+// ============================================================
+// CONTROL RGB
+// ============================================================
 void rgb_init(void)
 {
 	RGB_DDR |= (1 << LED_R) | (1 << LED_G) | (1 << LED_B);
@@ -169,6 +179,9 @@ void set_rgb_color(uint8_t r, uint8_t g, uint8_t b)
 	RGB_PORT &= ~(1 << LED_B);
 }
 
+// ============================================================
+// ADC - SENSOR EN ADC0 / A0
+// ============================================================
 void adc_init(void)
 {
 	ADMUX = (1 << REFS0);
@@ -210,6 +223,9 @@ uint16_t adc_read_promedio(uint8_t canal)
 	return (uint16_t)(suma / 8);
 }
 
+// ============================================================
+// UART
+// ============================================================
 void uart_init(uint32_t baud)
 {
 	uint16_t ubrr = (F_CPU / (16UL * baud)) - 1;
@@ -231,6 +247,9 @@ void uart_print(const char *str)
 	}
 }
 
+// ============================================================
+// SERVO - TIMER1 - D9 / PB1 / OC1A
+// ============================================================
 void servo_init(void)
 {
 	SERVO_DDR |= (1 << SERVO_PIN);
@@ -239,9 +258,13 @@ void servo_init(void)
 	TCCR1B = 0;
 	TCNT1 = 0;
 
+	// Periodo de 20 ms: 50 Hz.
 	ICR1 = 39999;
+
+	// Posición inicial aproximada: 90 grados.
 	OCR1A = 3000;
 
+	// Fast PWM modo 14, salida no inversora.
 	TCCR1A = (1 << COM1A1) | (1 << WGM11);
 
 	TCCR1B = (1 << WGM13) |
@@ -254,12 +277,16 @@ void servo_set_angle(uint8_t angulo)
 	if (angulo > 180)
 	angulo = 180;
 
+	// Pulso entre 1 ms y 2 ms.
 	uint16_t pulso =
 	2000 + ((uint32_t)angulo * 2000UL) / 180UL;
 
 	OCR1A = pulso;
 }
 
+// ============================================================
+// RAÍZ CUADRADA ENTERA
+// ============================================================
 uint16_t integer_sqrt(uint32_t n)
 {
 	uint32_t root = 0;
@@ -282,6 +309,9 @@ uint16_t integer_sqrt(uint32_t n)
 	return (uint16_t)root;
 }
 
+// ============================================================
+// MÁQUINA DE ESTADOS
+// ============================================================
 typedef enum {
 	ESTADO_MEDICION_ROJO,
 	ESTADO_MEDICION_VERDE,
@@ -291,6 +321,9 @@ typedef enum {
 	ESTADO_ESPERA
 } EstadoSistema;
 
+// ============================================================
+// MAIN
+// ============================================================
 int main(void)
 {
 	rgb_init();
@@ -322,7 +355,9 @@ int main(void)
 	while (1) {
 		switch (estado) {
 
-			
+			// ----------------------------------------------------
+			// MEDICIÓN ROJO
+			// ----------------------------------------------------
 			case ESTADO_MEDICION_ROJO:
 			set_rgb_color(1, 0, 0);
 			_delay_ms(150);
@@ -332,6 +367,9 @@ int main(void)
 			estado = ESTADO_MEDICION_VERDE;
 			break;
 
+			// ----------------------------------------------------
+			// MEDICIÓN VERDE
+			// ----------------------------------------------------
 			case ESTADO_MEDICION_VERDE:
 			set_rgb_color(0, 1, 0);
 			_delay_ms(150);
@@ -341,6 +379,9 @@ int main(void)
 			estado = ESTADO_MEDICION_AZUL;
 			break;
 
+			// ----------------------------------------------------
+			// MEDICIÓN AZUL
+			// ----------------------------------------------------
 			case ESTADO_MEDICION_AZUL:
 			set_rgb_color(0, 0, 1);
 			_delay_ms(150);
@@ -350,7 +391,9 @@ int main(void)
 			estado = ESTADO_PROCESAMIENTO;
 			break;
 
-
+			// ----------------------------------------------------
+			// PROCESAMIENTO
+			// ----------------------------------------------------
 			case ESTADO_PROCESAMIENTO: {
 				uint32_t dist_minima_sq = 0xFFFFFFFFUL;
 				idx_detectado = 0;
@@ -379,11 +422,14 @@ int main(void)
 				break;
 			}
 
-	
+			// ----------------------------------------------------
+			// ACTUACIÓN
+			// PRIMERO LCD, DESPUÉS SERVO
+			// ----------------------------------------------------
 			case ESTADO_ACTUACION: {
 				PatronColor detect = BANCO_COLORES[idx_detectado];
 
-		
+				// Mostrar el color inmediatamente.
 				set_rgb_color(
 				detect.r_out,
 				detect.g_out,
@@ -405,7 +451,7 @@ int main(void)
 				);
 				lcd_print(buffer);
 
-
+				// Enviar datos al monitor serie.
 				uart_print("\r\n--- LECTURA COLOR ---\r\n");
 
 				sprintf(
@@ -445,6 +491,7 @@ int main(void)
 				);
 				uart_print(buffer);
 
+				// Mover el servo después de actualizar la LCD.
 				servo_set_angle(detect.angulo_servo);
 				_delay_ms(1000);
 
@@ -452,6 +499,9 @@ int main(void)
 				break;
 			}
 
+			// ----------------------------------------------------
+			// ESPERA Y NUEVO CICLO
+			// ----------------------------------------------------
 			case ESTADO_ESPERA:
 			_delay_ms(2000);
 			estado = ESTADO_MEDICION_ROJO;
