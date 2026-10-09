@@ -318,3 +318,25 @@ int main(void)
 	uint16_t dist_minima = 0;
 
 	char buffer[64];
+
+	while (1) {
+		switch (estado) {
+
+			
+			case ESTADO_MEDICION_ROJO:
+			set_rgb_color(1, 0, 0);
+			_delay_ms(150);
+
+			r_med = adc_read_promedio(0);
+
+			estado = ESTADO_MEDICION_VERDE;
+			break;
+
+			case ESTADO_MEDICION_VERDE:
+			set_rgb_color(0, 1, 0);
+			_delay_ms(150);
+
+			g_med = adc_read_promedio(0);
+
+			estado = ESTADO_MEDICION_AZUL;
+			break;
