@@ -259,3 +259,25 @@ void servo_set_angle(uint8_t angulo)
 
 	OCR1A = pulso;
 }
+
+uint16_t integer_sqrt(uint32_t n)
+{
+	uint32_t root = 0;
+	uint32_t bit = 1UL << 30;
+
+	while (bit > n)
+	bit >>= 2;
+
+	while (bit != 0) {
+		if (n >= root + bit) {
+			n -= root + bit;
+			root = (root >> 1) + bit;
+			} else {
+			root >>= 1;
+		}
+
+		bit >>= 2;
+	}
+
+	return (uint16_t)root;
+}
