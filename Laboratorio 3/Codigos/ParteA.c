@@ -315,3 +315,34 @@ void lcd_init(void)
 
 	lcd_clear();
 }
+
+void actualizar_pantalla_lcd_estado(uint8_t temp, int8_t pm, uint8_t status)
+{
+	char line1[17];
+	char line2[17];
+
+	if (status == 0)
+	{
+		snprintf(line1, sizeof(line1),
+		"Temp: %d C       ", temp);
+	}
+	else if (status == 99)
+	{
+		snprintf(line1, sizeof(line1),
+		"Temp: Esperando  ");
+	}
+	else
+	{
+		snprintf(line1, sizeof(line1),
+		"Err DHT Cod: %d  ", status);
+	}
+
+	snprintf(line2, sizeof(line2),
+	"PM:   %d C       ", pm);
+
+	lcd_goto(0, 0);
+	lcd_print_str(line1);
+
+	lcd_goto(1, 0);
+	lcd_print_str(line2);
+}
