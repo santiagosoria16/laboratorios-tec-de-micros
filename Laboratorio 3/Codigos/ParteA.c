@@ -389,3 +389,25 @@ ISR(TIMER2_COMPA_vect)
 		flag_medir = 1;
 	}
 }
+
+void procesar_control_temperatura(uint8_t temp)
+{
+	char buffer_uart[100];
+
+	int8_t t_min_calefactor = punto_medio - 5;
+	int8_t t_max_ideal     = punto_medio + 5;
+	int8_t t_max_low_fan   = punto_medio + 15;
+	int8_t t_max_med_fan   = punto_medio + 25;
+
+	if (temp <= t_min_calefactor)
+	{
+		PORTB |= (1 << CALEFACTOR);
+
+		set_ventilador_speed(0);
+
+		snprintf(buffer_uart,
+		sizeof(buffer_uart),
+		"[SISTEMA] Temp: %d C | Accion: CALEFACTOR ENCENDIDO | PM: %d C\r\n",
+		temp,
+		punto_medio);
+	}
