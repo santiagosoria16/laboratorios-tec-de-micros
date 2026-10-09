@@ -243,3 +243,31 @@ void lcd_pulse(uint8_t data)
 
 	_delay_us(50);
 }
+
+void lcd_nibble(uint8_t data, uint8_t rs)
+{
+	uint8_t salida = data & 0xF0;
+
+	if (rs)
+	salida |= 0x01;
+
+	salida |= 0x08;
+
+	lcd_pulse(salida);
+}
+
+void lcd_send(uint8_t data, uint8_t rs)
+{
+	lcd_nibble(data & 0xF0, rs);
+	lcd_nibble((data << 4) & 0xF0, rs);
+}
+
+void lcd_command(uint8_t cmd)
+{
+	lcd_send(cmd, 0);
+}
+
+void lcd_data(uint8_t data)
+{
+	lcd_send(data, 1);
+}
