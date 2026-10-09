@@ -67,3 +67,29 @@ char uart_getchar(void)
 	while (!uart_available());
 	return UDR0;
 }
+
+void mostrar_menu_uart(void)
+{
+	uart_print("\r\n========================================\r\n");
+	uart_print("       MENU PUNTO MEDIO (PM)\r\n");
+	uart_print("========================================\r\n");
+	uart_print(" + / u : Incrementar PM (+1 C)\r\n");
+	uart_print(" - / d : Decrementar PM (-1 C)\r\n");
+	uart_print(" m / M : Mostrar este menu\r\n");
+	uart_print("----------------------------------------\r\n");
+}
+
+uint8_t dht_wait_level(uint8_t nivel, uint16_t timeout_us)
+{
+	while ((((DHT_PIN & (1 << DHT_BIT)) != 0) ? 1 : 0) != nivel)
+	{
+		_delay_us(1);
+
+		if (timeout_us == 0)
+		return 0;
+
+		timeout_us--;
+	}
+
+	return 1;
+}
