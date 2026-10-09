@@ -248,3 +248,14 @@ void servo_init(void)
 	(1 << WGM12) |
 	(1 << CS11);
 }
+
+void servo_set_angle(uint8_t angulo)
+{
+	if (angulo > 180)
+	angulo = 180;
+
+	uint16_t pulso =
+	2000 + ((uint32_t)angulo * 2000UL) / 180UL;
+
+	OCR1A = pulso;
+}
