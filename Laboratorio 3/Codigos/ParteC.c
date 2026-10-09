@@ -150,3 +150,21 @@ void rgb_init(void)
 	(1 << LED_G) |
 	(1 << LED_B));
 }
+
+void set_rgb_color(uint8_t r, uint8_t g, uint8_t b)
+{
+	if (r)
+	RGB_PORT |= (1 << LED_R);
+	else
+	RGB_PORT &= ~(1 << LED_R);
+
+	if (g)
+	RGB_PORT |= (1 << LED_G);
+	else
+	RGB_PORT &= ~(1 << LED_G);
+
+	if (b)
+	RGB_PORT |= (1 << LED_B);
+	else
+	RGB_PORT &= ~(1 << LED_B);
+}
