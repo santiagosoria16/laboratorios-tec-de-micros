@@ -134,3 +134,30 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 		sei();
 		return 3;
 	}
+
+	for (j = 0; j < 5; j++)
+	{
+		for (i = 0; i < 8; i++)
+		{
+			if (!dht_wait_level(1, 100))
+			{
+				sei();
+				return 4;
+			}
+			ancho = 0;
+
+			while (DHT_PIN & (1 << DHT_BIT))
+			{
+				_delay_us(1);
+				ancho++;
+
+				if (ancho >= 100)
+				break;
+			}
+
+			if (ancho > 40)
+			{
+				data[j] |= (1 << (7 - i));
+			}
+		}
+	}
