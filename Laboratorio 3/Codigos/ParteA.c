@@ -207,3 +207,39 @@ void i2c_stop(void)
 
 	_delay_us(10);
 }
+
+void i2c_write_timeout(uint8_t data)
+{
+	TWDR = data;
+
+	TWCR = (1 << TWINT) | (1 << TWEN);
+
+	uint16_t timer = 10000;
+
+	while (!(TWCR & (1 << TWINT)))
+	{
+		if (--timer == 0)
+		break;
+	}
+}
+
+void lcd_write(uint8_t data)
+{
+	if (i2c_start_timeout() == 0)
+	{
+		i2c_write_timeout(LCD_ADDR << 1);
+		i2c_write_timeout(data);
+		i2c_stop();
+	}
+}
+
+void lcd_pulse(uint8_t data)
+{
+	lcd_write(data | 0x04);
+
+	_delay_us(1);
+
+	lcd_write(data & ~0x04);
+
+	_delay_us(50);
+}
