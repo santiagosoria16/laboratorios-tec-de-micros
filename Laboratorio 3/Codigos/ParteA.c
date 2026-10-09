@@ -174,3 +174,36 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp)
 
 	return 0;
 }
+
+void i2c_init(void)
+{
+	TWSR = 0x00;
+
+	TWBR = (uint8_t)(((F_CPU / 100000UL) - 16) / 2);
+
+	DDRC &= ~((1 << SDA) | (1 << SCL));
+
+	PORTC |= (1 << SDA) | (1 << SCL);
+}
+
+uint8_t i2c_start_timeout(void)
+{
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+
+	uint16_t timer = 10000;
+
+	while (!(TWCR & (1 << TWINT)))
+	{
+		if (--timer == 0)
+		return 1;
+	}
+
+	return 0;
+}
+
+void i2c_stop(void)
+{
+	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+
+	_delay_us(10);
+}
