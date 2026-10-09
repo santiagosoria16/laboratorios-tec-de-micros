@@ -367,3 +367,25 @@ void set_ventilador_speed(uint8_t duty_cycle)
 {
 	OCR1A = duty_cycle;
 }
+
+void timer2_init(void)
+{
+	TCCR2A = (1 << WGM21);
+
+	TCCR2B = (1 << CS22);
+
+	OCR2A = 249;
+
+	TIMSK2 |= (1 << OCIE2A);
+}
+
+ISR(TIMER2_COMPA_vect)
+{
+	contador_ms++;
+
+	if (contador_ms >= 5000)
+	{
+		contador_ms = 0;
+		flag_medir = 1;
+	}
+}
