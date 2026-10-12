@@ -453,4 +453,15 @@ const uint16_t bajo_c3[] = {
 	G3    // Cierre
 };
 
+const uint16_t dur_bajo_c3[] = {
+	2308, 2308, 2308, 2308,
+	2018, 2308,
+	2308, 2308, 2308, 2308,
+	2018, 2308,
+	2308
+};
+
+const uint8_t len_c3 = sizeof(mel_c3) / sizeof(mel_c3[0]);
+const uint8_t len_bajo_c3 = sizeof(bajo_c3) / sizeof(bajo_c3[0]);
+
 
