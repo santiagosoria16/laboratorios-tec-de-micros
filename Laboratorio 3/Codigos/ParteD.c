@@ -331,3 +331,19 @@ const uint16_t mel_c1[] = {
 	// "Never gonna tell a lie and hurt you"
 	F4, G4, BB4, G4, BB4, C5, A4, F4, SIL, F4, C5, BB4, SIL
 };
+
+const uint16_t bajo_c1[] = {
+	// Eb -> F -> Dm
+	EB3, EB3, EB3, EB3, F3, F3, D3, SIL,
+	// Eb -> F -> Gm
+	EB3, EB3, EB3, EB3, F3, F3, BB3, A3, G3, SIL,
+	// Eb -> F -> Dm -> Gm -> Cm -> F -> Bb
+	EB3, EB3, EB3, EB3, F3, F3, D3, G3, SIL, C3, F3, BB3, SIL,
+	// Eb -> F -> Dm
+	EB3, EB3, EB3, EB3, F3, F3, D3, SIL,
+	// Eb -> F -> Dm -> Gm
+	EB3, EB3, EB3, EB3, F3, F3, D3, G3, G3, SIL,
+	// Eb -> F -> Dm -> Gm -> Cm -> F -> Bb
+	EB3, EB3, EB3, EB3, F3, F3, D3, G3, SIL, C3, F3, BB3, SIL
+};
+
