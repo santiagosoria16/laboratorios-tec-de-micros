@@ -65,3 +65,8 @@
 #define BB5 932
 #define B5  988
 
+// Octava 6
+#define C6  1047
+#define D6  1175
+
+#define FREQ_TO_ICR1(f) ((f > 0) ? ((F_CPU / (8UL * (f))) - 1) : 0)
