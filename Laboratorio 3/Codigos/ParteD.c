@@ -270,3 +270,15 @@ void Set_Tone_Buzzer1(uint16_t freq) {
 	}
 }
 
+void Set_Tone_Buzzer2(uint16_t freq) {
+	if (freq == 0) {
+		TCCR2A &= ~(1 << COM2A0);
+		PORTB &= ~(1 << PB3);
+		} else {
+		TCCR2A |= (1 << COM2A0);
+		uint32_t val = ((31250UL + (freq / 2)) / freq) - 1;
+		if (val > 255) val = 255;
+		OCR2A = (uint8_t)val;
+		TCNT2 = 0;
+	}
+}
