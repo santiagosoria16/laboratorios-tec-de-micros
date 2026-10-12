@@ -585,3 +585,26 @@ void Reproducir_Cancion3(void) {
 	Mostrar_Menu_LCD();
 }
 
+void Ejecutar_Opcion(uint8_t opcion) {
+	switch (opcion) {
+		case 0:
+		estadoActual = ESTADO_PIANO;
+		LCD_I2C_Cmd(0x01);
+		LCD_I2C_SetCursor(0, 0);
+		LCD_I2C_String("Modo: Piano");
+		UART_SendString("[FSM] Modo Piano Manual Activado.\r\n");
+		break;
+		case 1:
+		estadoActual = ESTADO_CANCION;
+		Reproducir_Cancion(mel_c1, bajo_c1, dur_c1, len_c1, "1. Never Gonna");
+		break;
+		case 2:
+		estadoActual = ESTADO_CANCION;
+		Reproducir_Cancion(mel_c2, bajo_c2, dur_c2, len_c2, "2. Free Bird");
+		break;
+		case 3:
+		estadoActual = ESTADO_CANCION;
+		Reproducir_Cancion3();
+		break;
+	}
+}
