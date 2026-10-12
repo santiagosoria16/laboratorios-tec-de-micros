@@ -100,3 +100,64 @@ ISR(USART_RX_vect) {
 		idx = 0; // Descarta buffer si entran letras o ruido
 	}
 }
+
+int main(void) {
+	UART_init(MYUBRR);
+	ADC_init();
+	PWM_init();
+	sei();
+
+	_delay_ms(100);
+	UART_sendString("\r\n--- SISTEMA LISTO ---\r\n");
+
+	char serial_buffer[100];
+
+	while (1) {
+		// Lectura atómica segura del Setpoint y de la bandera
+		cli();
+		uint16_t sp_local = setpoint_iluminacion;
+		uint8_t flag_local = nuevo_sp_flag;
+		nuevo_sp_flag = 0;
+		sei();
+
+		// Mensaje de confirmación cuando cambia el SP
+		if (flag_local) {
+			UART_sendString("\r\n>>> [OK] NUEVO SETPOINT ACEPTADO <<<\r\n");
+		}
+
+		uint16_t ldr_val = ADC_read(0);
+		uint16_t pot_pos = ADC_read(1);
+
+		int16_t error = (int16_t)sp_local - (int16_t)ldr_val;
+
+		int direction = 0;
+		uint16_t pwm_calc = 0;
+		const uint16_t MAX_PWM = 255;
+		const int16_t BANDA_MUERTA = 15;
+
+		if (abs(error) <= BANDA_MUERTA) {
+			direction = 0;
+			pwm_calc = 0;
+			} else if (error > 0) {
+			direction = 1;
+			pwm_calc = (uint16_t)error;
+			} else {
+			direction = -1;
+			pwm_calc = (uint16_t)(-error);
+		}
+
+		if (pwm_calc > MAX_PWM) {
+			pwm_calc = MAX_PWM;
+		}
+
+		Motor_Control(direction, (uint8_t)pwm_calc);
+
+		const char* dir_str = (direction > 0) ? "IZQ" : (direction < 0) ? "DER" : "STOP";
+		sprintf(serial_buffer, "SP:%u, LDR:%u, POT:%u, PWM:%u, DIR:%s\r\n",
+		sp_local, ldr_val, pot_pos, (unsigned int)pwm_calc, dir_str);
+		
+		UART_sendString(serial_buffer);
+
+		_delay_ms(100);
+	}
+}
