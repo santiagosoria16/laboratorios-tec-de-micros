@@ -398,3 +398,30 @@ const uint16_t dur_c2[] = {
 
 const uint8_t len_c2 = sizeof(mel_c2) / sizeof(mel_c2[0]);
 
+// ============================================================================
+// CANCIÓN 3 - WAKE ME UP WHEN SEPTEMBER ENDS (G Mayor, 104 BPM)
+// ============================================================================
+const uint16_t mel_c3[] = {
+	// "Summer has come and passed"
+	D4, D4, D4, D4, D4, B4,
+	// "the innocent can never last"
+	D4, D4, D4, D4, D4, B4, A4, G4,
+	// Interludio
+	SIL, SIL,
+	// "Wake me up..."
+	SIL, B4, C5, B4,
+	// "...when September ends"
+	SIL, B4, C5, B4, A4, G4,
+	// "Like my fathers come to pass"
+	D4, D4, D4, D4, D4, B4,
+	// "seven years has gone so fast"
+	D4, D4, D4, D4, D4, B4, A4, G4,
+	// Interludio
+	SIL, SIL,
+	// "Wake me up..."
+	SIL, B4, C5, B4,
+	// "...when September ends"
+	SIL, B4, C5, B4, A4, G4
+};
+
+
