@@ -363,3 +363,4 @@ const uint16_t dur_c1[] = {
 	130, 130, 130, 130, 260, 260, 260, 260, 80, 260, 260, 620, 200
 };
 
+const uint8_t len_c1 = sizeof(mel_c1) / sizeof(mel_c1[0]);
