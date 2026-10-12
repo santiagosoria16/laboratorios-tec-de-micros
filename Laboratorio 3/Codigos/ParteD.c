@@ -282,3 +282,34 @@ void Set_Tone_Buzzer2(uint16_t freq) {
 		TCNT2 = 0;
 	}
 }
+
+// ==========================================
+// PULSADORES
+// ==========================================
+uint8_t Leer_Pulsadores(uint16_t *freq_out, char *nota_out) {
+	if (!(PINB & (1 << PB0))) { *freq_out = C4; sprintf(nota_out, "DO (C4)"); return 1; }
+	if (!(PINB & (1 << PB2))) { *freq_out = D4; sprintf(nota_out, "RE (D4)"); return 1; }
+	if (!(PINB & (1 << PB4))) { *freq_out = E4; sprintf(nota_out, "MI (E4)"); return 1; }
+	if (!(PINB & (1 << PB5))) { *freq_out = F4; sprintf(nota_out, "FA (F4)"); return 1; }
+	if (!(PINC & (1 << PC0))) { *freq_out = G4; sprintf(nota_out, "SOL(G4)"); return 1; }
+	if (!(PINC & (1 << PC1))) { *freq_out = A4; sprintf(nota_out, "LA (A4)"); return 1; }
+	if (!(PINC & (1 << PC2))) { *freq_out = B4; sprintf(nota_out, "SI (B4)"); return 1; }
+	if (!(PINC & (1 << PC3))) { *freq_out = C5; sprintf(nota_out, "DO (C5)"); return 1; }
+
+	*freq_out = 0;
+	return 0;
+}
+
+uint8_t Hay_Boton_Pulsado(void) {
+	return (!(PINB & (1 << PB0)) || !(PINB & (1 << PB2)) ||
+	!(PINB & (1 << PB4)) || !(PINB & (1 << PB5)) ||
+	!(PINC & (1 << PC0)) || !(PINC & (1 << PC1)) ||
+	!(PINC & (1 << PC2)) || !(PINC & (1 << PC3)));
+}
+
+void Esperar_Liberacion_Botones(void) {
+	while (Hay_Boton_Pulsado()) {
+		_delay_ms(10);
+	}
+	_delay_ms(40); // Debounce
+}
