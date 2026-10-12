@@ -79,3 +79,15 @@ typedef enum {
 	ESTADO_PIANO,
 	ESTADO_CANCION
 } EstadoSistema;
+
+volatile EstadoSistema estadoActual = ESTADO_MENU;
+volatile char comandoUART = 0;
+volatile uint8_t nuevoComando = 0;
+
+uint8_t opcionMenuActual = 0;
+const char* opcionesMenu[] = {
+	"1. Piano Manual",
+	"2. Never Gonna",
+	"3. Free Bird",
+	"4. Wake Me Up"
+};
