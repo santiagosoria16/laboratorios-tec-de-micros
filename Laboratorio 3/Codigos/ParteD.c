@@ -130,3 +130,8 @@ void UART_MostrarMenu(void) {
 	UART_SendString("==================================================\r\n\r\n");
 }
 
+ISR(USART_RX_vect) {
+	comandoUART = UDR0;
+	nuevoComando = 1;
+}
+
