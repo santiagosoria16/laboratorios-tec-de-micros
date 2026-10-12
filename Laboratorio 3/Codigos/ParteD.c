@@ -437,4 +437,20 @@ const uint16_t dur_c3[] = {
 	288, 288, 288, 288, 288, 1731
 };
 
+const uint16_t bajo_c3[] = {
+	G3,   // G5
+	FS3,  // G5/F#
+	E3,   // Em7
+	D3,   // G5/D
+	C3,   // C
+	C3,   // Cm
+	G3,   // G5
+	FS3,  // G5/F#
+	E3,   // Em7
+	D3,   // G5/D
+	C3,   // C
+	C3,   // Cm
+	G3    // Cierre
+};
+
 
