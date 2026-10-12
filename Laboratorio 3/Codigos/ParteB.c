@@ -44,3 +44,19 @@ void ADC_init(void) {
 	ADMUX = (1 << REFS0);
 	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 }
+
+uint16_t ADC_read(uint8_t channel) {
+	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
+	_delay_us(10);
+	ADCSRA |= (1 << ADSC);
+	while (ADCSRA & (1 << ADSC));
+	return ADC;
+}
+
+// --- Inicialización de PWM ---
+void PWM_init(void) {
+	DDRD |= (1 << PWM_PIN) | (1 << IN1_PIN) | (1 << IN2_PIN);
+	TCCR0A = (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+	TCCR0B = (1 << CS01) | (1 << CS00);
+	OCR0A = 0;
+}
