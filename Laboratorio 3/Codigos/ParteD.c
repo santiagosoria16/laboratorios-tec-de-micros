@@ -116,3 +116,17 @@ void UART_SendString(const char *str) {
 	}
 }
 
+void UART_MostrarMenu(void) {
+	UART_SendString("\r\n==================================================\r\n");
+	UART_SendString("    PIANO ELECTRONICO POLIFONICO - ATmega328P     \r\n");
+	UART_SendString("==================================================\r\n");
+	UART_SendString(" Comandos UART Disponibles:\r\n");
+	UART_SendString("  [1] Modo Piano Manual\r\n");
+	UART_SendString("  [2] Cancion 1: Never Gonna Give You Up\r\n");
+	UART_SendString("  [3] Cancion 2: Free Bird (Solo)\r\n");
+	UART_SendString("  [4] Cancion 3: Wake Me Up When September Ends\r\n");
+	UART_SendString("  [S] o [0] Detener cancion / Volver al Menu\r\n");
+	UART_SendString("  [M] Mostrar este menu interactivo\r\n");
+	UART_SendString("==================================================\r\n\r\n");
+}
+
