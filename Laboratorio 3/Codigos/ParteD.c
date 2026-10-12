@@ -258,3 +258,14 @@ void PWM_Init(void) {
 	DDRB |= (1 << PB3);
 	PORTB &= ~(1 << PB3);
 }
+
+void Set_Tone_Buzzer1(uint16_t freq) {
+	if (freq == 0) {
+		TCCR1A &= ~(1 << COM1A1);
+		PORTB &= ~(1 << PB1);
+		} else {
+		TCCR1A |= (1 << COM1A1);
+		ICR1 = FREQ_TO_ICR1(freq);
+		OCR1A = ICR1 / 2;
+	}
+}
