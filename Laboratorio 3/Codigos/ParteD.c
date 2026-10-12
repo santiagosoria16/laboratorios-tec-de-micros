@@ -70,3 +70,12 @@
 #define D6  1175
 
 #define FREQ_TO_ICR1(f) ((f > 0) ? ((F_CPU / (8UL * (f))) - 1) : 0)
+
+// ==========================================
+// ESTADOS Y MENÚ
+// ==========================================
+typedef enum {
+	ESTADO_MENU,
+	ESTADO_PIANO,
+	ESTADO_CANCION
+} EstadoSistema;
