@@ -269,3 +269,4 @@ void Set_Tone_Buzzer1(uint16_t freq) {
 		OCR1A = ICR1 / 2;
 	}
 }
+
