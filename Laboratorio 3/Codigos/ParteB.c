@@ -12,3 +12,24 @@
 #define IN1_PIN PD2
 #define IN2_PIN PD3
 #define PWM_PIN PD6
+
+// Variable global para el Setpoint de iluminación
+volatile uint16_t setpoint_iluminacion = 512;
+volatile uint8_t nuevo_sp_flag = 0; // Bandera para avisar al main()
+
+// --- Inicialización de UART ---
+void UART_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+	
+	PORTD |= (1 << PORTD0); // Resistencia Pull-Up interna en RX
+}
+
+void UART_sendChar(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+
