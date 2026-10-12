@@ -347,7 +347,6 @@ const uint16_t bajo_c1[] = {
 	EB3, EB3, EB3, EB3, F3, F3, D3, G3, SIL, C3, F3, BB3, SIL
 };
 
-
 const uint16_t dur_c1[] = {
 	// Frase 1 (114 BPM)
 	130, 130, 130, 130, 310, 310, 620, 120,
@@ -365,6 +364,30 @@ const uint16_t dur_c1[] = {
 
 const uint8_t len_c1 = sizeof(mel_c1) / sizeof(mel_c1[0]);
 
+// ============================================================================
+// CANCIÓN 2 - FREE BIRD ("that funky solo bit", 143 BPM)
+// ============================================================================
+const uint16_t mel_c2[] = {
+	// Anacrusa
+	D5, E5,
+	// Compás 2
+	G5, E5, G5, E5, G5, E5, D5, B4,
+	// Compás 3
+	C5, D5, C5, B4, A4, G4, E4, G4,
+	// Compás 4
+	A4, SIL, D5, E5,
+	// Compás 5
+	G5, E5, G5, E5, G5, E5, D5, B4,
+	// Compás 6
+	C5, D5, C5, B4, A4, G4, A4, B4,
+	// Compás 7-8
+	G4, SIL,
+	// Compás 9: Semicorcheas
+	G5, E5, D5, B4, G5, E5, D5, B4,
+	G5, E5, D5, B4, G5, E5, D5, B4,
+	A5, G5, E5, D5, G5, E5, D5, B4,
+	C5, D5, C5, B4, A4, G4, G4, SIL
+};
 
 const uint16_t bajo_c2[] = {
 	SIL, SIL,
@@ -608,7 +631,6 @@ void Ejecutar_Opcion(uint8_t opcion) {
 		break;
 	}
 }
-
 
 // ==========================================
 // PROGRAMA PRINCIPAL
