@@ -313,3 +313,21 @@ void Esperar_Liberacion_Botones(void) {
 	}
 	_delay_ms(40); // Debounce
 }
+
+// ============================================================================
+// CANCIÓN 1 - NEVER GONNA GIVE YOU UP (Bb Mayor, 114 BPM)
+// ============================================================================
+const uint16_t mel_c1[] = {
+	// "Never gonna give you up"
+	F4, G4, BB4, G4, D5, D5, C5, SIL,
+	// "Never gonna let you down"
+	F4, G4, BB4, G4, C5, C5, BB4, A4, G4, SIL,
+	// "Never gonna run around and desert you"
+	F4, G4, BB4, G4, BB4, C5, A4, F4, SIL, F4, C5, BB4, SIL,
+	// "Never gonna make you cry"
+	F4, G4, BB4, G4, D5, D5, C5, SIL,
+	// "Never gonna say goodbye"
+	F4, G4, BB4, G4, F5, C5, BB4, A4, G4, SIL,
+	// "Never gonna tell a lie and hurt you"
+	F4, G4, BB4, G4, BB4, C5, A4, F4, SIL, F4, C5, BB4, SIL
+};
