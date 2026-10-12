@@ -515,4 +515,73 @@ void Reproducir_Cancion(const uint16_t *mel, const uint16_t *bajo, const uint16_
 	Mostrar_Menu_LCD();
 }
 
+void Reproducir_Cancion3(void) {
+	Esperar_Liberacion_Botones();
+
+	uint8_t i = 0, j = 0, bajoActivo = 1;
+	uint16_t tiempoBajo = 0;
+
+	LCD_I2C_Cmd(0x01);
+	LCD_I2C_SetCursor(0, 0);
+	LCD_I2C_String("Reproduciendo:");
+	LCD_I2C_SetCursor(1, 0);
+	LCD_I2C_String("3. Wake Me Up");
+
+	UART_SendString("\r\n[REPRODUCCION] Wake Me Up When September Ends\r\n");
+
+	while (i < len_c3) {
+		if (nuevoComando || Hay_Boton_Pulsado()) {
+			nuevoComando = 0;
+			UART_SendString("[UART/HW] Detencion solicitada.\r\n");
+			break;
+		}
+
+		Set_Tone_Buzzer1(mel_c3[i]);
+		if (bajoActivo && j < len_bajo_c3) Set_Tone_Buzzer2(bajo_c3[j]);
+		else Set_Tone_Buzzer2(0);
+
+		uint16_t durTotal = dur_c3[i];
+		uint16_t durSonido = (durTotal > 30) ? (durTotal - 25) : durTotal;
+		uint16_t durSilencio = durTotal - durSonido;
+
+		for (uint16_t t = 0; t < durSonido; t += 10) {
+			_delay_ms(10);
+			tiempoBajo += 10;
+
+			if (bajoActivo && j < len_bajo_c3 && tiempoBajo >= dur_bajo_c3[j]) {
+				tiempoBajo = 0;
+				j++;
+				if (j < len_bajo_c3) Set_Tone_Buzzer2(bajo_c3[j]);
+				else { bajoActivo = 0; Set_Tone_Buzzer2(0); }
+			}
+
+			if (nuevoComando || Hay_Boton_Pulsado()) break;
+		}
+
+		Set_Tone_Buzzer1(0);
+		for (uint16_t t = 0; t < durSilencio; t += 10) {
+			_delay_ms(10);
+			tiempoBajo += 10;
+
+			if (bajoActivo && j < len_bajo_c3 && tiempoBajo >= dur_bajo_c3[j]) {
+				tiempoBajo = 0;
+				j++;
+				if (j < len_bajo_c3) Set_Tone_Buzzer2(bajo_c3[j]);
+				else { bajoActivo = 0; Set_Tone_Buzzer2(0); }
+			}
+
+			if (nuevoComando || Hay_Boton_Pulsado()) break;
+		}
+
+		if (nuevoComando || Hay_Boton_Pulsado()) break;
+		i++;
+	}
+
+	Set_Tone_Buzzer1(0);
+	Set_Tone_Buzzer2(0);
+	Esperar_Liberacion_Botones();
+
+	estadoActual = ESTADO_MENU;
+	Mostrar_Menu_LCD();
+}
 
