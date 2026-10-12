@@ -220,3 +220,23 @@ void LCD_I2C_Init(void) {
 
 	_delay_ms(2);
 }
+
+void LCD_I2C_SetCursor(uint8_t row, uint8_t col) {
+	uint8_t addr = (row == 0) ? (0x80 + col) : (0xC0 + col);
+	LCD_I2C_Cmd(addr);
+}
+
+void LCD_I2C_String(const char *str) {
+	while (*str)
+	LCD_I2C_Char((uint8_t)*str++);
+}
+
+void Mostrar_Menu_LCD(void) {
+	LCD_I2C_Cmd(0x01);
+	LCD_I2C_SetCursor(0, 0);
+	LCD_I2C_String("MENU PRINCIPAL:");
+	LCD_I2C_SetCursor(1, 0);
+	LCD_I2C_String(">");
+	LCD_I2C_String(opcionesMenu[opcionMenuActual]);
+}
+
