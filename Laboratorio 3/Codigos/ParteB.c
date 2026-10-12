@@ -75,3 +75,28 @@ void Motor_Control(int direction, uint8_t pwm_val) {
 	OCR0A = pwm_val;
 }
 
+// --- Interrupción ultrarrápida de recepción UART ---
+ISR(USART_RX_vect) {
+	static char buffer[10];
+	static uint8_t idx = 0;
+	char rx_byte = UDR0;
+
+	// Acepta Enter (\n o \r), Espacio o Punto y Coma (;) como finalizador
+	if (rx_byte == '\n' || rx_byte == '\r' || rx_byte == ' ' || rx_byte == ';') {
+		if (idx > 0) {
+			buffer[idx] = '\0';
+			int val = atoi(buffer);
+			if (val >= 0 && val <= 1023) {
+				setpoint_iluminacion = (uint16_t)val;
+				nuevo_sp_flag = 1; // Notifica al main
+			}
+			idx = 0;
+		}
+		} else if (rx_byte >= '0' && rx_byte <= '9') {
+		if (idx < sizeof(buffer) - 1) {
+			buffer[idx++] = rx_byte;
+		}
+		} else {
+		idx = 0; // Descarta buffer si entran letras o ruido
+	}
+}
