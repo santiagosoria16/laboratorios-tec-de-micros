@@ -188,3 +188,35 @@ void LCD_I2C_WriteNibble(uint8_t nibble, uint8_t mode) {
 	I2C_Stop();
 }
 
+void LCD_I2C_Cmd(uint8_t cmd) {
+	LCD_I2C_WriteNibble(cmd & 0xF0, 0);
+	LCD_I2C_WriteNibble((cmd << 4) & 0xF0, 0);
+
+	if (cmd == 0x01 || cmd == 0x02)
+	_delay_ms(2);
+}
+
+void LCD_I2C_Char(uint8_t data) {
+	LCD_I2C_WriteNibble(data & 0xF0, 1);
+	LCD_I2C_WriteNibble((data << 4) & 0xF0, 1);
+}
+
+void LCD_I2C_Init(void) {
+	_delay_ms(50);
+
+	LCD_I2C_WriteNibble(0x30, 0);
+	_delay_ms(5);
+
+	LCD_I2C_WriteNibble(0x30, 0);
+	_delay_us(200);
+
+	LCD_I2C_WriteNibble(0x30, 0);
+	LCD_I2C_WriteNibble(0x20, 0);
+
+	LCD_I2C_Cmd(0x28);
+	LCD_I2C_Cmd(0x0C);
+	LCD_I2C_Cmd(0x06);
+	LCD_I2C_Cmd(0x01);
+
+	_delay_ms(2);
+}
