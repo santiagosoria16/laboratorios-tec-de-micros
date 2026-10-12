@@ -240,3 +240,21 @@ void Mostrar_Menu_LCD(void) {
 	LCD_I2C_String(opcionesMenu[opcionMenuActual]);
 }
 
+// ==========================================
+// PWM / AUDIO
+// ==========================================
+void PWM_Init(void) {
+	// Timer 1 - Melodía - PB1 / OC1A (Fast PWM con ICR1 como TOP)
+	TCCR1A = (1 << COM1A1) | (1 << WGM11);
+	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11);
+
+	DDRB |= (1 << PB1);
+	PORTB &= ~(1 << PB1);
+
+	// Timer 2 - Bajo - PB3 / OC2A (CTC Mode, Toggle OC2A, Prescaler 256)
+	TCCR2A = (1 << WGM21);
+	TCCR2B = (1 << CS22) | (1 << CS21);
+
+	DDRB |= (1 << PB3);
+	PORTB &= ~(1 << PB3);
+}
