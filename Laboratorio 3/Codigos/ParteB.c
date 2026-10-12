@@ -33,3 +33,14 @@ void UART_sendChar(char data) {
 	UDR0 = data;
 }
 
+void UART_sendString(const char* str) {
+	while (*str) {
+		UART_sendChar(*str++);
+	}
+}
+
+// --- Inicialización de ADC ---
+void ADC_init(void) {
+	ADMUX = (1 << REFS0);
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+}
