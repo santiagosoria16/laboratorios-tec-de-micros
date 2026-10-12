@@ -60,3 +60,18 @@ void PWM_init(void) {
 	TCCR0B = (1 << CS01) | (1 << CS00);
 	OCR0A = 0;
 }
+
+void Motor_Control(int direction, uint8_t pwm_val) {
+	if (direction > 0) {
+		PORTD |= (1 << IN1_PIN);
+		PORTD &= ~(1 << IN2_PIN);
+		} else if (direction < 0) {
+		PORTD &= ~(1 << IN1_PIN);
+		PORTD |= (1 << IN2_PIN);
+		} else {
+		PORTD &= ~((1 << IN1_PIN) | (1 << IN2_PIN));
+		pwm_val = 0;
+	}
+	OCR0A = pwm_val;
+}
+
