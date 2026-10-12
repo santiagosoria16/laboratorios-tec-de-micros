@@ -135,3 +135,14 @@ ISR(USART_RX_vect) {
 	nuevoComando = 1;
 }
 
+// ==========================================
+// I2C CON TIMEOUT
+// ==========================================
+void I2C_Init(void) {
+	TWSR = 0x00;
+	TWBR = 0x48; // 100 kHz
+	TWCR = (1 << TWEN);
+}
+
+
+
