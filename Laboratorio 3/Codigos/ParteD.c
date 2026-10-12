@@ -608,3 +608,107 @@ void Ejecutar_Opcion(uint8_t opcion) {
 		break;
 	}
 }
+
+
+// ==========================================
+// PROGRAMA PRINCIPAL
+// ==========================================
+int main(void) {
+	// Entradas con Pull-Up interno
+	DDRB &= ~((1 << PB0) | (1 << PB2) | (1 << PB4) | (1 << PB5));
+	PORTB |=  (1 << PB0) | (1 << PB2) | (1 << PB4) | (1 << PB5);
+
+	DDRC &= ~((1 << PC0) | (1 << PC1) | (1 << PC2) | (1 << PC3));
+	PORTC |=  (1 << PC0) | (1 << PC1) | (1 << PC2) | (1 << PC3);
+
+	// Inicializaciones
+	I2C_Init();
+	LCD_I2C_Init();
+	PWM_Init();
+	UART_Init(9600);
+	sei();
+
+	UART_MostrarMenu();
+	Mostrar_Menu_LCD();
+
+	uint16_t frecuencia = 0;
+	char nombreNota[12];
+	uint8_t notaPrevia = 0;
+	uint8_t botonPresionadoAntes = 0;
+
+	while (1) {
+		// ----------------------------------
+		// ATENCIÓN COMANDOS UART
+		// ----------------------------------
+		if (nuevoComando) {
+			char cmd = comandoUART;
+			nuevoComando = 0;
+
+			if (cmd == '1') { Ejecutar_Opcion(0); }
+			else if (cmd == '2') { Ejecutar_Opcion(1); }
+			else if (cmd == '3') { Ejecutar_Opcion(2); }
+			else if (cmd == '4') { Ejecutar_Opcion(3); }
+			else if (cmd == 'S' || cmd == 's' || cmd == '0' || cmd == 'M' || cmd == 'm') {
+				estadoActual = ESTADO_MENU;
+				Set_Tone_Buzzer1(0);
+				Set_Tone_Buzzer2(0);
+				Mostrar_Menu_LCD();
+				UART_SendString("[FSM] Retorno al MENU PRINCIPAL.\r\n");
+			}
+		}
+
+		// ----------------------------------
+		// MODO MENÚ
+		// ----------------------------------
+		if (estadoActual == ESTADO_MENU) {
+			// PB0: Navegar opción
+			if (!(PINB & (1 << PB0))) {
+				if (!botonPresionadoAntes) {
+					opcionMenuActual = (opcionMenuActual + 1) % TOTAL_OPCIONES;
+					Mostrar_Menu_LCD();
+					botonPresionadoAntes = 1;
+				}
+			}
+			// PB2: Seleccionar opción
+			else if (!(PINB & (1 << PB2))) {
+				if (!botonPresionadoAntes) {
+					botonPresionadoAntes = 1;
+					Ejecutar_Opcion(opcionMenuActual);
+				}
+				} else {
+				botonPresionadoAntes = 0;
+			}
+			_delay_ms(20);
+		}
+
+		// ----------------------------------
+		// MODO PIANO MANUAL
+		// ----------------------------------
+		else if (estadoActual == ESTADO_PIANO) {
+			if (Leer_Pulsadores(&frecuencia, nombreNota)) {
+				Set_Tone_Buzzer1(frecuencia);
+				Set_Tone_Buzzer2(0);
+
+				if (!notaPrevia) {
+					LCD_I2C_SetCursor(1, 0);
+					LCD_I2C_String("Nota: ");
+					LCD_I2C_String(nombreNota);
+
+					UART_SendString("Nota: ");
+					UART_SendString(nombreNota);
+					UART_SendString("\r\n");
+					notaPrevia = 1;
+				}
+				} else {
+				Set_Tone_Buzzer1(0);
+				Set_Tone_Buzzer2(0);
+
+				if (notaPrevia) {
+					LCD_I2C_SetCursor(1, 0);
+					LCD_I2C_String("                ");
+					notaPrevia = 0;
+				}
+			}
+		}
+	}
+}
