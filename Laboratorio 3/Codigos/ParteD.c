@@ -168,4 +168,23 @@ uint8_t I2C_Write(uint8_t data) {
 	return 1;
 }
 
+// ==========================================
+// LCD 16x2 I2C
+// ==========================================
+#define LCD_BACKLIGHT 0x08
+
+void LCD_I2C_WriteNibble(uint8_t nibble, uint8_t mode) {
+	uint8_t data = (nibble & 0xF0) | mode | LCD_BACKLIGHT;
+
+	if (!I2C_Start()) return;
+	if (!I2C_Write(PCF8574_ADDR << 1)) { I2C_Stop(); return; }
+
+	I2C_Write(data | 0x04);
+	_delay_us(1);
+
+	I2C_Write(data & ~0x04);
+	_delay_us(50);
+
+	I2C_Stop();
+}
 
