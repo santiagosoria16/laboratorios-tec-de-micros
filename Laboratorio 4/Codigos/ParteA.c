@@ -248,3 +248,14 @@ bool RC522_Anticoll(uint8_t *uid) {
 	return false;
 }
 
+bool RC522_CheckCard(uint8_t *uid) {
+	uint8_t atqa[2];
+	if (RC522_RequestA(atqa)) {
+		_delay_ms(5);
+		if (RC522_Anticoll(uid)) {
+			return true;
+		}
+	}
+	return false;
+}
+
