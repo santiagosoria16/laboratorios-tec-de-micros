@@ -350,3 +350,22 @@ void InicializarEEPROMDefecto(void) {
 	}
 }
 
+void AutoInicializarEEPROM(void) {
+	uint8_t magic = eeprom_read_byte((const uint8_t*)EEPROM_MAGIC_ADDR);
+	if (magic != EEPROM_MAGIC_VAL) {
+		InicializarEEPROMDefecto();
+		eeprom_write_byte((uint8_t*)EEPROM_MAGIC_ADDR, EEPROM_MAGIC_VAL);
+	}
+}
+
+int8_t BuscarCuentaPorUID(const uint8_t *uid) {
+	Cuenta_t cta;
+	for (uint8_t i = 0; i < CANT_CUENTAS; i++) {
+		CargarCuentaEEPROM(i, &cta);
+		if (memcmp(cta.uid, uid, 4) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
