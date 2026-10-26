@@ -445,3 +445,51 @@ int main(void) {
 					LCD_I2C_Clear();
 				}
 			}
+
+			break;
+
+			case ST_INGRESO_PIN:
+			LCD_I2C_SetCursor(0, 0);
+			LCD_I2C_Print("Ingrese PIN:    ");
+			LCD_I2C_SetCursor(1, 0);
+			for (uint8_t i = 0; i < 4; i++) {
+				if (i < bufIdx) LCD_I2C_Data('*');
+				else LCD_I2C_Data(' ');
+			}
+			LCD_I2C_Print("            ");
+
+			if (tecla != '\0') {
+				if (tecla >= '0' && tecla <= '9' && bufIdx < 4) {
+					buffer[bufIdx++] = tecla;
+					Beep(50, 1000);
+					} else if (tecla == '*' && bufIdx > 0) {
+					bufIdx--;
+					buffer[bufIdx] = '\0';
+					} else if (tecla == '#') {
+					if (bufIdx == 4) {
+						if (VerificarPIN(cuentaActiva, buffer)) {
+							AnimacionExito();
+							LCD_I2C_Clear();
+							estado = ST_MENU_PRINCIPAL;
+							} else {
+							intentosPin++;
+							AnimacionError();
+							if (intentosPin >= 3) {
+								estado = ST_BLOQUEO;
+								} else {
+								LCD_I2C_Clear();
+								LCD_I2C_SetCursor(0, 0);
+								LCD_I2C_Print("PIN Incorrecto ");
+								LCD_I2C_SetCursor(1, 0);
+								LCD_I2C_Print("Intentos res: ");
+								LCD_I2C_Data('0' + (3 - intentosPin));
+								_delay_ms(1500);
+								bufIdx = 0;
+								memset(buffer, 0, sizeof(buffer));
+								LCD_I2C_Clear();
+							}
+						}
+					}
+				}
+			}
+			break;
