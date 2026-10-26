@@ -454,3 +454,39 @@ int main(void)
 				}
 			}
 
+			break;
+
+			case EST_DESVIANDO:
+
+			ldr_bloqueado = 1;
+
+			piezas++;
+
+			spi_enviar_trama(CMD_PISTON, 1);
+
+			comando_actual = "PISTON";
+
+			estado = EST_FUNCIONANDO;
+
+			break;
+
+			case EST_FALLA:
+
+			if (boton_presionado && temperatura < TEMP_LIMITE)
+			{
+				spi_enviar_trama(CMD_STOP, 0);
+
+				comando_actual = "STOP";
+
+				estado = EST_PARADO;
+			}
+
+			break;
+
+			default:
+
+			estado = EST_PARADO;
+
+			break;
+		}
+
