@@ -140,3 +140,23 @@ bool Terminal_CheckCard(uint8_t *uid) {
 	return false;
 }
 
+void SPI_Init(void) {
+	DDRB |= (1 << SPI_MOSI) | (1 << SPI_SCK) | (1 << SPI_SS) | (1 << RC522_RST);
+	DDRB &= ~(1 << SPI_MISO);
+	PORTB |= (1 << SPI_SS) | (1 << RC522_RST);
+	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+}
+
+uint8_t SPI_Transfer(uint8_t data) {
+	SPDR = data;
+	while (!(SPSR & (1 << SPIF)));
+	return SPDR;
+}
+
+void RC522_WriteReg(uint8_t addr, uint8_t val) {
+	PORTB &= ~(1 << SPI_SS);
+	SPI_Transfer((addr << 1) & 0x7E);
+	SPI_Transfer(val);
+	PORTB |= (1 << SPI_SS);
+}
+
