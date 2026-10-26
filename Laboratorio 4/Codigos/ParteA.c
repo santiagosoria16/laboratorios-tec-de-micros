@@ -106,3 +106,37 @@ void LCD_I2C_Clear(void) {
 	_delay_ms(2);
 }
 
+
+void USART_Init(void) {
+	uint16_t ubrr = 103; // 9600 baudios
+	UBRR0H = (uint8_t)(ubrr >> 8);
+	UBRR0L = (uint8_t)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+
+bool Terminal_CheckCard(uint8_t *uid) {
+	static char hexBuf[9] = {0};
+	static uint8_t bufPos = 0;
+
+	while (UCSR0A & (1 << RXC0)) {
+		char c = UDR0;
+		if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) {
+			hexBuf[bufPos++] = c;
+			if (bufPos == 8) {
+				for (uint8_t i = 0; i < 4; i++) {
+					char byteStr[3] = { hexBuf[i*2], hexBuf[i*2+1], '\0' };
+					uid[i] = (uint8_t)strtoul(byteStr, NULL, 16);
+				}
+				bufPos = 0;
+				memset(hexBuf, 0, sizeof(hexBuf));
+				return true;
+			}
+			} else if (c == '\r' || c == '\n') {
+			bufPos = 0;
+			memset(hexBuf, 0, sizeof(hexBuf));
+		}
+	}
+	return false;
+}
+
