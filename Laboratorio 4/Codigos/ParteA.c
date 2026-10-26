@@ -534,3 +534,45 @@ int main(void) {
 				}
 				break;
 			}
+
+			case ST_INGRESO_RETIRO:
+			LCD_I2C_SetCursor(0, 0);
+			LCD_I2C_Print("Monto Retiro:   ");
+			LCD_I2C_SetCursor(1, 0);
+			char strRetiro[16];
+			sprintf(strRetiro, "$%s              ", buffer);
+			LCD_I2C_Print(strRetiro);
+
+			if (tecla != '\0') {
+				if (tecla >= '0' && tecla <= '9' && bufIdx < 6) {
+					buffer[bufIdx++] = tecla;
+					buffer[bufIdx] = '\0';
+					Beep(50, 1000);
+					} else if (tecla == '*' && bufIdx > 0) {
+					bufIdx--;
+					buffer[bufIdx] = '\0';
+					} else if (tecla == '#') {
+					uint32_t monto = atol(buffer);
+					Cuenta_t cta;
+					CargarCuentaEEPROM(cuentaActiva, &cta);
+
+					if (monto > 0 && cta.saldo >= monto) {
+						cta.saldo -= monto;
+						GuardarCuentaEEPROM(cuentaActiva, &cta);
+						AnimacionExito();
+						LCD_I2C_Clear();
+						LCD_I2C_SetCursor(0, 0);
+						LCD_I2C_Print("Retiro Exitoso ");
+						_delay_ms(1500);
+						} else {
+						AnimacionError();
+						LCD_I2C_Clear();
+						LCD_I2C_SetCursor(0, 0);
+						LCD_I2C_Print("Saldo Insufic. ");
+						_delay_ms(1500);
+					}
+					LCD_I2C_Clear();
+					estado = ST_MENU_PRINCIPAL;
+				}
+			}
+			break;
