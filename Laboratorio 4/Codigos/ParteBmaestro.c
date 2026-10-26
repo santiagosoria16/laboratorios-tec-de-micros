@@ -490,3 +490,35 @@ int main(void)
 			break;
 		}
 
+		if (estado == EST_FUNCIONANDO ||
+		estado == EST_DESVIANDO)
+		{
+			snprintf(linea, sizeof(linea),
+			"RUN V:%3u T:%2uC",
+			pwm_actual, temperatura);
+		}
+		else if (estado == EST_PARADO)
+		{
+			snprintf(linea, sizeof(linea),
+			"STOP V:%3u T:%2uC",
+			pwm_actual, temperatura);
+		}
+		else
+		{
+			snprintf(linea, sizeof(linea),
+			"EMERGENCIA T:%2uC",
+			temperatura);
+		}
+
+		lcd_texto(0, 0, linea);
+
+		snprintf(linea, sizeof(linea),
+		"P:%u CMD:%s",
+		piezas, comando_actual);
+
+		lcd_texto(1, 0, linea);
+
+		_delay_ms(30);
+	}
+}
+
