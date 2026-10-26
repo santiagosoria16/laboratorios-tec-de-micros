@@ -340,3 +340,69 @@ int main(void)
 
 	spi_enviar_trama(CMD_STOP, 0);
 
+	while (1)
+	{
+
+		boton_presionado = 0;
+
+		if (evento_boton)
+		{
+			evento_boton = 0;
+
+			_delay_ms(25);
+
+			if (!(PIND & (1 << PIN_BOTON)))
+			{
+				boton_presionado = 1;
+
+				while (!(PIND & (1 << PIN_BOTON)))
+				_delay_ms(5);
+			}
+		}
+
+
+		pwm_actual = (uint8_t)(adc_leer(0) >> 2);
+
+		ldr_actual = (PIND & (1 << PIN_LDR)) ? 1 : 0;
+
+		ciclos_dht++;
+
+		if (ciclos_dht >= 35)
+		{
+			ciclos_dht = 0;
+
+			uint8_t nueva_temp = dht_leer();
+
+			if (nueva_temp > 0 && nueva_temp < 95)
+			temperatura = nueva_temp;
+		}
+
+		switch (estado)
+		{
+			case EST_PARADO:
+
+			if (temperatura >= TEMP_LIMITE)
+			{
+				spi_enviar_trama(CMD_EMERGENCY, 0xFF);
+
+				comando_actual = "EMERG";
+
+				estado = EST_FALLA;
+			}
+			else if (boton_presionado)
+			{
+				ldr_referencia = ldr_actual;
+
+				ldr_bloqueado = 0;
+
+				spi_enviar_trama(CMD_START, 0);
+
+				spi_enviar_trama(CMD_SPEED, pwm_actual);
+
+				pwm_anterior = pwm_actual;
+
+				comando_actual = "START";
+
+				estado = EST_FUNCIONANDO;
+			}
+
