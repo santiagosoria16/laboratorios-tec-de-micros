@@ -294,3 +294,29 @@ char Keypad_GetKey(void) {
 	return '\0';
 }
 
+
+void Beep(uint16_t duration_ms, uint16_t freq_hz) {
+	uint32_t delay_us = 1000000UL / (2 * freq_hz);
+	uint32_t cycles = (uint32_t)duration_ms * 1000UL / (2 * delay_us);
+	for (uint32_t i = 0; i < cycles; i++) {
+		PORTB |= (1 << BUZZER_PIN);
+		for (uint32_t d = 0; d < delay_us / 10; d++) _delay_us(10);
+		PORTB &= ~(1 << BUZZER_PIN);
+		for (uint32_t d = 0; d < delay_us / 10; d++) _delay_us(10);
+	}
+}
+
+void AnimacionExito(void) {
+	PORTD |= (1 << LED_VERDE_PIN);
+	Beep(150, 2000);
+	_delay_ms(200);
+	PORTD &= ~(1 << LED_VERDE_PIN);
+}
+
+void AnimacionError(void) {
+	PORTD |= (1 << LED_ROJO_PIN);
+	Beep(400, 500);
+	_delay_ms(200);
+	PORTD &= ~(1 << LED_ROJO_PIN);
+}
+
