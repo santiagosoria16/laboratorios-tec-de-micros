@@ -268,3 +268,33 @@ uint8_t dht_leer(void)
 	if (!dht_esperar(1)) goto salida;
 	if (!dht_esperar(0)) goto salida;
 
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 8; j++)
+		{
+			if (!dht_esperar(1)) goto salida;
+
+			_delay_us(40);
+
+			if (PIND & (1 << PIN_DHT))
+			datos[i] |= (1 << (7 - j));
+
+			if (!dht_esperar(0)) goto salida;
+		}
+	}
+
+
+	if ((uint8_t)(datos[0] + datos[1] +
+	datos[2] + datos[3]) == datos[4])
+	{
+		resultado = datos[2];
+	}
+
+	salida:
+
+	SREG = estado_interrupciones;
+
+	return resultado;
+}
+
