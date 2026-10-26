@@ -185,3 +185,24 @@ void RC522_Init(void) {
 	RC522_WriteReg(0x15, 0x40);
 	RC522_WriteReg(0x11, 0x3D);
 
+
+	RC522_WriteReg(0x26, 0x70);
+
+	uint8_t txControl = RC522_ReadReg(0x14);
+	if ((txControl & 0x03) != 0x03) {
+		RC522_WriteReg(0x14, txControl | 0x03);
+	}
+}
+
+bool RC522_RequestA(uint8_t *bufferATQA) {
+	RC522_WriteReg(0x0D, 0x07);
+	RC522_WriteReg(0x04, 0x7F);
+	RC522_WriteReg(0x0A, 0x80);
+	RC522_WriteReg(0x01, 0x00);
+
+	RC522_WriteReg(0x09, 0x26);
+	RC522_WriteReg(0x01, 0x0C);
+	RC522_WriteReg(0x0D, 0x87);
+
+	_delay_ms(20);
+
