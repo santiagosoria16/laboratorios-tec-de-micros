@@ -406,3 +406,51 @@ int main(void)
 				estado = EST_FUNCIONANDO;
 			}
 
+			break;
+
+			case EST_FUNCIONANDO:
+
+			if (temperatura >= TEMP_LIMITE)
+			{
+				spi_enviar_trama(CMD_EMERGENCY, 0xFF);
+
+				comando_actual = "EMERG";
+
+				estado = EST_FALLA;
+			}
+			else if (boton_presionado)
+			{
+				spi_enviar_trama(CMD_STOP, 0);
+
+				comando_actual = "STOP";
+
+				estado = EST_PARADO;
+			}
+			else
+			{
+
+
+				if (ldr_actual != ldr_referencia)
+				{
+					if (!ldr_bloqueado)
+					estado = EST_DESVIANDO;
+				}
+				else
+				{
+					ldr_bloqueado = 0;
+				}
+
+
+				int16_t diferencia =
+				(int16_t)pwm_actual - (int16_t)pwm_anterior;
+
+				if (diferencia >= 2 || diferencia <= -2)
+				{
+					spi_enviar_trama(CMD_SPEED, pwm_actual);
+
+					pwm_anterior = pwm_actual;
+
+					comando_actual = "SPEED";
+				}
+			}
+
