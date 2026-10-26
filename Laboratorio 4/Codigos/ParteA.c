@@ -369,3 +369,20 @@ int8_t BuscarCuentaPorUID(const uint8_t *uid) {
 	return -1;
 }
 
+bool VerificarPIN(uint8_t index, const char *pinIngresado) {
+	Cuenta_t cta;
+	CargarCuentaEEPROM(index, &cta);
+	return (strncmp(cta.pin, pinIngresado, 4) == 0);
+}
+
+
+typedef enum {
+	ST_ESPERA_TARJETA,
+	ST_INGRESO_PIN,
+	ST_MENU_PRINCIPAL,
+	ST_CONSULTA_SALDO,
+	ST_INGRESO_RETIRO,
+	ST_INGRESO_DEPOSITO,
+	ST_BLOQUEO
+} EstadoFSM_t;
+
