@@ -613,3 +613,28 @@ int main(void) {
 				}
 			}
 			break;
+
+			case ST_BLOQUEO:
+			LCD_I2C_Clear();
+			LCD_I2C_SetCursor(0, 0);
+			LCD_I2C_Print("SISTEMA BLOQUEADO");
+			LCD_I2C_SetCursor(1, 0);
+			LCD_I2C_Print("3 INTENTOS FALL.");
+
+			for (uint8_t i = 0; i < 10; i++) {
+				PORTD |= (1 << LED_ROJO_PIN);
+				Beep(250, 1500);
+				PORTD &= ~(1 << LED_ROJO_PIN);
+				_delay_ms(250);
+			}
+
+			cuentaActiva = -1;
+			intentosPin = 0;
+			LCD_I2C_Clear();
+			estado = ST_ESPERA_TARJETA;
+			break;
+		}
+		_delay_ms(10);
+	}
+	return 0;
+}
