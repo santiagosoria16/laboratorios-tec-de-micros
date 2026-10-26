@@ -320,3 +320,33 @@ void AnimacionError(void) {
 	PORTD &= ~(1 << LED_ROJO_PIN);
 }
 
+typedef struct {
+	uint8_t uid[4];
+	char pin[4];
+	uint32_t saldo;
+} Cuenta_t;
+
+#define CANT_CUENTAS 3
+
+void GuardarCuentaEEPROM(uint8_t index, const Cuenta_t *cta) {
+	uint16_t addr = index * sizeof(Cuenta_t);
+	eeprom_update_block((const void*)cta, (void*)addr, sizeof(Cuenta_t));
+}
+
+void CargarCuentaEEPROM(uint8_t index, Cuenta_t *cta) {
+	uint16_t addr = index * sizeof(Cuenta_t);
+	eeprom_read_block((void*)cta, (const void*)addr, sizeof(Cuenta_t));
+}
+
+void InicializarEEPROMDefecto(void) {
+	// SE CARGAN LOS 3 UIDS OBTENIDOS POR EL ESCÁNER:
+	Cuenta_t iniciales[CANT_CUENTAS] = {
+		{ {0x0A, 0x98, 0xBD, 0x02}, {'1', '2', '3', '4'}, 5000 },
+		{ {0x43, 0x5F, 0x1A, 0x2D}, {'4', '3', '2', '1'}, 12000 },
+		{ {0xF3, 0xF6, 0x17, 0x29}, {'1', '1', '2', '2'}, 8500 }
+	};
+	for (uint8_t i = 0; i < CANT_CUENTAS; i++) {
+		GuardarCuentaEEPROM(i, &iniciales[i]);
+	}
+}
+
