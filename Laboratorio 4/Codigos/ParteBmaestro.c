@@ -209,3 +209,62 @@ void spi_enviar_trama(uint8_t comando, uint8_t valor)
 	_delay_ms(2);
 }
 
+ISR(INT0_vect)
+{
+	evento_boton = 1;
+}
+
+void boton_init(void)
+{
+	DDRD &= ~(1 << PIN_BOTON);
+
+	PORTD |= (1 << PIN_BOTON);
+
+	EICRA = (1 << ISC01);
+
+	EIMSK = (1 << INT0);
+}
+
+uint8_t dht_esperar(uint8_t nivel)
+{
+	uint16_t timeout = 1200;
+
+	while (((PIND & (1 << PIN_DHT)) != 0) != nivel)
+	{
+		if (--timeout == 0)
+		return 0;
+	}
+
+	return 1;
+}
+
+uint8_t dht_leer(void)
+{
+	uint8_t datos[5] = {0, 0, 0, 0, 0};
+
+	uint8_t i, j;
+	uint8_t resultado = 0;
+
+	uint8_t estado_interrupciones = SREG;
+
+	// Pulso de inicio
+	DDRD |= (1 << PIN_DHT);
+
+	PORTD &= ~(1 << PIN_DHT);
+
+	_delay_ms(18);
+
+	PORTD |= (1 << PIN_DHT);
+
+	_delay_us(30);
+
+	DDRD &= ~(1 << PIN_DHT);
+
+	PORTD |= (1 << PIN_DHT);
+
+	cli();
+
+	if (!dht_esperar(0)) goto salida;
+	if (!dht_esperar(1)) goto salida;
+	if (!dht_esperar(0)) goto salida;
+
