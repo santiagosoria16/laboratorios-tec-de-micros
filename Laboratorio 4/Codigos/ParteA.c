@@ -576,3 +576,40 @@ int main(void) {
 				}
 			}
 			break;
+
+			case ST_INGRESO_DEPOSITO:
+			LCD_I2C_SetCursor(0, 0);
+			LCD_I2C_Print("Monto Deposito: ");
+			LCD_I2C_SetCursor(1, 0);
+			char strDep[16];
+			sprintf(strDep, "$%s              ", buffer);
+			LCD_I2C_Print(strDep);
+
+			if (tecla != '\0') {
+				if (tecla >= '0' && tecla <= '9' && bufIdx < 6) {
+					buffer[bufIdx++] = tecla;
+					buffer[bufIdx] = '\0';
+					Beep(50, 1000);
+					} else if (tecla == '*' && bufIdx > 0) {
+					bufIdx--;
+					buffer[bufIdx] = '\0';
+					} else if (tecla == '#') {
+					uint32_t monto = atol(buffer);
+					if (monto > 0) {
+						Cuenta_t cta;
+						CargarCuentaEEPROM(cuentaActiva, &cta);
+						cta.saldo += monto;
+						GuardarCuentaEEPROM(cuentaActiva, &cta);
+						AnimacionExito();
+						LCD_I2C_Clear();
+						LCD_I2C_SetCursor(0, 0);
+						LCD_I2C_Print("Deposito Exitoso");
+						_delay_ms(1500);
+						} else {
+						AnimacionError();
+					}
+					LCD_I2C_Clear();
+					estado = ST_MENU_PRINCIPAL;
+				}
+			}
+			break;
