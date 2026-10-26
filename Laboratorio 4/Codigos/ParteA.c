@@ -7,26 +7,31 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+// ==========================================
+// ASIGNACIÓN DE PINES Y REGISTROS
+// ==========================================
 #define LED_VERDE_PIN   PD6
 #define LED_ROJO_PIN    PD7
 #define BUZZER_PIN      PB0
 
+#define SPI_SS          PB2 // Pin 10
+#define SPI_MOSI        PB3 // Pin 11
+#define SPI_MISO        PB4 // Pin 12
+#define SPI_SCK         PB5 // Pin 13
+#define RC522_RST       PB1 // Pin 9
 
-#define SPI_SS          PB2
-#define SPI_MOSI        PB3
-#define SPI_MISO        PB4
-#define SPI_SCK         PB5 
-#define RC522_RST       PB1 
-
-#define PCF8574_ADDR    (0x27 << 1)
+#define PCF8574_ADDR    (0x27 << 1) // Dirección I2C Pantalla LCD
 
 #define LCD_RS          (1 << 0)
 #define LCD_EN          (1 << 2)
 #define LCD_BACKLIGHT   (1 << 3)
 
 #define EEPROM_MAGIC_ADDR  0x03FF
-#define EEPROM_MAGIC_VAL   0xA6
+#define EEPROM_MAGIC_VAL   0xA6 // Marca de actualización EEPROM
 
+// ==========================================
+// CONTROLADOR TWI (I2C) & PANTALLA LCD 16x2
+// ==========================================
 static uint8_t lcd_backlight_val = LCD_BACKLIGHT;
 
 void TWI_Init(void) {
@@ -84,10 +89,10 @@ void LCD_I2C_Init(void) {
 	LCD_I2C_WriteNibble(0x30); _delay_ms(1);
 	LCD_I2C_WriteNibble(0x20); _delay_ms(1);
 
-	LCD_I2C_Cmd(0x28);
-	LCD_I2C_Cmd(0x0C);
-	LCD_I2C_Cmd(0x06);
-	LCD_I2C_Cmd(0x01);
+	LCD_I2C_Cmd(0x28); // 2 Líneas, matriz 5x8
+	LCD_I2C_Cmd(0x0C); // Display ON, Cursor OFF
+	LCD_I2C_Cmd(0x06); // Modo Incremento
+	LCD_I2C_Cmd(0x01); // Limpiar Pantalla
 	_delay_ms(2);
 }
 
@@ -101,12 +106,15 @@ void LCD_I2C_Print(const char *str) {
 		LCD_I2C_Data((uint8_t)*str++);
 	}
 }
+
 void LCD_I2C_Clear(void) {
 	LCD_I2C_Cmd(0x01);
 	_delay_ms(2);
 }
 
-
+// ==========================================
+// CONTROLADOR USART (TERMINAL SERIE / PICSIMLAB)
+// ==========================================
 void USART_Init(void) {
 	uint16_t ubrr = 103; // 9600 baudios
 	UBRR0H = (uint8_t)(ubrr >> 8);
@@ -140,11 +148,14 @@ bool Terminal_CheckCard(uint8_t *uid) {
 	return false;
 }
 
+// ==========================================
+// DRIVER RFID MFRC522 (OPTIMIZADO PROTOCOLO OFICIAL)
+// ==========================================
 void SPI_Init(void) {
 	DDRB |= (1 << SPI_MOSI) | (1 << SPI_SCK) | (1 << SPI_SS) | (1 << RC522_RST);
 	DDRB &= ~(1 << SPI_MISO);
 	PORTB |= (1 << SPI_SS) | (1 << RC522_RST);
-	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0); // SPI Maestro, Fosc/16
 }
 
 uint8_t SPI_Transfer(uint8_t data) {
@@ -175,7 +186,7 @@ void RC522_Init(void) {
 	PORTB |= (1 << RC522_RST);
 	_delay_ms(50);
 
-	RC522_WriteReg(0x01, 0x0F);
+	RC522_WriteReg(0x01, 0x0F); // Soft Reset
 	_delay_ms(50);
 
 	RC522_WriteReg(0x2A, 0x8D);
@@ -185,7 +196,7 @@ void RC522_Init(void) {
 	RC522_WriteReg(0x15, 0x40);
 	RC522_WriteReg(0x11, 0x3D);
 
-
+	// Ganancia de Antena a 48 dB (Máxima Potencia para chips HW-126)
 	RC522_WriteReg(0x26, 0x70);
 
 	uint8_t txControl = RC522_ReadReg(0x14);
@@ -200,8 +211,8 @@ bool RC522_RequestA(uint8_t *bufferATQA) {
 	RC522_WriteReg(0x0A, 0x80);
 	RC522_WriteReg(0x01, 0x00);
 
-	RC522_WriteReg(0x09, 0x26);
-	RC522_WriteReg(0x01, 0x0C);
+	RC522_WriteReg(0x09, 0x26); // REQA
+	RC522_WriteReg(0x01, 0x0C); // Transceive
 	RC522_WriteReg(0x0D, 0x87);
 
 	_delay_ms(20);
@@ -259,6 +270,9 @@ bool RC522_CheckCard(uint8_t *uid) {
 	return false;
 }
 
+// ==========================================
+// TECLADO MATRICIAL 4x4 (GPIO)
+// ==========================================
 void Keypad_Init(void) {
 	DDRC |= (1 << PC0) | (1 << PC1) | (1 << PC2) | (1 << PC3);
 	PORTC |= (1 << PC0) | (1 << PC1) | (1 << PC2) | (1 << PC3);
@@ -285,7 +299,7 @@ char Keypad_GetKey(void) {
 
 		for (uint8_t c = 0; c < 4; c++) {
 			if (!(PIND & (1 << colPins[c]))) {
-				_delay_ms(20); 
+				_delay_ms(20); // Anti-rebote
 				while (!(PIND & (1 << colPins[c])));
 				return keymap[r][c];
 			}
@@ -294,7 +308,9 @@ char Keypad_GetKey(void) {
 	return '\0';
 }
 
-
+// ==========================================
+// INDICADORES SONOROS Y VISUALES
+// ==========================================
 void Beep(uint16_t duration_ms, uint16_t freq_hz) {
 	uint32_t delay_us = 1000000UL / (2 * freq_hz);
 	uint32_t cycles = (uint32_t)duration_ms * 1000UL / (2 * delay_us);
@@ -320,6 +336,9 @@ void AnimacionError(void) {
 	PORTD &= ~(1 << LED_ROJO_PIN);
 }
 
+// ==========================================
+// MEMORIA EEPROM CON UIDS REALES OBTENIDOS
+// ==========================================
 typedef struct {
 	uint8_t uid[4];
 	char pin[4];
@@ -375,7 +394,9 @@ bool VerificarPIN(uint8_t index, const char *pinIngresado) {
 	return (strncmp(cta.pin, pinIngresado, 4) == 0);
 }
 
-
+// ==========================================
+// MÁQUINA DE ESTADOS FINITOS (FSM)
+// ==========================================
 typedef enum {
 	ST_ESPERA_TARJETA,
 	ST_INGRESO_PIN,
@@ -398,7 +419,7 @@ int main(void) {
 	LCD_I2C_Init();
 	Keypad_Init();
 
-
+	// Graba la EEPROM automáticamente al iniciar
 	AutoInicializarEEPROM();
 
 	LCD_I2C_Clear();
@@ -426,6 +447,7 @@ int main(void) {
 			LCD_I2C_SetCursor(1, 0);
 			LCD_I2C_Print("Acerque Tarjeta ");
 
+			// Detecta tanto tarjetas físicas reales como entrada por terminal serie
 			if (RC522_CheckCard(uidLeido) || Terminal_CheckCard(uidLeido)) {
 				cuentaActiva = BuscarCuentaPorUID(uidLeido);
 				if (cuentaActiva != -1) {
@@ -445,7 +467,6 @@ int main(void) {
 					LCD_I2C_Clear();
 				}
 			}
-
 			break;
 
 			case ST_INGRESO_PIN:
