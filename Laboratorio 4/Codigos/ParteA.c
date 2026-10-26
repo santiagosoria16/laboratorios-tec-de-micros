@@ -44,3 +44,26 @@ void TWI_Stop(void) {
 	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 }
 
+void TWI_Write(uint8_t data) {
+	TWDR = data;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
+
+void LCD_I2C_WriteNibble(uint8_t data) {
+	TWI_Start();
+	TWI_Write(PCF8574_ADDR);
+	TWI_Write(data | lcd_backlight_val | LCD_EN);
+	_delay_us(1);
+	TWI_Write((data | lcd_backlight_val) & ~LCD_EN);
+	_delay_us(50);
+	TWI_Stop();
+}
+
+void LCD_I2C_Send(uint8_t value, uint8_t mode) {
+	uint8_t highnib = value & 0xF0;
+	uint8_t lownib = (value << 4) & 0xF0;
+	LCD_I2C_WriteNibble(highnib | mode);
+	LCD_I2C_WriteNibble(lownib | mode);
+}
+
