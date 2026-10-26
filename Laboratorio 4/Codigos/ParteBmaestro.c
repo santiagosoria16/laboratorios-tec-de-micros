@@ -298,3 +298,45 @@ uint8_t dht_leer(void)
 	return resultado;
 }
 
+int main(void)
+{
+	char linea[17];
+
+	uint8_t boton_actual;
+	uint8_t boton_presionado;
+
+	uint8_t ldr_actual;
+
+	uint8_t ciclos_dht = 0;
+
+
+	DDRD &= ~((1 << PIN_LDR) | (1 << PIN_BOTON));
+
+	PORTD |= (1 << PIN_BOTON);
+
+
+	DDRC &= ~(1 << PC0);
+
+
+	boton_init();
+
+	adc_init();
+
+	i2c_init();
+
+	spi_init();
+
+	lcd_init();
+
+	sei();
+
+	lcd_texto(0, 0, "SISTEMA LISTO");
+
+	_delay_ms(700);
+
+	ldr_referencia = (PIND & (1 << PIN_LDR)) ? 1 : 0;
+
+	estado = EST_PARADO;
+
+	spi_enviar_trama(CMD_STOP, 0);
+
