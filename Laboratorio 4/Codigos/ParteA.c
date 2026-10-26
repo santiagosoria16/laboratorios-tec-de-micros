@@ -493,3 +493,44 @@ int main(void) {
 				}
 			}
 			break;
+
+			case ST_MENU_PRINCIPAL:
+			LCD_I2C_SetCursor(0, 0);
+			LCD_I2C_Print("1:Saldo 2:Retir ");
+			LCD_I2C_SetCursor(1, 0);
+			LCD_I2C_Print("3:Deposi 4:Salir");
+
+			if (tecla != '\0') {
+				Beep(50, 1000);
+				bufIdx = 0;
+				memset(buffer, 0, sizeof(buffer));
+				LCD_I2C_Clear();
+
+				if (tecla == '1') estado = ST_CONSULTA_SALDO;
+				else if (tecla == '2') estado = ST_INGRESO_RETIRO;
+				else if (tecla == '3') estado = ST_INGRESO_DEPOSITO;
+				else if (tecla == '4') {
+					cuentaActiva = -1;
+					estado = ST_ESPERA_TARJETA;
+				}
+			}
+			break;
+
+			case ST_CONSULTA_SALDO: {
+				Cuenta_t cta;
+				CargarCuentaEEPROM(cuentaActiva, &cta);
+
+				LCD_I2C_SetCursor(0, 0);
+				LCD_I2C_Print("Saldo Actual:   ");
+				LCD_I2C_SetCursor(1, 0);
+				char strSaldo[16];
+				sprintf(strSaldo, "$%lu              ", cta.saldo);
+				LCD_I2C_Print(strSaldo);
+
+				if (tecla != '\0') {
+					Beep(50, 1000);
+					LCD_I2C_Clear();
+					estado = ST_MENU_PRINCIPAL;
+				}
+				break;
+			}
