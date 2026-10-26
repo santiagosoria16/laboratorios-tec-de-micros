@@ -259,3 +259,38 @@ bool RC522_CheckCard(uint8_t *uid) {
 	return false;
 }
 
+void Keypad_Init(void) {
+	DDRC |= (1 << PC0) | (1 << PC1) | (1 << PC2) | (1 << PC3);
+	PORTC |= (1 << PC0) | (1 << PC1) | (1 << PC2) | (1 << PC3);
+
+	DDRD &= ~((1 << PD2) | (1 << PD3) | (1 << PD4) | (1 << PD5));
+	PORTD |= (1 << PD2) | (1 << PD3) | (1 << PD4) | (1 << PD5);
+}
+
+char Keypad_GetKey(void) {
+	const char keymap[4][4] = {
+		{'1', '2', '3', 'A'},
+		{'4', '5', '6', 'B'},
+		{'7', '8', '9', 'C'},
+		{'*', '0', '#', 'D'}
+	};
+
+	const uint8_t rowPins[4] = {PC0, PC1, PC2, PC3};
+	const uint8_t colPins[4] = {PD2, PD3, PD4, PD5};
+
+	for (uint8_t r = 0; r < 4; r++) {
+		PORTC |= (1 << PC0) | (1 << PC1) | (1 << PC2) | (1 << PC3);
+		PORTC &= ~(1 << rowPins[r]);
+		_delay_us(10);
+
+		for (uint8_t c = 0; c < 4; c++) {
+			if (!(PIND & (1 << colPins[c]))) {
+				_delay_ms(20); 
+				while (!(PIND & (1 << colPins[c])));
+				return keymap[r][c];
+			}
+		}
+	}
+	return '\0';
+}
+
