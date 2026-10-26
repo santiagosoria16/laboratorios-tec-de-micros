@@ -206,3 +206,23 @@ bool RC522_RequestA(uint8_t *bufferATQA) {
 
 	_delay_ms(20);
 
+	uint8_t irq = RC522_ReadReg(0x04);
+	uint8_t error = RC522_ReadReg(0x06);
+
+	if ((irq & 0x20) && !(error & 0x1B)) {
+		uint8_t fifoLen = RC522_ReadReg(0x0A) & 0x7F;
+		if (fifoLen >= 2) {
+			bufferATQA[0] = RC522_ReadReg(0x09);
+			bufferATQA[1] = RC522_ReadReg(0x09);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool RC522_Anticoll(uint8_t *uid) {
+	RC522_WriteReg(0x0D, 0x00);
+	RC522_WriteReg(0x04, 0x7F);
+	RC522_WriteReg(0x0A, 0x80);
+	RC522_WriteReg(0x01, 0x00);
+
