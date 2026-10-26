@@ -67,3 +67,27 @@ void LCD_I2C_Send(uint8_t value, uint8_t mode) {
 	LCD_I2C_WriteNibble(lownib | mode);
 }
 
+void LCD_I2C_Cmd(uint8_t cmd) {
+	LCD_I2C_Send(cmd, 0);
+}
+
+void LCD_I2C_Data(uint8_t data) {
+	LCD_I2C_Send(data, LCD_RS);
+}
+
+void LCD_I2C_Init(void) {
+	TWI_Init();
+	_delay_ms(50);
+	
+	LCD_I2C_WriteNibble(0x30); _delay_ms(5);
+	LCD_I2C_WriteNibble(0x30); _delay_us(150);
+	LCD_I2C_WriteNibble(0x30); _delay_ms(1);
+	LCD_I2C_WriteNibble(0x20); _delay_ms(1);
+
+	LCD_I2C_Cmd(0x28);
+	LCD_I2C_Cmd(0x0C);
+	LCD_I2C_Cmd(0x06);
+	LCD_I2C_Cmd(0x01);
+	_delay_ms(2);
+}
+
