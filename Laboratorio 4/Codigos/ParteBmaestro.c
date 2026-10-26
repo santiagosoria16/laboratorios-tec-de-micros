@@ -147,3 +147,65 @@ void lcd_nibble(uint8_t nibble, uint8_t rs)
 	_delay_us(50);
 }
 
+void adc_init(void)
+{
+	ADMUX = (1 << REFS0);
+
+	ADCSRA = (1 << ADEN) |
+	(1 << ADPS2) |
+	(1 << ADPS1) |
+	(1 << ADPS0);
+}
+
+uint16_t adc_leer(uint8_t canal)
+{
+	ADMUX = (1 << REFS0) | (canal & 0x07);
+
+	ADCSRA |= (1 << ADSC);
+
+	while (ADCSRA & (1 << ADSC));
+
+	return ADC;
+}
+
+void spi_init(void)
+{
+	DDRB |= (1 << PIN_SS) |
+	(1 << PIN_MOSI) |
+	(1 << PIN_SCK);
+
+	DDRB &= ~(1 << PIN_MISO);
+
+	PORTB |= (1 << PIN_SS);
+
+	SPCR = (1 << SPE) |
+	(1 << MSTR) |
+	(1 << SPR1);
+}
+
+void spi_enviar_byte(uint8_t dato)
+{
+	SPDR = dato;
+
+	while (!(SPSR & (1 << SPIF)));
+}
+
+void spi_enviar_trama(uint8_t comando, uint8_t valor)
+{
+	PORTB &= ~(1 << PIN_SS);
+
+	_delay_us(200);
+
+	spi_enviar_byte(comando);
+
+	_delay_us(300);
+
+	spi_enviar_byte(valor);
+
+	_delay_us(200);
+
+	PORTB |= (1 << PIN_SS);
+
+	_delay_ms(2);
+}
+
