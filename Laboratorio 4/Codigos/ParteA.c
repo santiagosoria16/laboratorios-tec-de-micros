@@ -160,3 +160,28 @@ void RC522_WriteReg(uint8_t addr, uint8_t val) {
 	PORTB |= (1 << SPI_SS);
 }
 
+uint8_t RC522_ReadReg(uint8_t addr) {
+	uint8_t val;
+	PORTB &= ~(1 << SPI_SS);
+	SPI_Transfer(((addr << 1) & 0x7E) | 0x80);
+	val = SPI_Transfer(0x00);
+	PORTB |= (1 << SPI_SS);
+	return val;
+}
+
+void RC522_Init(void) {
+	PORTB &= ~(1 << RC522_RST);
+	_delay_ms(10);
+	PORTB |= (1 << RC522_RST);
+	_delay_ms(50);
+
+	RC522_WriteReg(0x01, 0x0F);
+	_delay_ms(50);
+
+	RC522_WriteReg(0x2A, 0x8D);
+	RC522_WriteReg(0x2B, 0x3E);
+	RC522_WriteReg(0x2C, 0x00);
+	RC522_WriteReg(0x2D, 0x30);
+	RC522_WriteReg(0x15, 0x40);
+	RC522_WriteReg(0x11, 0x3D);
+
