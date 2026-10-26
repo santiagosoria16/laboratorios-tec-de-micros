@@ -386,3 +386,33 @@ typedef enum {
 	ST_BLOQUEO
 } EstadoFSM_t;
 
+int main(void) {
+	DDRD |= (1 << LED_VERDE_PIN) | (1 << LED_ROJO_PIN);
+	DDRB |= (1 << BUZZER_PIN);
+	PORTD &= ~((1 << LED_VERDE_PIN) | (1 << LED_ROJO_PIN));
+	PORTB &= ~(1 << BUZZER_PIN);
+
+	SPI_Init();
+	RC522_Init();
+	USART_Init();
+	LCD_I2C_Init();
+	Keypad_Init();
+
+
+	AutoInicializarEEPROM();
+
+	LCD_I2C_Clear();
+	LCD_I2C_SetCursor(0, 0);
+	LCD_I2C_Print("Hola");
+	LCD_I2C_SetCursor(1, 0);
+	LCD_I2C_Print(" Sistema Listo  ");
+	_delay_ms(1500);
+	LCD_I2C_Clear();
+
+	EstadoFSM_t estado = ST_ESPERA_TARJETA;
+	int8_t cuentaActiva = -1;
+	uint8_t intentosPin = 0;
+	char buffer[10] = {0};
+	uint8_t bufIdx = 0;
+	uint8_t uidLeido[4] = {0};
+
