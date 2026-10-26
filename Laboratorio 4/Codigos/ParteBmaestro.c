@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <stdint.h>
 
+// =====================================================
+// CONFIGURACION GENERAL
+// =====================================================
+
 #define CMD_START       0x01
 #define CMD_STOP        0x02
 #define CMD_SPEED       0x03
@@ -26,9 +30,18 @@
 
 #define LCD_ADDR        0x27
 
+// Mapeo habitual del PCF8574:
+// P0 = RS, P1 = RW, P2 = EN, P3 = Backlight
+// P4-P7 = D4-D7
+
 #define LCD_RS_BIT      0
 #define LCD_EN_BIT      2
 #define LCD_BL_BIT      3
+
+// =====================================================
+// VARIABLES Y ESTADOS
+// =====================================================
+
 typedef enum {
 	EST_PARADO = 0,
 	EST_FUNCIONANDO,
@@ -52,6 +65,9 @@ uint8_t ldr_bloqueado = 0;
 
 const char *comando_actual = "STOP";
 
+// =====================================================
+// LCD - COMUNICACION I2C
+// =====================================================
 
 void i2c_init(void)
 {
@@ -107,45 +123,77 @@ void lcd_nibble(uint8_t nibble, uint8_t rs)
 	_delay_us(50);
 }
 
-void i2c_stop(void)
+void lcd_enviar(uint8_t dato, uint8_t rs)
 {
-	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+	lcd_nibble(dato >> 4, rs);
+	lcd_nibble(dato & 0x0F, rs);
 }
 
-void i2c_write(uint8_t dato)
+void lcd_comando(uint8_t cmd)
 {
-	TWDR = dato;
-	TWCR = (1 << TWINT) | (1 << TWEN);
+	lcd_enviar(cmd, 0);
 
-	while (!(TWCR & (1 << TWINT)));
+	if (cmd == 0x01 || cmd == 0x02)
+	_delay_ms(2);
 }
 
-void pcf_escribir(uint8_t dato)
+void lcd_caracter(char c)
 {
-	i2c_start();
-
-	i2c_write(LCD_ADDR << 1);
-	i2c_write(dato);
-
-	i2c_stop();
+	lcd_enviar((uint8_t)c, 1);
 }
 
-void lcd_nibble(uint8_t nibble, uint8_t rs)
+void lcd_init(void)
 {
-	uint8_t dato = (nibble << 4) |
-	(1 << LCD_BL_BIT);
+	_delay_ms(50);
 
-	if (rs)
-	dato |= (1 << LCD_RS_BIT);
+	lcd_nibble(0x03, 0);
+	_delay_ms(5);
 
-	pcf_escribir(dato | (1 << LCD_EN_BIT));
+	lcd_nibble(0x03, 0);
+	_delay_us(150);
 
-	_delay_us(2);
+	lcd_nibble(0x03, 0);
+	_delay_us(150);
 
-	pcf_escribir(dato);
+	lcd_nibble(0x02, 0);
 
-	_delay_us(50);
+	lcd_comando(0x28);
+	lcd_comando(0x0C);
+	lcd_comando(0x06);
+	lcd_comando(0x01);
 }
+
+void lcd_posicion(uint8_t fila, uint8_t columna)
+{
+	uint8_t direccion;
+
+	direccion = (fila == 0) ? 0x80 : 0xC0;
+
+	lcd_comando(direccion + columna);
+}
+
+void lcd_texto(uint8_t fila, uint8_t columna, const char *texto)
+{
+	lcd_posicion(fila, columna);
+
+	uint8_t i = 0;
+
+	while (i < 16 && texto[i] != '\0')
+	{
+		lcd_caracter(texto[i]);
+		i++;
+	}
+
+	while (i < 16)
+	{
+		lcd_caracter(' ');
+		i++;
+	}
+}
+
+// =====================================================
+// CONVERSOR ADC
+// =====================================================
 
 void adc_init(void)
 {
@@ -167,6 +215,10 @@ uint16_t adc_leer(uint8_t canal)
 
 	return ADC;
 }
+
+// =====================================================
+// SPI MAESTRO
+// =====================================================
 
 void spi_init(void)
 {
@@ -209,6 +261,10 @@ void spi_enviar_trama(uint8_t comando, uint8_t valor)
 	_delay_ms(2);
 }
 
+// =====================================================
+// INTERRUPCION DEL BOTON
+// =====================================================
+
 ISR(INT0_vect)
 {
 	evento_boton = 1;
@@ -224,6 +280,10 @@ void boton_init(void)
 
 	EIMSK = (1 << INT0);
 }
+
+// =====================================================
+// LECTURA DHT11
+// =====================================================
 
 uint8_t dht_esperar(uint8_t nivel)
 {
@@ -264,11 +324,12 @@ uint8_t dht_leer(void)
 
 	cli();
 
+	// Respuesta del sensor
 	if (!dht_esperar(0)) goto salida;
 	if (!dht_esperar(1)) goto salida;
 	if (!dht_esperar(0)) goto salida;
 
-
+	// Recepcion de 40 bits
 	for (i = 0; i < 5; i++)
 	{
 		for (j = 0; j < 8; j++)
@@ -284,7 +345,7 @@ uint8_t dht_leer(void)
 		}
 	}
 
-
+	// Comprobacion del checksum
 	if ((uint8_t)(datos[0] + datos[1] +
 	datos[2] + datos[3]) == datos[4])
 	{
@@ -298,6 +359,10 @@ uint8_t dht_leer(void)
 	return resultado;
 }
 
+// =====================================================
+// PROGRAMA PRINCIPAL
+// =====================================================
+
 int main(void)
 {
 	char linea[17];
@@ -309,15 +374,15 @@ int main(void)
 
 	uint8_t ciclos_dht = 0;
 
-
+	// Entradas
 	DDRD &= ~((1 << PIN_LDR) | (1 << PIN_BOTON));
 
 	PORTD |= (1 << PIN_BOTON);
 
-
+	// Potenciometro ADC0
 	DDRC &= ~(1 << PC0);
 
-
+	// Inicializacion
 	boton_init();
 
 	adc_init();
@@ -342,6 +407,9 @@ int main(void)
 
 	while (1)
 	{
+		// =============================================
+		// BOTON
+		// =============================================
 
 		boton_presionado = 0;
 
@@ -360,6 +428,9 @@ int main(void)
 			}
 		}
 
+		// =============================================
+		// SENSORES
+		// =============================================
 
 		pwm_actual = (uint8_t)(adc_leer(0) >> 2);
 
@@ -376,6 +447,10 @@ int main(void)
 			if (nueva_temp > 0 && nueva_temp < 95)
 			temperatura = nueva_temp;
 		}
+
+		// =============================================
+		// MAQUINA DE ESTADOS
+		// =============================================
 
 		switch (estado)
 		{
@@ -428,7 +503,7 @@ int main(void)
 			}
 			else
 			{
-
+				// Deteccion de pieza
 
 				if (ldr_actual != ldr_referencia)
 				{
@@ -440,6 +515,7 @@ int main(void)
 					ldr_bloqueado = 0;
 				}
 
+				// Regulacion de velocidad
 
 				int16_t diferencia =
 				(int16_t)pwm_actual - (int16_t)pwm_anterior;
@@ -490,6 +566,10 @@ int main(void)
 			break;
 		}
 
+		// =============================================
+		// ACTUALIZACION LCD
+		// =============================================
+
 		if (estado == EST_FUNCIONANDO ||
 		estado == EST_DESVIANDO)
 		{
@@ -521,4 +601,3 @@ int main(void)
 		_delay_ms(30);
 	}
 }
-
