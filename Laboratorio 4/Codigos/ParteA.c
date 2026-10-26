@@ -91,3 +91,18 @@ void LCD_I2C_Init(void) {
 	_delay_ms(2);
 }
 
+void LCD_I2C_SetCursor(uint8_t row, uint8_t col) {
+	uint8_t offsets[] = {0x00, 0x40};
+	LCD_I2C_Cmd(0x80 | (col + offsets[row]));
+}
+
+void LCD_I2C_Print(const char *str) {
+	while (*str) {
+		LCD_I2C_Data((uint8_t)*str++);
+	}
+}
+void LCD_I2C_Clear(void) {
+	LCD_I2C_Cmd(0x01);
+	_delay_ms(2);
+}
+
