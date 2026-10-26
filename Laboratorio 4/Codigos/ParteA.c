@@ -416,3 +416,32 @@ int main(void) {
 	uint8_t bufIdx = 0;
 	uint8_t uidLeido[4] = {0};
 
+	while (1) {
+		char tecla = Keypad_GetKey();
+
+		switch (estado) {
+			case ST_ESPERA_TARJETA:
+			LCD_I2C_SetCursor(0, 0);
+			LCD_I2C_Print("  CAJERO AUTOM. ");
+			LCD_I2C_SetCursor(1, 0);
+			LCD_I2C_Print("Acerque Tarjeta ");
+
+			if (RC522_CheckCard(uidLeido) || Terminal_CheckCard(uidLeido)) {
+				cuentaActiva = BuscarCuentaPorUID(uidLeido);
+				if (cuentaActiva != -1) {
+					intentosPin = 0;
+					bufIdx = 0;
+					memset(buffer, 0, sizeof(buffer));
+					LCD_I2C_Clear();
+					estado = ST_INGRESO_PIN;
+					} else {
+					LCD_I2C_Clear();
+					LCD_I2C_SetCursor(0, 0);
+					LCD_I2C_Print("Tarjeta no      ");
+					LCD_I2C_SetCursor(1, 0);
+					LCD_I2C_Print("Registrada!     ");
+					AnimacionError();
+					_delay_ms(1500);
+					LCD_I2C_Clear();
+				}
+			}
