@@ -27,3 +27,20 @@
 #define EEPROM_MAGIC_ADDR  0x03FF
 #define EEPROM_MAGIC_VAL   0xA6
 
+static uint8_t lcd_backlight_val = LCD_BACKLIGHT;
+
+void TWI_Init(void) {
+	TWSR = 0x00;
+	TWBR = 72; // 100 kHz a 16 MHz
+	TWCR = (1 << TWEN);
+}
+
+void TWI_Start(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
+
+void TWI_Stop(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}
+
