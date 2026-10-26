@@ -107,3 +107,43 @@ void lcd_nibble(uint8_t nibble, uint8_t rs)
 	_delay_us(50);
 }
 
+void i2c_stop(void)
+{
+	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}
+
+void i2c_write(uint8_t dato)
+{
+	TWDR = dato;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+
+	while (!(TWCR & (1 << TWINT)));
+}
+
+void pcf_escribir(uint8_t dato)
+{
+	i2c_start();
+
+	i2c_write(LCD_ADDR << 1);
+	i2c_write(dato);
+
+	i2c_stop();
+}
+
+void lcd_nibble(uint8_t nibble, uint8_t rs)
+{
+	uint8_t dato = (nibble << 4) |
+	(1 << LCD_BL_BIT);
+
+	if (rs)
+	dato |= (1 << LCD_RS_BIT);
+
+	pcf_escribir(dato | (1 << LCD_EN_BIT));
+
+	_delay_us(2);
+
+	pcf_escribir(dato);
+
+	_delay_us(50);
+}
+
