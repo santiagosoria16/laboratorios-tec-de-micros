@@ -107,6 +107,18 @@ void ws2812_mostrar(void) {
 	_delay_us(60); // Reset latch de WS2812B (>50us)
 }
 
+void limpiar_matriz(void) {
+	for (uint16_t i = 0; i < NUM_LEDS; i++) {
+		matriz[i].r = 0;
+		matriz[i].g = 0;
+		matriz[i].b = 0;
+	}
+	ws2812_mostrar();
+}
+
+uint8_t xy_a_index(uint8_t x, uint8_t y) {
+	return (y * 8) + x;
+}
 
 
 
