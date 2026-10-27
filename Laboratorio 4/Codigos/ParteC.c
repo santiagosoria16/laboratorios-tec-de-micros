@@ -163,7 +163,10 @@ void TWI_init(void) {
 	TWBR = 72;   // Frecuencia SCL = 100 kHz a 16 MHz
 }
 
-
+void TWI_start(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
 
 
 
