@@ -64,7 +64,16 @@ void TWI_start(void);
 void TWI_stop(void);
 void TWI_write(uint8_t data);
 
-
+// Funciones LCD I2C
+void lcd_send_nibble(uint8_t nibble, uint8_t rs);
+void lcd_send_byte(uint8_t val, uint8_t rs);
+void lcd_send_cmd(uint8_t cmd);
+void lcd_send_data(uint8_t data);
+void lcd_init(void);
+void lcd_set_cursor(uint8_t row, uint8_t col);
+void lcd_print(const char* str);
+void lcd_clear(void);
+void actualizar_lcd(void);
 
 
 
