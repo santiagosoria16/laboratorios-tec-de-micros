@@ -49,3 +49,38 @@ volatile uint8_t valor_recibido = 0;
 
 volatile uint16_t tiempo_servo = 0;
 
+void motor_detener(void)
+{
+	TCCR0A = 0;
+
+	OCR0A = 0;
+
+	PORTD &= ~((1 << MOTOR_IN1) |
+	(1 << MOTOR_IN2) |
+	(1 << MOTOR_EN));
+}
+
+void motor_velocidad(uint8_t velocidad)
+{
+	if (velocidad == 0)
+	{
+		TCCR0A = 0;
+
+		OCR0A = 0;
+
+		PORTD &= ~(1 << MOTOR_EN);
+	}
+	else
+	{
+		PORTD |= (1 << MOTOR_IN1);
+
+		PORTD &= ~(1 << MOTOR_IN2);
+
+		TCCR0A = (1 << COM0A1) |
+		(1 << WGM01) |
+		(1 << WGM00);
+
+		OCR0A = velocidad;
+	}
+}
+
