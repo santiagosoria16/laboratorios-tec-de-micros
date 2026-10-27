@@ -72,6 +72,9 @@ typedef enum {
 	ESTADO_ERROR
 } EstadoJuego;
 
+// Matriz de píxeles (GRB para WS2812B)
+ColorRGB matriz[NUM_LEDS];
+
 
 
 
