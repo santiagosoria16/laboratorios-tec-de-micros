@@ -172,7 +172,11 @@ void TWI_stop(void) {
 	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 }
 
-
+void TWI_write(uint8_t data) {
+	TWDR = data;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
 
 
 
