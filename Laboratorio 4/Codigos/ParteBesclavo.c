@@ -218,3 +218,73 @@ ISR(SPI_STC_vect)
 	}
 }
 
+int main(void)
+{
+	uint8_t devolver_servo;
+
+
+	DDRB |= (1 << LED_VERDE) |
+	(1 << SERVO_PIN);
+
+	DDRC |= (1 << LED_ROJO) |
+	(1 << BUZZER);
+
+	DDRD |= (1 << MOTOR_IN1) |
+	(1 << MOTOR_IN2) |
+	(1 << MOTOR_EN);
+
+
+	PORTB &= ~(1 << LED_VERDE);
+
+	PORTC &= ~(1 << BUZZER);
+
+	PORTC |= (1 << LED_ROJO);
+
+
+	timer0_init();
+
+	timer1_init();
+
+	spi_esclavo_init();
+
+	motor_detener();
+
+	sei();
+
+	while (1)
+	{
+
+		if (PINB & (1 << SPI_SS))
+		{
+			fase_spi = RECIBIR_COMANDO;
+		}
+
+		devolver_servo = 0;
+
+		cli();
+
+		if (tiempo_servo > 0)
+		{
+			tiempo_servo--;
+
+			if (tiempo_servo == 0)
+			{
+				devolver_servo = 1;
+			}
+		}
+
+		sei();
+
+		if (devolver_servo)
+		{
+			if (estado == EST_PISTON)
+			{
+				OCR1A = 2000;
+
+				estado = EST_MARCHA;
+			}
+		}
+
+		_delay_ms(1);
+	}
+}
