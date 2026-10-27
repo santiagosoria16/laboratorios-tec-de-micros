@@ -171,3 +171,35 @@ void clear_pixels(void) {
 	for (uint16_t i = 0; i < 192; i++) led_buffer[i] = 0;
 }
 
+
+void buzzer_sound(bool state) {
+	if (state) {
+		for (uint8_t i = 0; i < 30; i++) {
+			PORTD |= (1 << BUZZER_PIN);
+			_delay_us(250);
+			PORTD &= ~(1 << BUZZER_PIN);
+			_delay_us(250);
+		}
+		} else {
+		PORTD &= ~(1 << BUZZER_PIN);
+	}
+}
+
+void load_eeprom(void) {
+	if (eeprom_read_byte(&eeprom_flag) == EEPROM_MAGIC) {
+		offset_x = eeprom_read_float(&eeprom_offset_x);
+		offset_y = eeprom_read_float(&eeprom_offset_y);
+		} else {
+		offset_x = 0.0f;
+		offset_y = 0.0f;
+	}
+}
+
+void save_eeprom(float ox, float oy) {
+	eeprom_update_float(&eeprom_offset_x, ox);
+	eeprom_update_float(&eeprom_offset_y, oy);
+	eeprom_update_byte(&eeprom_flag, EEPROM_MAGIC);
+	offset_x = ox;
+	offset_y = oy;
+}
+
