@@ -309,6 +309,50 @@ uint16_t ADC_read(uint8_t channel) {
 	return ADC;
 }
 
+// ============================================================================
+// LÓGICA DEL SISTEMA Y TONO PARA BUZZER PASIVO
+// ============================================================================
+void procesar_comando_bluetooth(void) {
+	if (strcmp(rx_buffer, "ARM") == 0) {
+		estado_actual = ESTADO_ARMADO;
+		silenciar_buzzer = 0;
+		USART_send_string("ESTADO: ARMADO\r\n");
+	}
+	else if (strcmp(rx_buffer, "DISARM") == 0) {
+		estado_actual = ESTADO_DESARMADO;
+		silenciar_buzzer = 0;
+		USART_send_string("ESTADO: DESARMADO\r\n");
+	}
+	else if (strcmp(rx_buffer, "AUTO") == 0) {
+		modo_actual = MODO_AUTO;
+		USART_send_string("MODO: AUTOMATICO\r\n");
+	}
+	else if (strcmp(rx_buffer, "MANUAL") == 0) {
+		modo_actual = MODO_MANUAL;
+		USART_send_string("MODO: MANUAL\r\n");
+	}
+	else if (strcmp(rx_buffer, "SILENCE") == 0) {
+		if (estado_actual == ESTADO_ALARMA) {
+			estado_actual = ESTADO_SILENCIADO;
+			silenciar_buzzer = 1;
+			USART_send_string("ALARMA: SILENCIADA\r\n");
+		}
+	}
+	else if (strcmp(rx_buffer, "FORZAR_ALARMA") == 0) {
+		if (modo_actual == MODO_MANUAL) {
+			estado_actual = ESTADO_ALARMA;
+			silenciar_buzzer = 0;
+			strcpy(zona_afectada, "REMOTO");
+			USART_send_string("ALARMA:ON; ZONA: FORZADO_REMOTO\r\n");
+			} else {
+			USART_send_string("ERROR: Solo en MODO MANUAL\r\n");
+		}
+	}
+	else {
+		USART_send_string("COMANDO NO RECONOCIDO\r\n");
+	}
+}
+
 
 
 
