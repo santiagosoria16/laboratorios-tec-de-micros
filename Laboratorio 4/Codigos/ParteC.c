@@ -50,3 +50,52 @@ char zona_afectada[16] = "";
 char rx_buffer[BUFFER_SIZE];
 volatile uint8_t rx_index = 0;
 volatile uint8_t comando_listo = 0;
+
+// Declaración de funciones
+void USART_init(unsigned int ubrr);
+void USART_transmit_char(char data);
+void USART_send_string(const char* str);
+void ADC_init(void);
+uint16_t ADC_read(uint8_t channel);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
