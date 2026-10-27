@@ -31,3 +31,8 @@ typedef enum {
 	ESTADO_SILENCIADO
 } EstadoAlarma;
 
+// Modos de Operación
+typedef enum {
+	MODO_AUTO = 0,
+	MODO_MANUAL
+} ModoOperacion;
