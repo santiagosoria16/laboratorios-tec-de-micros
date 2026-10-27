@@ -27,3 +27,12 @@
 // Intercambio de canales ADC para corregir la orientación del joystick:
 #define ADC_JOY_X   1        // Canal ADC1 (PC1 / A1) para Eje X del Joystick
 #define ADC_JOY_Y   0        // Canal ADC0 (PC0 / A0) para Eje Y del Joystick
+
+// -----------------------------------------------------------------------------
+// Constantes del Sistema
+// -----------------------------------------------------------------------------
+#define EEPROM_ADDR_RECORD ((uint8_t*)0x00)
+#define NUM_LEDS           64
+#define MAX_SECUENCIA      50
+#define UMBRAL_ADC_BAJO    350
+#define UMBRAL_ADC_ALTO    670
