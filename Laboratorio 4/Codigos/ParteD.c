@@ -164,6 +164,20 @@ uint16_t adc_leer(uint8_t canal) {
 	return ADC;
 }
 
+// -----------------------------------------------------------------------------
+// Gestión de Entradas y Lectura con Antirrebote
+// -----------------------------------------------------------------------------
+uint8_t boton_presionado(void) {
+	if (!(JOY_SW_PINR & (1 << JOY_SW_BIT))) { // Botón presionado (activo bajo)
+		_delay_ms(20);
+		if (!(JOY_SW_PINR & (1 << JOY_SW_BIT))) {
+			while (!(JOY_SW_PINR & (1 << JOY_SW_BIT))); // Esperar liberación
+			_delay_ms(20);
+			return 1;
+		}
+	}
+	return 0;
+}
 
 
 
