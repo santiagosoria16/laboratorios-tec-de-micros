@@ -139,6 +139,14 @@ void buzzer_tono(uint16_t freq_hz) {
 	TCCR2B = (1 << CS22) | (1 << CS21);   // Prescaler 256
 }
 
+void emitir_tono(uint16_t freq_hz, uint16_t duracion_ms) {
+	buzzer_tono(freq_hz);
+	for (uint16_t i = 0; i < duracion_ms; i++) {
+		_delay_ms(1);
+	}
+	buzzer_tono(0);
+}
+
 
 
 
