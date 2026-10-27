@@ -23,3 +23,7 @@
 #define JOY_SW_PINR PIND
 #define JOY_SW_DDR  DDRD
 #define JOY_SW_BIT  PD2      // Pin 2 (PD2) para el Pulsador SW del Joystick
+
+// Intercambio de canales ADC para corregir la orientación del joystick:
+#define ADC_JOY_X   1        // Canal ADC1 (PC1 / A1) para Eje X del Joystick
+#define ADC_JOY_Y   0        // Canal ADC0 (PC0 / A0) para Eje Y del Joystick
