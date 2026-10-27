@@ -180,6 +180,60 @@ uint8_t boton_presionado(void) {
 }
 
 
+// -----------------------------------------------------------------------------
+// Persistencia en EEPROM
+// -----------------------------------------------------------------------------
+uint8_t cargar_record(void) {
+	uint8_t rec = eeprom_read_byte(EEPROM_ADDR_RECORD);
+	if (rec == 0xFF) {
+		eeprom_write_byte(EEPROM_ADDR_RECORD, 0);
+		return 0;
+	}
+	return rec;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
