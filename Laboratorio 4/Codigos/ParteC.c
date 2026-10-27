@@ -22,3 +22,12 @@
 
 // Umbral analógico para el sensor LDR (Apertura de ventana/portón)
 #define LDR_THRESHOLD 500
+
+// Estados de la Máquina de Estados
+typedef enum {
+	ESTADO_DESARMADO = 0,
+	ESTADO_ARMADO,
+	ESTADO_ALARMA,
+	ESTADO_SILENCIADO
+} EstadoAlarma;
+
