@@ -287,3 +287,27 @@ int main(void) {
 			}
 		}
 
+
+		bool border = (row == 0 || row == 7 || col == 0 || col == 7);
+		buzzer_sound(border && !hold);
+
+		clear_pixels();
+		set_pixel(row, col, r, g, b);
+		ws2812_show();
+
+
+		char buffer[17];
+		lcd_set_cursor(0, 0);
+		snprintf(buffer, sizeof(buffer), "P:%3d%c R:%3d%c   ", (int)filt_pitch, 0xDF, (int)filt_roll, 0xDF);
+		lcd_print(buffer);
+
+		lcd_set_cursor(0, 1);
+		if (hold) {
+			lcd_print("MODO: HOLD     ");
+			} else {
+			lcd_print("MODO: NORMAL   ");
+		}
+
+		_delay_ms(35);
+	}
+}
