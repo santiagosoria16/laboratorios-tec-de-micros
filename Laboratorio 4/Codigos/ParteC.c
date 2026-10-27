@@ -81,6 +81,21 @@ void evaluar_sensores(void);
 void sonar_sirena(void);
 void actualizar_indicadores(void);
 
+// Interrupción por recepción UART (Bluetooth HC-05)
+ISR(USART_RX_vect) {
+	char ch = UDR0;
+	if (ch == '\r' || ch == '\n') {
+		if (rx_index > 0) {
+			rx_buffer[rx_index] = '\0';
+			comando_listo = 1;
+			rx_index = 0;
+		}
+		} else {
+		if (rx_index < BUFFER_SIZE - 1) {
+			rx_buffer[rx_index++] = ch;
+		}
+	}
+}
 
 
 
