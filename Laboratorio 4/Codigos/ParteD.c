@@ -227,7 +227,155 @@ void animacion_error(void) {
 	}
 }
 
+// -----------------------------------------------------------------------------
+// Función Principal
+// -----------------------------------------------------------------------------
+int main(void) {
+	// Configuración de Direcciones E/S (DDR)
+	WS2812_DDR |= (1 << WS2812_PIN);   // Salida datos Matriz
+	BUZZER_DDR |= (1 << BUZZER_PIN);   // Salida Buzzer
+	JOY_SW_DDR &= ~(1 << JOY_SW_BIT);  // Entrada Pulsador Joystick
+	JOY_SW_PORT |= (1 << JOY_SW_BIT);  // Habilitar Resistencia Pull-Up interna
 
+	adc_init();
+	
+	// Generar semilla aleatoria usando lectura flotante de ADC2
+	srand(adc_leer(2));
+
+	uint8_t record_historico = cargar_record();
+	(void)record_historico;
+
+	// Variables de control del juego
+	EstadoJuego estado = ESTADO_INICIO_LIBRE;
+	PasoSecuencia secuencia[MAX_SECUENCIA];
+	uint8_t nivel_actual = 1;
+	uint8_t paso_jugador = 0;
+
+	int8_t cursor_x = 3;
+	int8_t cursor_y = 3;
+	uint8_t color_cursor = 0;
+
+	limpiar_matriz();
+
+	while (1) {
+		switch (estado) {
+
+			case ESTADO_INICIO_LIBRE: {
+				// Lectura del Joystick con Filtro de Zona Muerta
+				uint16_t val_x = adc_leer(ADC_JOY_X);
+				uint16_t val_y = adc_leer(ADC_JOY_Y);
+
+				if (val_x < UMBRAL_ADC_BAJO && cursor_x > 0) cursor_x--;
+				else if (val_x > UMBRAL_ADC_ALTO && cursor_x < 7) cursor_x++;
+
+				if (val_y < UMBRAL_ADC_BAJO && cursor_y > 0) cursor_y--;
+				else if (val_y > UMBRAL_ADC_ALTO && cursor_y < 7) cursor_y++;
+
+				limpiar_matriz();
+				matriz[xy_a_index(cursor_x, cursor_y)] = COLORES[color_cursor];
+				ws2812_mostrar();
+				_delay_ms(120);
+
+				if (boton_presionado()) {
+					color_cursor = (color_cursor + 1) % 4;
+					emitir_tono(1000, 50);
+					nivel_actual = 1;
+					estado = ESTADO_GENERAR_PASO;
+				}
+				break;
+			}
+
+			case ESTADO_GENERAR_PASO: {
+				// Agregar un nuevo paso aleatorio a la secuencia
+				secuencia[nivel_actual - 1].x = rand() % 8;
+				secuencia[nivel_actual - 1].y = rand() % 8;
+				secuencia[nivel_actual - 1].colorIdx = rand() % 4;
+
+				paso_jugador = 0;
+				_delay_ms(400);
+				estado = ESTADO_REPRODUCIR_SECUENCIA;
+				break;
+			}
+
+			case ESTADO_REPRODUCIR_SECUENCIA: {
+				limpiar_matriz();
+				_delay_ms(200);
+
+				for (uint8_t i = 0; i < nivel_actual; i++) {
+					uint8_t idx = xy_a_index(secuencia[i].x, secuencia[i].y);
+					uint8_t c_idx = secuencia[i].colorIdx;
+
+					matriz[idx] = COLORES[c_idx];
+					ws2812_mostrar();
+					buzzer_tono(TONOS[c_idx]);
+					_delay_ms(500); // Duración de iluminación
+
+					limpiar_matriz();
+					buzzer_tono(0);
+					_delay_ms(200); // Pausa entre elementos
+				}
+
+				cursor_x = 3;
+				cursor_y = 3;
+				estado = ESTADO_TURNO_JUGADOR;
+				break;
+			}
+
+			case ESTADO_TURNO_JUGADOR: {
+				uint16_t val_x = adc_leer(ADC_JOY_X);
+				uint16_t val_y = adc_leer(ADC_JOY_Y);
+
+				if (val_x < UMBRAL_ADC_BAJO && cursor_x > 0) cursor_x--;
+				else if (val_x > UMBRAL_ADC_ALTO && cursor_x < 7) cursor_x++;
+
+				if (val_y < UMBRAL_ADC_BAJO && cursor_y > 0) cursor_y--;
+				else if (val_y > UMBRAL_ADC_ALTO && cursor_y < 7) cursor_y++;
+
+				limpiar_matriz();
+				matriz[xy_a_index(cursor_x, cursor_y)] = COLORES[color_cursor];
+				ws2812_mostrar();
+				_delay_ms(120);
+
+				if (boton_presionado()) {
+					PasoSecuencia esperado = secuencia[paso_jugador];
+
+					if (cursor_x == esperado.x && cursor_y == esperado.y) {
+						// Selección Correcta
+						emitir_tono(TONOS[esperado.colorIdx], 200);
+						paso_jugador++;
+
+						if (paso_jugador >= nivel_actual) {
+							estado = ESTADO_EXITO;
+						}
+						} else {
+						// Selección Incorrecta
+						estado = ESTADO_ERROR;
+					}
+				}
+				break;
+			}
+
+			case ESTADO_EXITO: {
+				animacion_exito();
+				guardar_record(nivel_actual);
+				nivel_actual++;
+				if (nivel_actual > MAX_SECUENCIA) nivel_actual = MAX_SECUENCIA;
+				estado = ESTADO_GENERAR_PASO;
+				break;
+			}
+
+			case ESTADO_ERROR: {
+				animacion_error();
+				guardar_record(nivel_actual - 1);
+				nivel_actual = 1;
+				estado = ESTADO_INICIO_LIBRE;
+				break;
+			}
+		}
+	}
+
+	return 0;
+}
 
 
 
