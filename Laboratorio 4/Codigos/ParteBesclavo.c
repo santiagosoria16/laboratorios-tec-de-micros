@@ -84,3 +84,43 @@ void motor_velocidad(uint8_t velocidad)
 	}
 }
 
+void timer0_init(void)
+{
+	TCCR0A = 0;
+
+	TCCR0B = (1 << CS01) |
+	(1 << CS00);
+
+	OCR0A = 0;
+}
+
+void timer1_init(void)
+{
+
+	TCCR1A = (1 << COM1A1) |
+	(1 << WGM11);
+
+	TCCR1B = (1 << WGM13) |
+	(1 << WGM12) |
+	(1 << CS11);
+
+	ICR1 = 39999;
+
+	OCR1A = 2000;
+}
+
+void spi_esclavo_init(void)
+{
+
+	DDRB |= (1 << SPI_MISO);
+
+	DDRB &= ~((1 << SPI_SS) |
+	(1 << SPI_MOSI) |
+	(1 << SPI_SCK));
+
+	PORTB |= (1 << SPI_SS);
+
+	SPCR = (1 << SPE) |
+	(1 << SPIE);
+}
+
