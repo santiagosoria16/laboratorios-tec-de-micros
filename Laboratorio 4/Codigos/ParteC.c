@@ -8,7 +8,6 @@
 // ============================================================================
 // DIRECCIÓN I2C DE LA PANTALLA LCD (Módulo PCF8574)
 // Usar 0x4E para dirección de placa 0x27 (0x27 << 1)
-// Si la pantalla enciende pero no muestra letras, cambiar 0x4E por 0x7E (0x3F << 1)
 // ============================================================================
 #define LCD_ADDR 0x4E
 
