@@ -230,6 +230,109 @@ void lcd_init(void) {
 	lcd_clear();
 }
 
+void lcd_set_cursor(uint8_t row, uint8_t col) {
+	uint8_t addr = (row == 0) ? col : (0x40 + col);
+	lcd_send_cmd(0x80 | addr);
+}
+
+void lcd_print(const char* str) {
+	while (*str) {
+		lcd_send_data(*str++);
+	}
+}
+
+void lcd_clear(void) {
+	lcd_send_cmd(0x01);
+	_delay_ms(2);
+}
+
+void actualizar_lcd(void) {
+	lcd_clear();
+	
+	// Línea 1: Modo de Operación
+	lcd_set_cursor(0, 0);
+	if (modo_actual == MODO_AUTO) {
+		lcd_print("MODO: AUTOMATICO");
+		} else {
+		lcd_print("MODO: MANUAL    ");
+	}
+
+	// Línea 2: Estado del Sistema
+	lcd_set_cursor(1, 0);
+	switch (estado_actual) {
+		case ESTADO_DESARMADO:
+		lcd_print("EST: DESARMADO  ");
+		break;
+		case ESTADO_ARMADO:
+		lcd_print("EST: ARMADO     ");
+		break;
+		case ESTADO_ALARMA:
+		lcd_print("ALARM: ");
+		lcd_print(zona_afectada);
+		break;
+		case ESTADO_SILENCIADO:
+		lcd_print("EST: SILENCIADO ");
+		break;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
