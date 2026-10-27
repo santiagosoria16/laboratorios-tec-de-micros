@@ -192,6 +192,13 @@ uint8_t cargar_record(void) {
 	return rec;
 }
 
+void guardar_record(uint8_t rec) {
+	uint8_t actual = eeprom_read_byte(EEPROM_ADDR_RECORD);
+	if (rec > actual) {
+		eeprom_update_byte(EEPROM_ADDR_RECORD, rec);
+	}
+}
+
 
 
 
