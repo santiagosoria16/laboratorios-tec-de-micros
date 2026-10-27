@@ -147,6 +147,15 @@ void emitir_tono(uint16_t freq_hz, uint16_t duracion_ms) {
 	buzzer_tono(0);
 }
 
+// -----------------------------------------------------------------------------
+// Driver ADC (Convertidor Analógico a Digital)
+// -----------------------------------------------------------------------------
+void adc_init(void) {
+	// Referencia AVcc con condensador externo en AREF
+	ADMUX = (1 << REFS0);
+	// Habilitar ADC y prescaler de 128 (16MHz / 128 = 125kHz de reloj ADC)
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+}
 
 
 
