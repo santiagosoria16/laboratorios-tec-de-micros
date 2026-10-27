@@ -58,7 +58,11 @@ void USART_send_string(const char* str);
 void ADC_init(void);
 uint16_t ADC_read(uint8_t channel);
 
-
+// Funciones I2C / TWI
+void TWI_init(void);
+void TWI_start(void);
+void TWI_stop(void);
+void TWI_write(uint8_t data);
 
 
 
