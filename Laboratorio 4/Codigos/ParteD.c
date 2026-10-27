@@ -14,3 +14,7 @@
 #define WS2812_PORT PORTB
 #define WS2812_DDR  DDRB
 #define WS2812_PIN  PB0      // Pin 8 (PB0) para la Matriz LED RGB WS2812B
+
+#define BUZZER_PORT PORTD
+#define BUZZER_DDR  DDRD
+#define BUZZER_PIN  PD3      // Pin 3 (PD3 / OC2B) para el Buzzer
