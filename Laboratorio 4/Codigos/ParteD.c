@@ -120,6 +120,25 @@ uint8_t xy_a_index(uint8_t x, uint8_t y) {
 	return (y * 8) + x;
 }
 
+// -----------------------------------------------------------------------------
+// Generación de Sonido con Timer2 (Modo CTC)
+// -----------------------------------------------------------------------------
+void buzzer_tono(uint16_t freq_hz) {
+	if (freq_hz == 0) {
+		TCCR2A = 0;
+		TCCR2B = 0;
+		BUZZER_PORT &= ~(1 << BUZZER_PIN);
+		return;
+	}
+	// Prescaler = 256. F_CPU = 16MHz.
+	uint32_t ocr_val = (F_CPU / (2UL * 256UL * freq_hz)) - 1;
+	if (ocr_val > 255) ocr_val = 255;
+
+	OCR2A = (uint8_t)ocr_val;
+	TCCR2A = (1 << WGM21) | (1 << COM2B0); // Modo CTC, conmuta pin OC2B (PD3)
+	TCCR2B = (1 << CS22) | (1 << CS21);   // Prescaler 256
+}
+
 
 
 
