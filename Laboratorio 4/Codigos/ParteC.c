@@ -168,7 +168,9 @@ void TWI_start(void) {
 	while (!(TWCR & (1 << TWINT)));
 }
 
-
+void TWI_stop(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}
 
 
 
