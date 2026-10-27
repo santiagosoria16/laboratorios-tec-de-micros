@@ -97,6 +97,63 @@ ISR(USART_RX_vect) {
 	}
 }
 
+int main(void) {
+	// 1. Configuración de Entradas / Salidas
+	// Puerto B: PB1(Buzzer), PB2(LED Verde), PB3(LED Rojo) como salidas
+	DDRB |= (1 << BUZZER_PIN) | (1 << LED_VERDE) | (1 << LED_ROJO);
+	PORTB &= ~((1 << BUZZER_PIN) | (1 << LED_VERDE) | (1 << LED_ROJO)); // Apagado inicial
+
+	// Puerto D: PD2 (Botón) como entrada con PULL-UP interno activado
+	DDRD &= ~(1 << BOTON_PIN);
+	PORTD |= (1 << BOTON_PIN);
+
+	// 2. Inicializar Periféricos
+	USART_init(103); // UBRR = 103 para 9600 baudios a F_CPU = 16 MHz
+	ADC_init();
+	lcd_init();      // Inicializa pantalla LCD vía I2C
+
+	// Habilitar interrupciones globales
+	sei();
+
+	// Notificaciones iniciales por UART
+	USART_send_string("\r\n--- SISTEMA DE ALARMA INICIADO ---\r\n");
+	USART_send_string("MODO: AUTO | ESTADO: DESARMADO\r\n");
+
+	// Pantalla de Bienvenida
+	lcd_set_cursor(0, 0);
+	lcd_print("  SISTEMA ALARMA ");
+	lcd_set_cursor(1, 0);
+	lcd_print("  INICIANDOSE... ");
+	_delay_ms(1500);
+	lcd_clear();
+
+	actualizar_lcd();
+
+	while (1) {
+		// Procesar comando entrante desde celular (HC-05)
+		if (comando_listo) {
+			procesar_comando_bluetooth();
+			comando_listo = 0;
+		}
+
+		// Evaluar sensores si la alarma está armada
+		evaluar_sensores();
+
+		// Actualizar salidas físicas (LEDs y Buzzer)
+		actualizar_indicadores();
+
+		// Refrescar LCD solo si hubo un cambio de estado o modo
+		if (estado_actual != estado_anterior || modo_actual != modo_anterior) {
+			actualizar_lcd();
+			estado_anterior = estado_actual;
+			modo_anterior = modo_actual;
+		}
+
+		_delay_ms(100);
+	}
+
+	return 0;
+}
 
 
 
