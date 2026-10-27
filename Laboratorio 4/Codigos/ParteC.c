@@ -36,3 +36,11 @@ typedef enum {
 	MODO_AUTO = 0,
 	MODO_MANUAL
 } ModoOperacion;
+
+// Variables Globales del Sistema
+volatile EstadoAlarma estado_actual = ESTADO_DESARMADO;
+volatile EstadoAlarma estado_anterior = 0xFF; // Refresco inteligente del LCD
+volatile ModoOperacion modo_actual = MODO_AUTO;
+volatile ModoOperacion modo_anterior = 0xFF;
+volatile uint8_t silenciar_buzzer = 0;
+char zona_afectada[16] = "";
