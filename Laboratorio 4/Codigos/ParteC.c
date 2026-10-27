@@ -353,6 +353,30 @@ void procesar_comando_bluetooth(void) {
 	}
 }
 
+void evaluar_sensores(void) {
+	if (estado_actual != ESTADO_ARMADO) {
+		return;
+	}
+
+	uint16_t ldr_val = ADC_read(0);
+	uint8_t boton_presionado = !(PIND & (1 << BOTON_PIN)) ? 1 : 0;
+
+	if (modo_actual == MODO_AUTO) {
+		if (ldr_val > LDR_THRESHOLD) {
+			estado_actual = ESTADO_ALARMA;
+			silenciar_buzzer = 0;
+			strcpy(zona_afectada, "VENTANA");
+			USART_send_string("ALARMA:ON; ZONA: VENTANA\r\n");
+		}
+		else if (boton_presionado) {
+			estado_actual = ESTADO_ALARMA;
+			silenciar_buzzer = 0;
+			strcpy(zona_afectada, "MOVIMIENTO");
+			USART_send_string("ALARMA:ON; ZONA: MOVIMIENTO_BOTON\r\n");
+		}
+	}
+}
+
 
 
 
