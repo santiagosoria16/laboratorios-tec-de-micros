@@ -150,3 +150,71 @@ void indicar_emergencia(void)
 	PORTC |= (1 << BUZZER);
 }
 
+ISR(SPI_STC_vect)
+{
+	uint8_t dato = SPDR;
+	if (fase_spi == RECIBIR_COMANDO)
+	{
+		comando_recibido = dato;
+		fase_spi = RECIBIR_VALOR;
+	}
+	else
+	{
+		valor_recibido = dato;
+		fase_spi = RECIBIR_COMANDO;
+		if (comando_recibido == CMD_EMERGENCY)
+		{
+			estado = EST_EMERGENCIA;
+			motor_detener();
+			indicar_emergencia();
+			OCR1A = 2000;
+			tiempo_servo = 0;
+		}
+
+		else if (comando_recibido == CMD_STOP)
+		{
+			estado = EST_PARADO;
+			motor_detener();
+			indicar_paro();
+			OCR1A = 2000;
+			tiempo_servo = 0;
+		}
+
+		// ---------------------------------------------
+		// RESTO DE COMANDOS
+		// ---------------------------------------------
+
+		else if (estado != EST_EMERGENCIA)
+		{
+			switch (comando_recibido)
+			{
+				case CMD_START:
+				estado = EST_MARCHA;
+				indicar_marcha();
+				PORTD |= (1 << MOTOR_IN1);
+				PORTD &= ~(1 << MOTOR_IN2);
+				break;
+				case CMD_SPEED:
+				if (estado == EST_MARCHA ||
+				estado == EST_PISTON)
+				{
+					motor_velocidad(valor_recibido);
+				}
+
+				break;
+				case CMD_PISTON:
+				if (estado == EST_MARCHA ||
+				estado == EST_PISTON)
+				{
+					estado = EST_PISTON;
+					OCR1A = 4000;
+					tiempo_servo = 700;
+				}
+				break;
+				default:
+				break;
+			}
+		}
+	}
+}
+
