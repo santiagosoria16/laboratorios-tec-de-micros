@@ -227,3 +227,63 @@ int main(void) {
 	bool hold = false;
 	uint8_t last_hold = 1, last_calib = 1;
 
+	while (1) {
+		uint8_t read_hold = (PIND & (1 << HOLD_PIN)) ? 1 : 0;
+		uint8_t read_calib = (PIND & (1 << CALIB_PIN)) ? 1 : 0;
+
+		if (last_hold == 1 && read_hold == 0) {
+			hold = !hold;
+			_delay_ms(50);
+		}
+		last_hold = read_hold;
+
+		int16_t ax, ay, az;
+		mpu6050_read_accel(&ax, &ay, &az);
+
+		float fax = (float)ax / 16384.0f;
+		float fay = (float)ay / 16384.0f;
+		float faz = (float)az / 16384.0f;
+
+		float raw_pitch = atan2(fay, sqrt(fax * fax + faz * faz)) * 180.0f / M_PI;
+		float raw_roll  = atan2(-fax, sqrt(fay * fay + faz * faz)) * 180.0f / M_PI;
+
+		if (last_calib == 1 && read_calib == 0) {
+			save_eeprom(raw_pitch, raw_roll);
+			_delay_ms(50);
+		}
+		last_calib = read_calib;
+
+		if (!hold) {
+			float cal_pitch = raw_pitch - offset_x;
+			float cal_roll  = raw_roll  - offset_y;
+
+
+			filt_pitch = (0.8f * filt_pitch) + (0.2f * cal_pitch);
+			filt_roll  = (0.8f * filt_roll)  + (0.2f * cal_roll);
+		}
+
+		float abs_p = fabs(filt_pitch);
+		float abs_r = fabs(filt_roll);
+
+		uint8_t row = 3, col = 3;
+		uint8_t r = 0, g = 0, b = 0;
+
+		if (abs_p < 3.0f && abs_r < 3.0f) {
+			row = 3; col = 3;
+			b = 60;
+			} else {
+			float p_clamped = filt_pitch < -30.0f ? -30.0f : (filt_pitch > 30.0f ? 30.0f : filt_pitch);
+			float r_clamped = filt_roll  < -30.0f ? -30.0f : (filt_roll  > 30.0f ? 30.0f : filt_roll);
+
+			col = (uint8_t)((r_clamped + 30.0f) * 7.0f / 60.0f);
+			row = (uint8_t)((30.0f - p_clamped) * 7.0f / 60.0f);
+
+			if (abs_r > 2.0f * abs_p) {
+				r = 60; 
+				} else if (abs_p > 2.0f * abs_r) {
+				g = 60;
+				} else {
+				r = 60; g = 60;
+			}
+		}
+
