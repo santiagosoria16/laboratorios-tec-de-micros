@@ -123,4 +123,30 @@ void spi_esclavo_init(void)
 	SPCR = (1 << SPE) |
 	(1 << SPIE);
 }
+void indicar_paro(void)
+{
+	PORTB &= ~(1 << LED_VERDE);
+
+	PORTC |= (1 << LED_ROJO);
+
+	PORTC &= ~(1 << BUZZER);
+}
+
+void indicar_marcha(void)
+{
+	PORTB |= (1 << LED_VERDE);
+
+	PORTC &= ~(1 << LED_ROJO);
+
+	PORTC &= ~(1 << BUZZER);
+}
+
+void indicar_emergencia(void)
+{
+	PORTB &= ~(1 << LED_VERDE);
+
+	PORTC |= (1 << LED_ROJO);
+
+	PORTC |= (1 << BUZZER);
+}
 
