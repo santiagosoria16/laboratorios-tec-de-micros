@@ -16,3 +16,9 @@
 #define BUZZER_PIN   PB1  // Pin Digital 9 (Señal 'S' del Buzzer)
 #define LED_VERDE    PB2  // Pin Digital 10
 #define LED_ROJO     PB3  // Pin Digital 11
+
+// Definición de bits de Puerto D (Entradas)
+#define BOTON_PIN    PD2  // Pin Digital 2 (Botón de presencia)
+
+// Umbral analógico para el sensor LDR (Apertura de ventana/portón)
+#define LDR_THRESHOLD 500
