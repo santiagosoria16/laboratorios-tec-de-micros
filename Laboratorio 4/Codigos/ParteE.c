@@ -203,3 +203,27 @@ void save_eeprom(float ox, float oy) {
 	offset_y = oy;
 }
 
+
+int main(void) {
+	// Configuración de puertos
+	DDRD |= (1 << LED_PIN) | (1 << BUZZER_PIN);
+	DDRD &= ~((1 << HOLD_PIN) | (1 << CALIB_PIN));
+	PORTD |= (1 << HOLD_PIN) | (1 << CALIB_PIN);
+
+	twi_init();
+	mpu6050_init();
+	lcd_init();
+
+	lcd_set_cursor(0, 0);
+	lcd_print("Burbuja Nivel");
+	lcd_set_cursor(0, 1);
+	lcd_print("Iniciando...");
+	_delay_ms(1000);
+	lcd_command(0x01);
+
+	load_eeprom();
+
+	float filt_pitch = 0.0f, filt_roll = 0.0f;
+	bool hold = false;
+	uint8_t last_hold = 1, last_calib = 1;
+
