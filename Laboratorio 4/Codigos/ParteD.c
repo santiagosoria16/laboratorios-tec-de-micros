@@ -8,3 +8,9 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
+// -----------------------------------------------------------------------------
+// Definición de Pines de Hardware
+// -----------------------------------------------------------------------------
+#define WS2812_PORT PORTB
+#define WS2812_DDR  DDRB
+#define WS2812_PIN  PB0      // Pin 8 (PB0) para la Matriz LED RGB WS2812B
