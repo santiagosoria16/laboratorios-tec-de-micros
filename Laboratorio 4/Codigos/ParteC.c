@@ -44,3 +44,9 @@ volatile ModoOperacion modo_actual = MODO_AUTO;
 volatile ModoOperacion modo_anterior = 0xFF;
 volatile uint8_t silenciar_buzzer = 0;
 char zona_afectada[16] = "";
+
+// Buffer para comunicación USART (Bluetooth HC-05)
+#define BUFFER_SIZE 32
+char rx_buffer[BUFFER_SIZE];
+volatile uint8_t rx_index = 0;
+volatile uint8_t comando_listo = 0;
