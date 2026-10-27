@@ -195,6 +195,40 @@ void lcd_send_nibble(uint8_t nibble, uint8_t rs) {
 	TWI_stop();
 }
 
+void lcd_send_byte(uint8_t val, uint8_t rs) {
+	lcd_send_nibble(val & 0xF0, rs);
+	lcd_send_nibble((val << 4) & 0xF0, rs);
+}
+
+void lcd_send_cmd(uint8_t cmd) {
+	lcd_send_byte(cmd, 0);
+	_delay_ms(2);
+}
+
+void lcd_send_data(uint8_t data) {
+	lcd_send_byte(data, 1);
+	_delay_us(50);
+}
+
+void lcd_init(void) {
+	TWI_init();
+	_delay_ms(50);
+
+	// Secuencia oficial de inicio HD44780
+	lcd_send_nibble(0x30, 0);
+	_delay_ms(5);
+	lcd_send_nibble(0x30, 0);
+	_delay_us(200);
+	lcd_send_nibble(0x30, 0);
+	_delay_us(200);
+	lcd_send_nibble(0x20, 0);
+	_delay_ms(5);
+
+	lcd_send_cmd(0x28); // 2 líneas, 5x8 puntos
+	lcd_send_cmd(0x0C); // Display ON, Cursor OFF
+	lcd_send_cmd(0x06); // Auto increment
+	lcd_clear();
+}
 
 
 
