@@ -55,3 +55,38 @@ const ColorRGB COLORES[4] = {
 	{255, 255, 0  }  // 3: Amarillo
 };
 
+// Estructura de Paso de la Secuencia
+typedef struct {
+	uint8_t x;
+	uint8_t y;
+	uint8_t colorIdx;
+} PasoSecuencia;
+
+// Estados de la Máquina de Estados Finitos (FSM)
+typedef enum {
+	ESTADO_INICIO_LIBRE,
+	ESTADO_GENERAR_PASO,
+	ESTADO_REPRODUCIR_SECUENCIA,
+	ESTADO_TURNO_JUGADOR,
+	ESTADO_EXITO,
+	ESTADO_ERROR
+} EstadoJuego;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
