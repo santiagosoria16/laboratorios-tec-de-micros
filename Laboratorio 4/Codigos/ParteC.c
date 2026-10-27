@@ -276,6 +276,38 @@ void actualizar_lcd(void) {
 	}
 }
 
+// ============================================================================
+// PERIFÉRICOS AVR (USART Y ADC)
+// ============================================================================
+void USART_init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+
+void USART_transmit_char(char data) {
+	while (!(UCSR0A & (1 << UDRE0)));
+	UDR0 = data;
+}
+
+void USART_send_string(const char* str) {
+	while (*str) {
+		USART_transmit_char(*str++);
+	}
+}
+
+void ADC_init(void) {
+	ADMUX = (1 << REFS0); // AVcc como referencia
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Prescaler 128
+}
+
+uint16_t ADC_read(uint8_t channel) {
+	ADMUX = (ADMUX & 0xF0) | (channel & 0x07);
+	ADCSRA |= (1 << ADSC);
+	while (ADCSRA & (1 << ADSC));
+	return ADC;
+}
 
 
 
