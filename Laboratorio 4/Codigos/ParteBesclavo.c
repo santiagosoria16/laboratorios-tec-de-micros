@@ -26,3 +26,26 @@
 #define SPI_MISO        PB4
 #define SPI_SCK         PB5
 
+typedef enum
+{
+	RECIBIR_COMANDO = 0,
+	RECIBIR_VALOR
+} estado_spi_t;
+
+typedef enum
+{
+	EST_PARADO = 0,
+	EST_MARCHA,
+	EST_PISTON,
+	EST_EMERGENCIA
+} estado_esclavo_t;
+
+volatile estado_spi_t fase_spi = RECIBIR_COMANDO;
+
+volatile estado_esclavo_t estado = EST_PARADO;
+
+volatile uint8_t comando_recibido = 0;
+volatile uint8_t valor_recibido = 0;
+
+volatile uint16_t tiempo_servo = 0;
+
