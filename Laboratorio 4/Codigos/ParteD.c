@@ -36,3 +36,6 @@
 #define MAX_SECUENCIA      50
 #define UMBRAL_ADC_BAJO    350
 #define UMBRAL_ADC_ALTO    670
+
+// Frecuencias de tonos para los 4 colores (Do, Mi, Sol, Si)
+const uint16_t TONOS[4] = {262, 330, 392, 494};
