@@ -199,6 +199,20 @@ void guardar_record(uint8_t rec) {
 	}
 }
 
+// -----------------------------------------------------------------------------
+// Animaciones Visuales
+// -----------------------------------------------------------------------------
+void animacion_exito(void) {
+	for (uint8_t i = 0; i < 3; i++) {
+		for (uint8_t k = 0; k < NUM_LEDS; k++) {
+			matriz[k] = COLORES[1]; // Verde
+		}
+		ws2812_mostrar();
+		emitir_tono(523, 100);
+		limpiar_matriz();
+		_delay_ms(100);
+	}
+}
 
 
 
