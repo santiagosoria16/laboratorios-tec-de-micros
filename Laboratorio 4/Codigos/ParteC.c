@@ -178,7 +178,22 @@ void TWI_write(uint8_t data) {
 	while (!(TWCR & (1 << TWINT)));
 }
 
-
+// ============================================================================
+// DRIVER LCD I2C (PCF8574 en modo 4 bits)
+// ============================================================================
+void lcd_send_nibble(uint8_t nibble, uint8_t rs) {
+	uint8_t data = (nibble & 0xF0) | (rs ? 0x01 : 0x00) | 0x08; // Bit 0x08 = Backlight ON
+	TWI_start();
+	TWI_write(LCD_ADDR);
+	
+	// Pulso de Enable
+	TWI_write(data | 0x04);
+	_delay_us(1);
+	TWI_write(data & ~0x04);
+	_delay_us(50);
+	
+	TWI_stop();
+}
 
 
 
