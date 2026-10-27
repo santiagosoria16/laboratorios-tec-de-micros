@@ -75,6 +75,37 @@ typedef enum {
 // Matriz de píxeles (GRB para WS2812B)
 ColorRGB matriz[NUM_LEDS];
 
+// -----------------------------------------------------------------------------
+// Controlador WS2812B (Protocolo de Tiempo mediante Ensamblador Inline)
+// -----------------------------------------------------------------------------
+void ws2812_mostrar(void) {
+	cli(); // Deshabilitar interrupciones para mantener sincronización estricta
+	for (uint16_t i = 0; i < NUM_LEDS; i++) {
+		// WS2812B requiere secuencia de envío: Verde, Rojo, Azul
+		uint8_t datos[3] = {matriz[i].g, matriz[i].r, matriz[i].b};
+		
+		for (uint8_t j = 0; j < 3; j++) {
+			uint8_t byte = datos[j];
+			for (int8_t bit = 7; bit >= 0; bit--) {
+				if (byte & (1 << bit)) {
+					// Bit '1': T1H ~700ns, T1L ~600ns
+					WS2812_PORT |= (1 << WS2812_PIN);
+					asm volatile("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\t");
+					WS2812_PORT &= ~(1 << WS2812_PIN);
+					asm volatile("nop\n\tnop\n\tnop\n\tnop\n\t");
+					} else {
+					// Bit '0': T0H ~350ns, T0L ~800ns
+					WS2812_PORT |= (1 << WS2812_PIN);
+					asm volatile("nop\n\tnop\n\tnop\n\tnop\n\t");
+					WS2812_PORT &= ~(1 << WS2812_PIN);
+					asm volatile("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\t");
+				}
+			}
+		}
+	}
+	sei(); // Habilitar interrupciones
+	_delay_us(60); // Reset latch de WS2812B (>50us)
+}
 
 
 
