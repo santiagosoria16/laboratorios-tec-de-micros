@@ -133,3 +133,41 @@ void lcd_print(const char *str) {
 	while (*str) lcd_char(*str++);
 }
 
+
+void ws2812_show(void) {
+	uint8_t masklo = PORTD & ~(1 << LED_PIN);
+	uint8_t maskhi = PORTD | (1 << LED_PIN);
+	
+	cli();
+	for (uint16_t i = 0; i < 192; i++) {
+		uint8_t b = led_buffer[i];
+		for (uint8_t bit = 0; bit < 8; bit++) {
+			if (b & 0x80) {
+				PORTD = maskhi;
+				asm volatile ("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\t");
+				PORTD = masklo;
+				asm volatile ("nop\n\tnop\n\tnop\n\t");
+				} else {
+				PORTD = maskhi;
+				asm volatile ("nop\n\tnop\n\tnop\n\t");
+				PORTD = masklo;
+				asm volatile ("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\tnop\n\t");
+			}
+			b <<= 1;
+		}
+	}
+	sei();
+	_delay_us(50);
+}
+
+void set_pixel(uint8_t row, uint8_t col, uint8_t r, uint8_t g, uint8_t b) {
+	uint16_t index = ((row * 8) + col) * 3;
+	led_buffer[index]     = g;
+	led_buffer[index + 1] = r;
+	led_buffer[index + 2] = b;
+}
+
+void clear_pixels(void) {
+	for (uint16_t i = 0; i < 192; i++) led_buffer[i] = 0;
+}
+
