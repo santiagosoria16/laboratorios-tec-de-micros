@@ -157,6 +157,13 @@ void adc_init(void) {
 	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 }
 
+uint16_t adc_leer(uint8_t canal) {
+	ADMUX = (ADMUX & 0xF0) | (canal & 0x07);
+	ADCSRA |= (1 << ADSC); // Iniciar conversión
+	while (ADCSRA & (1 << ADSC)); // Esperar fin de conversión
+	return ADC;
+}
+
 
 
 
