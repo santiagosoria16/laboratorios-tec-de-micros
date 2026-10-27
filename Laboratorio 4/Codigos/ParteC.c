@@ -377,6 +377,16 @@ void evaluar_sensores(void) {
 	}
 }
 
+// Función encargada de hacer vibrar la membrana del buzzer pasivo a 2 kHz
+void sonar_sirena(void) {
+	for (uint8_t i = 0; i < 150; i++) {
+		PORTB |= (1 << BUZZER_PIN);
+		_delay_us(250); // 250us ALTO + 250us BAJO = 2000 Hz
+		PORTB &= ~(1 << BUZZER_PIN);
+		_delay_us(250);
+	}
+}
+
 
 
 
