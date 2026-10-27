@@ -387,7 +387,38 @@ void sonar_sirena(void) {
 	}
 }
 
+void actualizar_indicadores(void) {
+	switch (estado_actual) {
+		case ESTADO_DESARMADO:
+		PORTB &= ~(1 << LED_VERDE);
+		PORTB &= ~(1 << LED_ROJO);
+		PORTB &= ~(1 << BUZZER_PIN);
+		break;
 
+		case ESTADO_ARMADO:
+		PORTB |= (1 << LED_VERDE);   // LED Verde encendido
+		PORTB &= ~(1 << LED_ROJO);
+		PORTB &= ~(1 << BUZZER_PIN);
+		break;
+
+		case ESTADO_ALARMA:
+		PORTB &= ~(1 << LED_VERDE);
+		PORTB |= (1 << LED_ROJO);    // LED Rojo encendido
+
+		if (!silenciar_buzzer) {
+			sonar_sirena();          // Genera el tono de 2 kHz
+			} else {
+			PORTB &= ~(1 << BUZZER_PIN);
+		}
+		break;
+
+		case ESTADO_SILENCIADO:
+		PORTB &= ~(1 << LED_VERDE);
+		PORTB |= (1 << LED_ROJO);    // Mantiene indicación visual de alerta
+		PORTB &= ~(1 << BUZZER_PIN); // Sirena silenciada
+		break;
+	}
+}
 
 
 
