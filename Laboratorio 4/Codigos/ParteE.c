@@ -91,3 +91,45 @@ void mpu6050_read_accel(int16_t *ax, int16_t *ay, int16_t *az) {
 	*az = (int16_t)((zh << 8) | zl);
 }
 
+void lcd_send_nibble(uint8_t nibble, uint8_t mode) {
+	uint8_t data = nibble | mode | LCD_BACKLIGHT;
+	twi_start();
+	twi_write(LCD_ADDR);
+	twi_write(data | LCD_ENABLE);
+	_delay_us(1);
+	twi_write(data & ~LCD_ENABLE);
+	_delay_us(50);
+	twi_stop();
+}
+
+void lcd_send_byte(uint8_t val, uint8_t mode) {
+	lcd_send_nibble(val & 0xF0, mode);
+	lcd_send_nibble((val << 4) & 0xF0, mode);
+}
+
+void lcd_command(uint8_t cmd) { lcd_send_byte(cmd, 0); }
+void lcd_char(uint8_t data)   { lcd_send_byte(data, LCD_RS); }
+
+void lcd_init(void) {
+	_delay_ms(50);
+	lcd_send_nibble(0x30, 0); _delay_ms(5);
+	lcd_send_nibble(0x30, 0); _delay_us(150);
+	lcd_send_nibble(0x30, 0);
+	lcd_send_nibble(0x20, 0); // Modo 4 bits
+
+	lcd_command(0x28);
+	lcd_command(0x0C);
+	lcd_command(0x06);
+	lcd_command(0x01);
+	_delay_ms(2);
+}
+
+void lcd_set_cursor(uint8_t col, uint8_t row) {
+	uint8_t offsets[] = {0x00, 0x40};
+	lcd_command(0x80 | (col + offsets[row]));
+}
+
+void lcd_print(const char *str) {
+	while (*str) lcd_char(*str++);
+}
+
