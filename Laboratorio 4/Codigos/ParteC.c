@@ -75,6 +75,11 @@ void lcd_print(const char* str);
 void lcd_clear(void);
 void actualizar_lcd(void);
 
+// Lógica de Control
+void procesar_comando_bluetooth(void);
+void evaluar_sensores(void);
+void sonar_sirena(void);
+void actualizar_indicadores(void);
 
 
 
