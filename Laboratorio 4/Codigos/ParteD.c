@@ -39,3 +39,19 @@
 
 // Frecuencias de tonos para los 4 colores (Do, Mi, Sol, Si)
 const uint16_t TONOS[4] = {262, 330, 392, 494};
+
+// Estructura de Color RGB
+typedef struct {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+} ColorRGB;
+
+// Paleta de Colores
+const ColorRGB COLORES[4] = {
+	{255, 0,   0  }, // 0: Rojo
+	{0,   255, 0  }, // 1: Verde
+	{0,   0,   255}, // 2: Azul
+	{255, 255, 0  }  // 3: Amarillo
+};
+
