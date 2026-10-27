@@ -5,6 +5,10 @@
 #include <util/delay.h>
 #include <stdint.h>
 
+// =====================================================
+// COMANDOS SPI
+// =====================================================
+
 #define CMD_START       0x01
 #define CMD_STOP        0x02
 #define CMD_SPEED       0x03
@@ -25,6 +29,10 @@
 #define SPI_MOSI        PB3
 #define SPI_MISO        PB4
 #define SPI_SCK         PB5
+
+// =====================================================
+// ESTADOS
+// =====================================================
 
 typedef enum
 {
@@ -48,6 +56,10 @@ volatile uint8_t comando_recibido = 0;
 volatile uint8_t valor_recibido = 0;
 
 volatile uint16_t tiempo_servo = 0;
+
+// =====================================================
+// CONTROL DEL MOTOR
+// =====================================================
 
 void motor_detener(void)
 {
@@ -84,6 +96,10 @@ void motor_velocidad(uint8_t velocidad)
 	}
 }
 
+// =====================================================
+// TEMPORIZADORES
+// =====================================================
+
 void timer0_init(void)
 {
 	TCCR0A = 0;
@@ -96,6 +112,8 @@ void timer0_init(void)
 
 void timer1_init(void)
 {
+	// Fast PWM modo 14, salida OC1A
+	// Frecuencia aproximada: 50 Hz
 
 	TCCR1A = (1 << COM1A1) |
 	(1 << WGM11);
@@ -106,14 +124,20 @@ void timer1_init(void)
 
 	ICR1 = 39999;
 
+	// Posicion inicial
 	OCR1A = 2000;
 }
 
+// =====================================================
+// SPI ESCLAVO
+// =====================================================
+
 void spi_esclavo_init(void)
 {
-
+	// MISO salida
 	DDRB |= (1 << SPI_MISO);
 
+	// SS, MOSI y SCK entradas
 	DDRB &= ~((1 << SPI_SS) |
 	(1 << SPI_MOSI) |
 	(1 << SPI_SCK));
@@ -123,6 +147,11 @@ void spi_esclavo_init(void)
 	SPCR = (1 << SPE) |
 	(1 << SPIE);
 }
+
+// =====================================================
+// CONTROL DE ACTUADORES
+// =====================================================
+
 void indicar_paro(void)
 {
 	PORTB &= ~(1 << LED_VERDE);
@@ -150,33 +179,57 @@ void indicar_emergencia(void)
 	PORTC |= (1 << BUZZER);
 }
 
+// =====================================================
+// INTERRUPCION DE RECEPCION SPI
+// =====================================================
+
 ISR(SPI_STC_vect)
 {
 	uint8_t dato = SPDR;
+
 	if (fase_spi == RECIBIR_COMANDO)
 	{
 		comando_recibido = dato;
+
 		fase_spi = RECIBIR_VALOR;
 	}
 	else
 	{
 		valor_recibido = dato;
+
 		fase_spi = RECIBIR_COMANDO;
+
+		// ---------------------------------------------
+		// EMERGENCIA
+		// ---------------------------------------------
+
 		if (comando_recibido == CMD_EMERGENCY)
 		{
 			estado = EST_EMERGENCIA;
+
 			motor_detener();
+
 			indicar_emergencia();
+
 			OCR1A = 2000;
+
 			tiempo_servo = 0;
 		}
+
+		// ---------------------------------------------
+		// PARO
+		// ---------------------------------------------
 
 		else if (comando_recibido == CMD_STOP)
 		{
 			estado = EST_PARADO;
+
 			motor_detener();
+
 			indicar_paro();
+
 			OCR1A = 2000;
+
 			tiempo_servo = 0;
 		}
 
@@ -189,12 +242,19 @@ ISR(SPI_STC_vect)
 			switch (comando_recibido)
 			{
 				case CMD_START:
+
 				estado = EST_MARCHA;
+
 				indicar_marcha();
+
 				PORTD |= (1 << MOTOR_IN1);
+
 				PORTD &= ~(1 << MOTOR_IN2);
+
 				break;
+
 				case CMD_SPEED:
+
 				if (estado == EST_MARCHA ||
 				estado == EST_PISTON)
 				{
@@ -202,26 +262,40 @@ ISR(SPI_STC_vect)
 				}
 
 				break;
+
 				case CMD_PISTON:
+
 				if (estado == EST_MARCHA ||
 				estado == EST_PISTON)
 				{
 					estado = EST_PISTON;
+
 					OCR1A = 4000;
+
 					tiempo_servo = 700;
 				}
+
 				break;
+
 				default:
+
 				break;
 			}
 		}
 	}
 }
 
+// =====================================================
+// PROGRAMA PRINCIPAL
+// =====================================================
+
 int main(void)
 {
 	uint8_t devolver_servo;
 
+	// ---------------------------------------------
+	// CONFIGURACION DE SALIDAS
+	// ---------------------------------------------
 
 	DDRB |= (1 << LED_VERDE) |
 	(1 << SERVO_PIN);
@@ -233,13 +307,16 @@ int main(void)
 	(1 << MOTOR_IN2) |
 	(1 << MOTOR_EN);
 
-
+	// Estado inicial
 	PORTB &= ~(1 << LED_VERDE);
 
 	PORTC &= ~(1 << BUZZER);
 
 	PORTC |= (1 << LED_ROJO);
 
+	// ---------------------------------------------
+	// INICIALIZACION
+	// ---------------------------------------------
 
 	timer0_init();
 
@@ -251,13 +328,21 @@ int main(void)
 
 	sei();
 
+	// ---------------------------------------------
+	// BUCLE PRINCIPAL
+	// ---------------------------------------------
+
 	while (1)
 	{
-
+		// Reiniciar recepcion cuando SS esta alto
 		if (PINB & (1 << SPI_SS))
 		{
 			fase_spi = RECIBIR_COMANDO;
 		}
+
+		// -----------------------------------------
+		// TEMPORIZACION DEL SERVO
+		// -----------------------------------------
 
 		devolver_servo = 0;
 
