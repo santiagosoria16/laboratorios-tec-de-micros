@@ -179,3 +179,28 @@ void estado_apagado(void) {
 		LCD_Clear();
 	}
 }
+
+FuncionEstado fsm_estados[] = { estado_activo, estado_standby, estado_apagado };
+
+int main(void) {
+	DDRB |= (1 << LED_PIN) | (1 << BUZZER_PIN);
+	DDRD &= ~(1 << BUTTON_PIN);
+	PORTD |= (1 << BUTTON_PIN); // Pull-up activo
+
+	LCD_Init();
+	Timer0_Init();
+	INT0_Init();
+
+	sei();
+
+	while (1) {
+		if (flag_evento_boton) {
+			flag_evento_boton = false;
+			PORTB |= (1 << BUZZER_PIN);
+			_delay_ms(50);
+			PORTB &= ~(1 << BUZZER_PIN);
+		}
+
+		fsm_estados[id_estado_actual]();
+	}
+}
