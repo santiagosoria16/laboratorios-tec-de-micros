@@ -143,3 +143,15 @@ void Tarea_LCD_Update(void) {
 	LCD_SetCursor(0, 0);
 	LCD_Print("Estado: ACTIVO  ");
 }
+
+void estado_activo(void) {
+	if (flag_tarea_led) { flag_tarea_led = false; Tarea_LED(); }
+	if (flag_tarea_lcd) { flag_tarea_lcd = false; Tarea_LCD_Update(); }
+
+	if (milisegundos_totales - ultimo_evento_usuario >= 10000) {
+		id_estado_actual = ESTADO_STANDBY;
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("Esperando...");
+	}
+}
