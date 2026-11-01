@@ -11,3 +11,11 @@
 
 #define LCD_RS_PIN    PB1   // Pin 9 Arduino
 #define LCD_E_PIN     PB2   // Pin 10 Arduino
+
+// --- TIPOS DE DATOS Y FSM ---
+typedef enum {
+	ESTADO_ACTIVO = 0,
+	ESTADO_STANDBY,
+	ESTADO_APAGADO
+} EstadoSistema;
+
