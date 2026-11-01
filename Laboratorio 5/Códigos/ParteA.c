@@ -155,3 +155,27 @@ void estado_activo(void) {
 		LCD_Print("Esperando...");
 	}
 }
+
+void estado_standby(void) {
+	if (flag_evento_boton) {
+		id_estado_actual = ESTADO_ACTIVO;
+		LCD_Clear();
+		return;
+	}
+
+	if (milisegundos_totales - ultimo_evento_usuario >= 30000) {
+		id_estado_actual = ESTADO_APAGADO;
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("APAGADO");
+	}
+}
+
+void estado_apagado(void) {
+	PORTB &= ~(1 << LED_PIN);
+
+	if (flag_evento_boton) {
+		id_estado_actual = ESTADO_ACTIVO;
+		LCD_Clear();
+	}
+}
