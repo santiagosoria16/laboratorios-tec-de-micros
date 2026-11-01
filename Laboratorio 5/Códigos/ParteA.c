@@ -79,3 +79,14 @@ void LCD_Init(void) {
 	_delay_ms(10);
 	lcd_send_byte(0x06, 0); // Incremento automático
 }
+
+void LCD_SetCursor(uint8_t fila, uint8_t columna) {
+	uint8_t addr = (fila == 0) ? (0x80 + columna) : (0xC0 + columna);
+	lcd_send_byte(addr, 0);
+}
+
+void LCD_Print(const char* str) {
+	while (*str) {
+		lcd_send_byte(*str++, 1);
+	}
+}
