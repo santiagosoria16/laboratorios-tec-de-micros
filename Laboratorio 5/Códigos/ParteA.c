@@ -109,3 +109,21 @@ void INT0_Init(void) {
 	EICRA |= (1 << ISC01);  // Interrupción por flanco de bajada
 	EIMSK |= (1 << INT0);
 }
+
+ISR(TIMER0_COMPA_vect) {
+	milisegundos_totales++;
+
+	if (id_estado_actual == ESTADO_ACTIVO) {
+		cont_led_ms++;
+		if (cont_led_ms >= 200) {
+			cont_led_ms = 0;
+			flag_tarea_led = true;
+		}
+
+		cont_lcd_ms++;
+		if (cont_lcd_ms >= 500) {
+			cont_lcd_ms = 0;
+			flag_tarea_lcd = true;
+		}
+	}
+}
