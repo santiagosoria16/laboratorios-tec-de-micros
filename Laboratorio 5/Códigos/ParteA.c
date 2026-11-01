@@ -47,3 +47,14 @@ void lcd_send_nibble(uint8_t nibble) {
 	PORTB &= ~(1 << LCD_E_PIN);
 	_delay_ms(2);
 }
+
+void lcd_send_byte(uint8_t byte, uint8_t es_dato) {
+	if (es_dato) {
+		PORTB |= (1 << LCD_RS_PIN);  // RS = 1 (Texto)
+		} else {
+		PORTB &= ~(1 << LCD_RS_PIN); // RS = 0 (Comando)
+	}
+
+	lcd_send_nibble(byte & 0xF0);        // Parte alta
+	lcd_send_nibble((byte << 4) & 0xF0); // Parte baja
+}
