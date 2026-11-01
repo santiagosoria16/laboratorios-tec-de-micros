@@ -58,3 +58,24 @@ void lcd_send_byte(uint8_t byte, uint8_t es_dato) {
 	lcd_send_nibble(byte & 0xF0);        // Parte alta
 	lcd_send_nibble((byte << 4) & 0xF0); // Parte baja
 }
+
+void LCD_Init(void) {
+	// Configurar PD4..PD7, PB1 y PB2 como salidas
+	DDRD |= 0xF0;
+	DDRB |= (1 << LCD_RS_PIN) | (1 << LCD_E_PIN);
+
+	PORTB &= ~((1 << LCD_RS_PIN) | (1 << LCD_E_PIN));
+	_delay_ms(100); // Espera inicial de encendido
+
+	// Secuencia estándar HD44780
+	lcd_send_nibble(0x30); _delay_ms(10);
+	lcd_send_nibble(0x30); _delay_ms(5);
+	lcd_send_nibble(0x30); _delay_ms(5);
+	lcd_send_nibble(0x20); _delay_ms(5); // Activa bus de 4 bits
+
+	lcd_send_byte(0x28, 0); // 2 líneas, modo 5x8
+	lcd_send_byte(0x0C, 0); // Encender pantalla, sin cursor
+	lcd_send_byte(0x01, 0); // Limpiar pantalla
+	_delay_ms(10);
+	lcd_send_byte(0x06, 0); // Incremento automático
+}
