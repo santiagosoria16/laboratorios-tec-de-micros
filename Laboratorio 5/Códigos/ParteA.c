@@ -127,3 +127,19 @@ ISR(TIMER0_COMPA_vect) {
 		}
 	}
 }
+
+ISR(INT0_vect) {
+	flag_evento_boton = true;
+	ultimo_evento_usuario = milisegundos_totales;
+}
+
+// --- TAREAS Y MÁQUINA DE ESTADOS ---
+
+void Tarea_LED(void) {
+	PORTB ^= (1 << LED_PIN);
+}
+
+void Tarea_LCD_Update(void) {
+	LCD_SetCursor(0, 0);
+	LCD_Print("Estado: ACTIVO  ");
+}
