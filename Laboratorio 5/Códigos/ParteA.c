@@ -19,3 +19,17 @@ typedef enum {
 	ESTADO_APAGADO
 } EstadoSistema;
 
+typedef void (*FuncionEstado)(void);
+
+// --- VARIABLES GLOBALES VOLÁTILES ---
+volatile uint32_t milisegundos_totales = 0;
+volatile uint32_t ultimo_evento_usuario = 0;
+
+volatile uint16_t cont_led_ms = 0;
+volatile uint16_t cont_lcd_ms = 0;
+
+volatile bool flag_tarea_led = false;
+volatile bool flag_tarea_lcd = false;
+volatile bool flag_evento_boton = false;
+
+EstadoSistema id_estado_actual = ESTADO_ACTIVO;
