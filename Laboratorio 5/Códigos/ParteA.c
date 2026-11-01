@@ -90,3 +90,22 @@ void LCD_Print(const char* str) {
 		lcd_send_byte(*str++, 1);
 	}
 }
+
+void LCD_Clear(void) {
+	lcd_send_byte(0x01, 0);
+	_delay_ms(10);
+}
+
+// --- CONFIGURACIÓN DE TIMERS E INTERRUPCIONES ---
+
+void Timer0_Init(void) {
+	TCCR0A = (1 << WGM01);              // CTC modo 2
+	TCCR0B = (1 << CS01) | (1 << CS00); // Prescaler 64
+	OCR0A = 249;                        // 1 ms exacto
+	TIMSK0 |= (1 << OCIE0A);
+}
+
+void INT0_Init(void) {
+	EICRA |= (1 << ISC01);  // Interrupción por flanco de bajada
+	EIMSK |= (1 << INT0);
+}
