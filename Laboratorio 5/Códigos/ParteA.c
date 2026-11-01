@@ -33,3 +33,17 @@ volatile bool flag_tarea_lcd = false;
 volatile bool flag_evento_boton = false;
 
 EstadoSistema id_estado_actual = ESTADO_ACTIVO;
+
+
+// --- DRIVER LCD ROBUSTO PARA PICSIMLAB ---
+
+void lcd_send_nibble(uint8_t nibble) {
+	// Escribe únicamente en PD4, PD5, PD6 y PD7 manteniendo el resto del puerto
+	PORTD = (PORTD & 0x0F) | (nibble & 0xF0);
+	
+	// Pulso de Enable amplio para asegurar captura en el simulador
+	PORTB |= (1 << LCD_E_PIN);
+	_delay_ms(2);
+	PORTB &= ~(1 << LCD_E_PIN);
+	_delay_ms(2);
+}
