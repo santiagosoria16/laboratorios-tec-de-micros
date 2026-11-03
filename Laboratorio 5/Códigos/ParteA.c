@@ -17,7 +17,7 @@
 #define DHT_BIT       PB4   // Pin 12 Arduino
 
 // Configuración LCD I2C (PCF8574 en A4/A5)
-#define I2C_ADDR      0x27  // Dirección I2C habitual (probar 0x3F si no muestra texto)
+#define I2C_ADDR      0x27  // Dirección I2C habitual
 #define LCD_BACKLIGHT 0x08  // Bit P3: Luz de fondo
 #define LCD_ENABLE    0x04  // Bit P2: Enable
 #define LCD_RS        0x01  // Bit P0: Register Select
