@@ -6,13 +6,21 @@
 #include <stdio.h>
 
 // --- DEFINICIÓN DE PINES ---
-#define LED_PIN       PB5   // Pin 13 Arduino
-#define BUZZER_PIN    PB0   // Pin 8 Arduino
-#define BUTTON_PIN    PD2   // Pin 2 Arduino (INT0)
-#define DHT11_PIN     PD3   // Pin 3 Arduino (Datos DHT11)
+#define LED_PIN       PB5   // Pin 13 Arduino (LED de estado)
+#define BUZZER_PIN    PB0   // Pin 8 Arduino (Buzzer)
+#define BUTTON_PIN    PD2   // Pin 2 Arduino (INT0 - Pulsador)
 
-#define LCD_RS_PIN    PB1   // Pin 9 Arduino
-#define LCD_E_PIN     PB2   // Pin 10 Arduino
+// Mapeo del DHT11 en Pin 12 (PB4)
+#define DHT_PORT      PORTB
+#define DHT_DDR       DDRB
+#define DHT_PIN       PINB
+#define DHT_BIT       PB4   // Pin 12 Arduino
+
+// Configuración LCD I2C (PCF8574 en A4/A5)
+#define I2C_ADDR      0x27  // Dirección I2C habitual (probar 0x3F si no muestra texto)
+#define LCD_BACKLIGHT 0x08  // Bit P3: Luz de fondo
+#define LCD_ENABLE    0x04  // Bit P2: Enable
+#define LCD_RS        0x01  // Bit P0: Register Select
 
 // --- FSM ---
 typedef enum {
@@ -38,44 +46,80 @@ volatile bool flag_evento_boton = false;
 
 volatile uint16_t valor_adc = 0;
 volatile uint8_t dht_temp = 0;
-volatile uint8_t dht_hum = 0; // Se lee en background para validación del DHT11
+volatile uint8_t dht_hum = 0;
 
 EstadoSistema id_estado_actual = ESTADO_ACTIVO;
 
-// --- DRIVER LCD HD44780 ---
+// --- GENERADOR DE TONO PARA BUZZER ---
 
-void lcd_send_nibble(uint8_t nibble) {
-	PORTD = (PORTD & 0x0F) | (nibble & 0xF0);
-	PORTB |= (1 << LCD_E_PIN);
-	_delay_ms(2);
-	PORTB &= ~(1 << LCD_E_PIN);
-	_delay_ms(2);
+void Buzzer_Beep(void) {
+	for (uint16_t i = 0; i < 100; i++) {
+		PORTB |= (1 << BUZZER_PIN);
+		_delay_us(500);
+		PORTB &= ~(1 << BUZZER_PIN);
+		_delay_us(500);
+	}
+}
+
+// --- HARDWARE TWI (I2C POR REGISTROS) ---
+
+void TWI_Init(void) {
+	TWSR = 0x00; // Prescaler = 1
+	TWBR = 72;   // Frecuencia SCL = 100 kHz @ 16 MHz
+	TWCR = (1 << TWEN);
+}
+
+void TWI_Start(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
+
+void TWI_Stop(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}
+
+void TWI_Write(uint8_t data) {
+	TWDR = data;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
+
+void pcf8574_write(uint8_t data) {
+	TWI_Start();
+	TWI_Write((I2C_ADDR << 1) | 0);
+	TWI_Write(data);
+	TWI_Stop();
+}
+
+// --- DRIVER LCD I2C ---
+
+void lcd_send_nibble(uint8_t nibble, uint8_t es_dato) {
+	uint8_t data = (nibble & 0xF0) | LCD_BACKLIGHT | (es_dato ? LCD_RS : 0);
+	pcf8574_write(data | LCD_ENABLE);
+	_delay_us(1);
+	pcf8574_write(data & ~LCD_ENABLE);
+	_delay_us(50);
 }
 
 void lcd_send_byte(uint8_t byte, uint8_t es_dato) {
-	if (es_dato) PORTB |= (1 << LCD_RS_PIN);
-	else         PORTB &= ~(1 << LCD_RS_PIN);
-
-	lcd_send_nibble(byte & 0xF0);
-	lcd_send_nibble((byte << 4) & 0xF0);
+	lcd_send_nibble(byte & 0xF0, es_dato);
+	lcd_send_nibble((byte << 4) & 0xF0, es_dato);
 }
 
 void LCD_Init(void) {
-	DDRD |= 0xF0;
-	DDRB |= (1 << LCD_RS_PIN) | (1 << LCD_E_PIN);
-	PORTB &= ~((1 << LCD_RS_PIN) | (1 << LCD_E_PIN));
-	_delay_ms(100);
+	TWI_Init();
+	_delay_ms(50);
 
-	lcd_send_nibble(0x30); _delay_ms(10);
-	lcd_send_nibble(0x30); _delay_ms(5);
-	lcd_send_nibble(0x30); _delay_ms(5);
-	lcd_send_nibble(0x20); _delay_ms(5);
+	lcd_send_nibble(0x30, 0); _delay_ms(5);
+	lcd_send_nibble(0x30, 0); _delay_ms(5);
+	lcd_send_nibble(0x30, 0); _delay_us(150);
+	lcd_send_nibble(0x20, 0); _delay_ms(2);
 
-	lcd_send_byte(0x28, 0);
-	lcd_send_byte(0x0C, 0);
-	lcd_send_byte(0x01, 0);
-	_delay_ms(10);
-	lcd_send_byte(0x06, 0);
+	lcd_send_byte(0x28, 0); // 2 líneas, 5x8
+	lcd_send_byte(0x0C, 0); // Display ON, Cursor OFF
+	lcd_send_byte(0x01, 0); // Limpiar pantalla
+	_delay_ms(2);
+	lcd_send_byte(0x06, 0); // Auto-incremento
 }
 
 void LCD_SetCursor(uint8_t fila, uint8_t columna) {
@@ -89,71 +133,91 @@ void LCD_Print(const char* str) {
 
 void LCD_Clear(void) {
 	lcd_send_byte(0x01, 0);
-	_delay_ms(10);
+	_delay_ms(2);
 }
 
-// --- DRIVER DHT11 (1-WIRE PROTOCOL) ---
+// --- RUTINA DHT11 INTEGRADA DEL OTRO LABORATORIO ---
 
-uint8_t DHT11_Read(uint8_t *temp, uint8_t *hum) {
+uint8_t dht_wait_level(uint8_t nivel, uint16_t timeout_us) {
+	while ((((DHT_PIN & (1 << DHT_BIT)) != 0) ? 1 : 0) != nivel) {
+		_delay_us(1);
+		if (timeout_us == 0) return 0;
+		timeout_us--;
+	}
+	return 1;
+}
+
+uint8_t dht11_read(uint8_t *hum, uint8_t *temp) {
 	uint8_t data[5] = {0, 0, 0, 0, 0};
 	uint8_t i, j;
+	uint16_t ancho;
 
-	DDRD |= (1 << DHT11_PIN);
-	PORTD &= ~(1 << DHT11_PIN);
-	_delay_ms(18);
-	PORTD |= (1 << DHT11_PIN);
+	cli();
+
+	DHT_DDR |= (1 << DHT_BIT);
+	DHT_PORT &= ~(1 << DHT_BIT);
+	_delay_ms(20);
+
+	DHT_PORT |= (1 << DHT_BIT);
 	_delay_us(30);
-	DDRD &= ~(1 << DHT11_PIN);
-	PORTD |= (1 << DHT11_PIN);
 
-	_delay_us(40);
-	if (PIND & (1 << DHT11_PIN)) return 0;
-	_delay_us(80);
-	if (!(PIND & (1 << DHT11_PIN))) return 0;
-	while (PIND & (1 << DHT11_PIN));
+	DHT_DDR &= ~(1 << DHT_BIT);
+	DHT_PORT |= (1 << DHT_BIT);
+
+	if (!dht_wait_level(0, 200)) { sei(); return 1; }
+	if (!dht_wait_level(1, 200)) { sei(); return 2; }
+	if (!dht_wait_level(0, 200)) { sei(); return 3; }
 
 	for (j = 0; j < 5; j++) {
 		for (i = 0; i < 8; i++) {
-			while (!(PIND & (1 << DHT11_PIN)));
-			_delay_us(30);
-			if (PIND & (1 << DHT11_PIN)) {
+			if (!dht_wait_level(1, 100)) { sei(); return 4; }
+			ancho = 0;
+			while (DHT_PIN & (1 << DHT_BIT)) {
+				_delay_us(1);
+				ancho++;
+				if (ancho >= 100) break;
+			}
+			if (ancho > 40) {
 				data[j] |= (1 << (7 - i));
 			}
-			while (PIND & (1 << DHT11_PIN));
 		}
 	}
 
-	if ((uint8_t)(data[0] + data[1] + data[2] + data[3]) == data[4]) {
-		*hum  = data[0];
-		*temp = data[2];
-		return 1;
+	sei();
+
+	if ((uint8_t)(data[0] + data[1] + data[2] + data[3]) != data[4]) {
+		return 6;
 	}
+
+	*hum = data[0];
+	*temp = data[2];
 	return 0;
 }
 
 // --- HARDWARE INIT ---
 
 void Timer0_Init(void) {
-	TCCR0A = (1 << WGM01);
-	TCCR0B = (1 << CS01) | (1 << CS00);
-	OCR0A = 249;
+	TCCR0A = (1 << WGM01);              // Modo CTC
+	TCCR0B = (1 << CS01) | (1 << CS00); // Prescaler 64
+	OCR0A = 249;                        // Base de tiempo 1 ms
 	TIMSK0 |= (1 << OCIE0A);
 }
 
 void Timer1_Init(void) {
 	TCCR1A = 0;
-	TCCR1B = (1 << WGM12) | (1 << CS12);
-	OCR1A = 6249;
+	TCCR1B = (1 << WGM12) | (1 << CS12); // Prescaler 256
+	OCR1A = 6249;                        // Interrupción cada 100 ms
 	TIMSK1 |= (1 << OCIE1A);
 }
 
 void ADC_Init(void) {
-	ADMUX = (1 << REFS0);
-	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+	ADMUX = (1 << REFS0);               // Referencia AVcc (5V), Canal ADC0 (A0)
+	ADCSRA = (1 << ADEN)  | (1 << ADIE) |
+	(1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Prescaler 128
 }
 
 void INT0_Init(void) {
-	EICRA |= (1 << ISC01);
+	EICRA |= (1 << ISC01);              // Flanco de bajada
 	EIMSK |= (1 << INT0);
 }
 
@@ -176,7 +240,7 @@ ISR(TIMER0_COMPA_vect) {
 
 ISR(TIMER1_COMPA_vect) {
 	if (id_estado_actual == ESTADO_ACTIVO) {
-		ADCSRA |= (1 << ADSC);
+		ADCSRA |= (1 << ADSC); // Conversión ADC cada 100 ms
 	}
 }
 
@@ -197,7 +261,7 @@ void Tarea_LED(void) {
 
 void Tarea_Temperatura(void) {
 	uint8_t t = 0, h = 0;
-	if (DHT11_Read(&t, &h)) {
+	if (dht11_read(&h, &t) == 0) {
 		dht_temp = t;
 		dht_hum  = h;
 	}
@@ -215,6 +279,11 @@ void Tarea_LCD_Update(void) {
 }
 
 void estado_activo(void) {
+	if (flag_evento_boton) {
+		flag_evento_boton = false;
+		Buzzer_Beep();
+	}
+
 	if (flag_tarea_led)  { flag_tarea_led = false;  Tarea_LED(); }
 	if (flag_tarea_temp) { flag_tarea_temp = false; Tarea_Temperatura(); }
 	if (flag_tarea_lcd)  { flag_tarea_lcd = false;  Tarea_LCD_Update(); }
@@ -229,6 +298,9 @@ void estado_activo(void) {
 
 void estado_standby(void) {
 	if (flag_evento_boton) {
+		flag_evento_boton = false;
+		Buzzer_Beep();
+
 		id_estado_actual = ESTADO_ACTIVO;
 		LCD_Clear();
 		return;
@@ -246,6 +318,9 @@ void estado_apagado(void) {
 	PORTB &= ~(1 << LED_PIN);
 
 	if (flag_evento_boton) {
+		flag_evento_boton = false;
+		Buzzer_Beep();
+
 		id_estado_actual = ESTADO_ACTIVO;
 		LCD_Clear();
 	}
@@ -256,7 +331,7 @@ FuncionEstado fsm_estados[] = { estado_activo, estado_standby, estado_apagado };
 int main(void) {
 	DDRB |= (1 << LED_PIN) | (1 << BUZZER_PIN);
 	DDRD &= ~(1 << BUTTON_PIN);
-	PORTD |= (1 << BUTTON_PIN);
+	PORTD |= (1 << BUTTON_PIN); // Pull-Up en PD2
 
 	LCD_Init();
 	Timer0_Init();
@@ -266,14 +341,9 @@ int main(void) {
 
 	sei();
 
-	while (1) {
-		if (flag_evento_boton) {
-			flag_evento_boton = false;
-			PORTB |= (1 << BUZZER_PIN);
-			_delay_ms(50);
-			PORTB &= ~(1 << BUZZER_PIN);
-		}
+	Tarea_LCD_Update();
 
+	while (1) {
 		fsm_estados[id_estado_actual]();
 	}
 }
