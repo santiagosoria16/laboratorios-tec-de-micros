@@ -264,7 +264,6 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp) {
 		return 6; // Retorna error si falla el Checksum
 	}
 
-	*hum = data[0];  // Asigna la parte entera de la humedad
 	*temp = data[2]; // Asigna la parte entera de la temperatura
 	return 0;        // Retorna 0 indicando lectura exitosa
 }
