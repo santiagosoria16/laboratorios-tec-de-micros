@@ -317,3 +317,38 @@ uint8_t dht11_read(uint8_t *hum, uint8_t *temp) {
 	return 0;
 }
 
+// --- CONFIGURACIÓN DEL WATCHDOG TIMER ---
+
+// Habilita el WDT estrictamente en MODO RESET (2.0s, WDIE=0)
+void WDT_Enable_Reset(void) {
+	cli();
+	wdt_reset();
+	MCUSR &= ~(1 << WDRF);
+	WDTCSR |= (1 << WDCE) | (1 << WDE);
+	WDTCSR = (1 << WDE) | (1 << WDP2) | (1 << WDP1); // 2.0s, WDIE = 0
+	sei();
+}
+
+// PRUEBA A: Habilita WDT en modo Interrupción pura a 8.0s para el modo APAGADO
+void WDT_Init_Interrupt_8s(void) {
+	MCUSR &= ~(1 << WDRF);
+	WDTCSR |= (1 << WDCE) | (1 << WDE);
+	WDTCSR = (1 << WDIE) | (1 << WDP3) | (1 << WDP0);
+}
+
+void WDT_Disable(void) {
+	wdt_disable();
+}
+
+// SIMULACIÓN DE BLOQUEO: Pin 4 de Arduino a GND
+void Simular_Bloqueo(void) {
+	if (!(PIND & (1 << HANG_PIN))) { // Si Pin 4 pasa a GND
+		wdt_signature = WDT_MAGIC_KEY;
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("BLOQUEO DE CPU..");
+		LCD_SetCursor(1, 0);
+		LCD_Print("Desconecte PIN4");
+		while (1) { } // Bucle infinito: al no llamar wdt_reset(), el WDT reinicia la MCU
+	}
+}
