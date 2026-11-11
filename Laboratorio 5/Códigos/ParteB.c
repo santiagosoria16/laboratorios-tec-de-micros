@@ -176,3 +176,32 @@ void Buzzer_Alarm(void) { // Alarma ruidosa para estado de emergencia
 	}
 }
 
+// --- DRIVER HARDWARE TWI (I2C) POR REGISTROS ---
+void TWI_Init(void) {
+	TWSR = 0x00;
+	TWBR = 72;
+	TWCR = (1 << TWEN);
+}
+
+void TWI_Start(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
+
+void TWI_Stop(void) {
+	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}
+
+void TWI_Write(uint8_t data) {
+	TWDR = data;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
+}
+
+void pcf8574_write(uint8_t data) {
+	TWI_Start();
+	TWI_Write((I2C_ADDR << 1) | 0);
+	TWI_Write(data);
+	TWI_Stop();
+}
+
