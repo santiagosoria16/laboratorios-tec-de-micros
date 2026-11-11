@@ -352,3 +352,49 @@ void Simular_Bloqueo(void) {
 		while (1) { } // Bucle infinito: al no llamar wdt_reset(), el WDT reinicia la MCU
 	}
 }
+
+
+// --- CONFIGURACIÓN DE PERIFÉRICOS HARDWARE ---
+void Timer0_Init(void) {
+	TCCR0A = (1 << WGM01);
+	TCCR0B = (1 << CS01) | (1 << CS00);
+	OCR0A = 249;
+	TIMSK0 |= (1 << OCIE0A);
+}
+
+void Timer1_Init(void) {
+	TCCR1A = 0;
+	TCCR1B = (1 << WGM12) | (1 << CS12);
+	OCR1A = 6249;
+	TIMSK1 |= (1 << OCIE1A);
+}
+
+void ADC_Init(void) {
+	ADMUX = (1 << REFS0);
+	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+}
+
+void External_Interrupts_Init(void) {
+	EICRA |= (1 << ISC01) | (1 << ISC11);
+	EIMSK |= (1 << INT0) | (1 << INT1);
+}
+
+void Perifericos_Reanudar(void) {
+	PRR_Config_Activo();
+	USART_Init(MYUBRR);
+	TWI_Init();
+	ADC_Init();
+	WDT_Enable_Reset();
+}
+
+void Lectura_Rapida_Despertar(void) {
+	PRR &= ~(1 << PRADC);
+	ADMUX = (1 << REFS0);
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+	ADCSRA |= (1 << ADSC);
+	while (ADCSRA & (1 << ADSC));
+	valor_adc = ADC;
+	ADCSRA &= ~(1 << ADEN);
+	PRR |= (1 << PRADC);
+}
+
