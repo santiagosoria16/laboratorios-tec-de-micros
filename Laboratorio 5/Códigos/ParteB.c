@@ -35,3 +35,12 @@
 #define LCD_ENABLE      0x04
 #define LCD_RS          0x01
 
+// --- MÁQUINA DE ESTADOS FINITA (FSM) ---
+typedef enum {
+	ESTADO_ACTIVO = 0,
+	ESTADO_STANDBY,
+	ESTADO_APAGADO,
+	ESTADO_EMERGENCIA
+} EstadoSistema;
+
+typedef void (*FuncionEstado)(void);
