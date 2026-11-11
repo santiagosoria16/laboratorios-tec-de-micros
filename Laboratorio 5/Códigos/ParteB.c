@@ -454,3 +454,27 @@ ISR(WDT_vect) {
 	}
 }
 
+// --- TAREAS SECUNDARIAS ---
+void Tarea_LED(void) {
+	PORTB ^= (1 << LED_PIN);
+}
+
+void Tarea_Temperatura(void) {
+	uint8_t t = 0, h = 0;
+	if (dht11_read(&h, &t) == 0) {
+		dht_temp = t;
+		dht_hum  = h;
+	}
+}
+
+void Tarea_LCD_Update(void) {
+	char buffer[17];
+
+	LCD_SetCursor(0, 0);
+	LCD_Print("Estado: ACTIVO  ");
+
+	LCD_SetCursor(1, 0);
+	snprintf(buffer, sizeof(buffer), "Temp:%02dC A0:%04d", dht_temp, valor_adc);
+	LCD_Print(buffer);
+}
+
