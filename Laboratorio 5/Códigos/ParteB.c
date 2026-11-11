@@ -627,3 +627,233 @@ void Entrar_Estado_Seguro(void) {
 	LCD_Print("Estado Seguro   ");
 }
 
+// --- MÁQUINAS DE ESTADO ---
+void estado_activo(void) {
+	if (flag_evento_emergencia) { // Transición manual por Botón INT1
+		flag_evento_emergencia = false;
+		id_estado_actual = ESTADO_EMERGENCIA;
+		Buzzer_Alarm();
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("! EMERGENCIA !  ");
+		LCD_SetCursor(1, 0);
+		LCD_Print("Estado Seguro   ");
+		return;
+	}
+
+	if (flag_evento_boton) {
+		flag_evento_boton = false;
+		Buzzer_Beep();
+	}
+
+	if (flag_tarea_led)  { flag_tarea_led = false;  Tarea_LED(); }
+	if (flag_tarea_temp) { flag_tarea_temp = false; Tarea_Temperatura(); }
+	if (flag_tarea_lcd)  { flag_tarea_lcd = false;  Tarea_LCD_Update(); }
+
+	if (milisegundos_totales - ultimo_evento_usuario >= 10000) {
+		id_estado_actual = ESTADO_STANDBY;
+		PRR_Config_Standby();
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("Esperando...");
+	}
+}
+
+void estado_standby(void) {
+	if (flag_evento_emergencia) {
+		flag_evento_emergencia = false;
+		Perifericos_Reanudar();
+		id_estado_actual = ESTADO_EMERGENCIA;
+		Buzzer_Alarm();
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("! EMERGENCIA !  ");
+		LCD_SetCursor(1, 0);
+		LCD_Print("Estado Seguro   ");
+		return;
+	}
+
+	if (flag_evento_boton) {
+		flag_evento_boton = false;
+		Perifericos_Reanudar();
+		Buzzer_Beep();
+
+		id_estado_actual = ESTADO_ACTIVO;
+		LCD_Clear();
+		return;
+	}
+
+	if (milisegundos_totales - ultimo_evento_usuario >= 30000) {
+		id_estado_actual = ESTADO_APAGADO;
+
+		PORTB &= ~(1 << LED_PIN);
+
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("APAGADO");
+		_delay_ms(1000);
+		LCD_Clear();
+		LCD_BacklightOff();
+		
+		PRR_Config_Apagado();
+		WDT_Init_Interrupt_8s();
+	}
+}
+
+void estado_apagado(void) {
+	PORTB &= ~(1 << LED_PIN);
+
+	if (flag_wdt_despertar) {
+		flag_wdt_despertar = false;
+		
+		Lectura_Rapida_Despertar();
+
+		PRR &= ~(1 << PRTWI);
+		TWI_Init();
+		LCD_BacklightOn();
+		LCD_Clear();
+		
+		LCD_SetCursor(0, 0);
+		LCD_Print("Lectura hecha!");
+		
+		char buf_msg[17];
+		snprintf(buf_msg, sizeof(buf_msg), "Ev:%u A0:%04u", wdt_eventos, valor_adc);
+		LCD_SetCursor(1, 0);
+		LCD_Print(buf_msg);
+
+		_delay_ms(1500);
+
+		LCD_Clear();
+		LCD_BacklightOff();
+		PRR |= (1 << PRTWI);
+	}
+
+	if (flag_evento_emergencia) {
+		flag_evento_emergencia = false;
+		Perifericos_Reanudar();
+		LCD_BacklightOn();
+		Buzzer_Alarm();
+		id_estado_actual = ESTADO_EMERGENCIA;
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("! EMERGENCIA !  ");
+		LCD_SetCursor(1, 0);
+		LCD_Print("Estado Seguro   ");
+		return;
+	}
+
+	if (flag_evento_boton) {
+		flag_evento_boton = false;
+		Perifericos_Reanudar();
+		LCD_BacklightOn();
+		Buzzer_Beep();
+
+		id_estado_actual = ESTADO_ACTIVO;
+		LCD_Clear();
+	}
+}
+
+void estado_emergencia(void) {
+	PORTB |= (1 << LED_PIN);
+
+	if (flag_evento_emergencia || flag_evento_boton) {
+		flag_evento_emergencia = false;
+		flag_evento_boton = false;
+
+		// Si el cable en el Pin 4 sigue conectado a GND, bloquea el retorno
+		if (!(PIND & (1 << HANG_PIN))) {
+			Buzzer_Beep();
+			LCD_Clear();
+			LCD_SetCursor(0, 0);
+			LCD_Print("! BLOQUEADO !   ");
+			LCD_SetCursor(1, 0);
+			LCD_Print("Desconecte Pin4!");
+			_delay_ms(1500);
+			
+			Entrar_Estado_Seguro();
+			return;
+		}
+
+		// Al desconectar el cable, regresa al modo activo
+		Buzzer_Beep();
+		id_estado_actual = ESTADO_ACTIVO;
+		LCD_Clear();
+	}
+}
+
+FuncionEstado fsm_estados[] = { estado_activo, estado_standby, estado_apagado, estado_emergencia };
+
+// --- FUNCIÓN PRINCIPAL MAIN ---
+int main(void) {
+	causa_reset_mcusr = mcusr_mirror;
+
+	// Configuración de Entradas y Salidas
+	DDRB |= (1 << LED_PIN) | (1 << BUZZER_PIN) | (1 << WDT_TEST_PIN);
+	DDRD &= ~((1 << BUTTON_PIN) | (1 << EMERGENCY_BUTTON_PIN) | (1 << HANG_PIN));
+	PORTD |= (1 << BUTTON_PIN) | (1 << EMERGENCY_BUTTON_PIN) | (1 << HANG_PIN); // Pull-up en Pin 4 (PD4)
+
+	PRR_Config_Activo();
+	USART_Init(MYUBRR);
+
+	LCD_Init();
+	Timer0_Init();
+	Timer1_Init();
+	ADC_Init();
+	External_Interrupts_Init();
+
+	// Validación combinada de la causa de reseteo por Watchdog
+	bool reset_por_wdt = ((causa_reset_mcusr & (1 << WDRF)) != 0) || (wdt_signature == WDT_MAGIC_KEY);
+	wdt_signature = 0; // Limpiar clave en RAM
+
+	sei();
+
+	// Si fue reseteado por el WDT, ingresa a Emergencia 
+	if (reset_por_wdt) {
+		LCD_SetCursor(0, 0);
+		LCD_Print("! EMERGENCIA !  ");
+		LCD_SetCursor(1, 0);
+		LCD_Print("RESET POR WDT!  ");
+		
+		Entrar_Estado_Seguro();
+		Buzzer_Alarm(); // Alarma tras reinicio por WDT
+		USART_Send_String("$EVT:RESET_WDT\n");
+		_delay_ms(2000);
+		
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("! EMERGENCIA !  ");
+		LCD_SetCursor(1, 0);
+		LCD_Print("Estado Seguro   ");
+		} else {
+		Tarea_LCD_Update();
+	}
+
+	// Habilitar el WDT en MODO RESET (2.0s)
+	WDT_Enable_Reset();
+
+	while (1) {
+		// Evaluar simulación de bloqueo en operación normal
+		if (id_estado_actual == ESTADO_ACTIVO || id_estado_actual == ESTADO_STANDBY) {
+			Simular_Bloqueo(); // Al conectar Pin 4 a GND, congela la CPU y muestra aviso visual
+		}
+
+		// Refrescar temporizador del WDT
+		wdt_reset();
+
+		// 1. Manejador de la FSM
+		fsm_estados[id_estado_actual]();
+
+		// 2. Procesamiento de tramas Bluetooth
+		Tarea_Bluetooth_Parse();
+
+		// 3. Control de Modos Sleep
+		if (id_estado_actual == ESTADO_STANDBY) {
+			set_sleep_mode(SLEEP_MODE_IDLE);
+			sleep_mode();
+		}
+		else if (id_estado_actual == ESTADO_APAGADO) {
+			set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+			sleep_mode();
+		}
+	}
+}
