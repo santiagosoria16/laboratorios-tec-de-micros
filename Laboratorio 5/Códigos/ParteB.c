@@ -205,3 +205,115 @@ void pcf8574_write(uint8_t data) {
 	TWI_Stop();
 }
 
+// --- CONTROL DE RETROILUMINACIÓN LCD ---
+void LCD_BacklightOn(void) {
+	lcd_backlight_mask = 0x08;
+	pcf8574_write(lcd_backlight_mask);
+}
+
+void LCD_BacklightOff(void) {
+	lcd_backlight_mask = 0x00;
+	pcf8574_write(lcd_backlight_mask);
+}
+
+// --- DRIVER PANTALLA LCD MODO 4 BITS VÍA I2C ---
+void lcd_send_nibble(uint8_t nibble, uint8_t es_dato) {
+	uint8_t data = (nibble & 0xF0) | lcd_backlight_mask | (es_dato ? LCD_RS : 0);
+	pcf8574_write(data | LCD_ENABLE);
+	_delay_us(1);
+	pcf8574_write(data & ~LCD_ENABLE);
+	_delay_us(50);
+}
+
+void lcd_send_byte(uint8_t byte, uint8_t es_dato) {
+	lcd_send_nibble(byte & 0xF0, es_dato);
+	lcd_send_nibble((byte << 4) & 0xF0, es_dato);
+}
+
+void LCD_Init(void) {
+	TWI_Init();
+	_delay_ms(50);
+
+	lcd_send_nibble(0x30, 0); _delay_ms(5);
+	lcd_send_nibble(0x30, 0); _delay_ms(5);
+	lcd_send_nibble(0x30, 0); _delay_us(150);
+	lcd_send_nibble(0x20, 0); _delay_ms(2);
+
+	lcd_send_byte(0x28, 0);
+	lcd_send_byte(0x0C, 0);
+	lcd_send_byte(0x01, 0);
+	_delay_ms(2);
+	lcd_send_byte(0x06, 0);
+}
+
+void LCD_SetCursor(uint8_t fila, uint8_t columna) {
+	uint8_t addr = (fila == 0) ? (0x80 + columna) : (0xC0 + columna);
+	lcd_send_byte(addr, 0);
+}
+
+void LCD_Print(const char* str) {
+	while (*str) lcd_send_byte(*str++, 1);
+}
+
+void LCD_Clear(void) {
+	lcd_send_byte(0x01, 0);
+	_delay_ms(2);
+}
+
+// --- PROTOCOLO Y LECTURA DEL SENSOR DHT11 ---
+uint8_t dht_wait_level(uint8_t nivel, uint16_t timeout_us) {
+	while ((((DHT_PIN & (1 << DHT_BIT)) != 0) ? 1 : 0) != nivel) {
+		_delay_us(1);
+		if (timeout_us == 0) return 0;
+		timeout_us--;
+	}
+	return 1;
+}
+
+uint8_t dht11_read(uint8_t *hum, uint8_t *temp) {
+	uint8_t data[5] = {0, 0, 0, 0, 0};
+	uint8_t i, j;
+	uint16_t ancho;
+
+	DHT_DDR |= (1 << DHT_BIT);
+	DHT_PORT &= ~(1 << DHT_BIT);
+	_delay_ms(20);
+
+	cli();
+
+	DHT_PORT |= (1 << DHT_BIT);
+	_delay_us(30);
+
+	DHT_DDR &= ~(1 << DHT_BIT);
+	DHT_PORT |= (1 << DHT_BIT);
+
+	if (!dht_wait_level(0, 200)) { sei(); return 1; }
+	if (!dht_wait_level(1, 200)) { sei(); return 2; }
+	if (!dht_wait_level(0, 200)) { sei(); return 3; }
+
+	for (j = 0; j < 5; j++) {
+		for (i = 0; i < 8; i++) {
+			if (!dht_wait_level(1, 100)) { sei(); return 4; }
+			ancho = 0;
+			while (DHT_PIN & (1 << DHT_BIT)) {
+				_delay_us(1);
+				ancho++;
+				if (ancho >= 100) break;
+			}
+			if (ancho > 40) {
+				data[j] |= (1 << (7 - i));
+			}
+		}
+	}
+
+	sei();
+
+	if ((uint8_t)(data[0] + data[1] + data[2] + data[3]) != data[4]) {
+		return 6;
+	}
+
+	*temp = data[2];
+	*hum  = data[0];
+	return 0;
+}
+
