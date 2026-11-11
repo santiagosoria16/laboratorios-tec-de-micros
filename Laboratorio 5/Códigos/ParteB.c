@@ -44,3 +44,41 @@ typedef enum {
 } EstadoSistema;
 
 typedef void (*FuncionEstado)(void);
+// --- BÚFERES CIRCULARES UART  ---
+#define UART_BUFFER_SIZE 64
+
+volatile char rx_buffer[UART_BUFFER_SIZE];
+volatile uint8_t rx_head = 0;
+volatile uint8_t rx_tail = 0;
+
+volatile char tx_buffer[UART_BUFFER_SIZE];
+volatile uint8_t tx_head = 0;
+volatile uint8_t tx_tail = 0;
+
+// --- VARIABLES GLOBALES VOLÁTILES ---
+volatile uint32_t milisegundos_totales = 0;
+volatile uint32_t ultimo_evento_usuario = 0;
+
+volatile uint16_t cont_led_ms = 0;
+volatile uint16_t cont_lcd_ms = 0;
+volatile uint16_t cont_temp_ms = 0;
+
+volatile bool flag_tarea_led = false;
+volatile bool flag_tarea_lcd = false;
+volatile bool flag_tarea_temp = false;
+
+volatile bool flag_evento_boton = false;
+volatile bool flag_evento_emergencia = false;
+volatile bool flag_wdt_despertar = false;
+
+volatile uint16_t wdt_eventos = 0;        // Registro de eventos de despertar del WDT
+
+volatile uint16_t valor_adc = 0;
+volatile uint8_t dht_temp = 0;
+volatile uint8_t dht_hum = 0;
+
+volatile EstadoSistema id_estado_actual = ESTADO_ACTIVO;
+
+uint8_t causa_reset_mcusr = 0;
+volatile uint8_t lcd_backlight_mask = 0x08;
+
