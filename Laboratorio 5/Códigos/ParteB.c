@@ -398,3 +398,59 @@ void Lectura_Rapida_Despertar(void) {
 	PRR |= (1 << PRADC);
 }
 
+// --- RUTINAS DE SERVICIO DE INTERRUPCIÓN (ISRs) ---
+ISR(TIMER0_COMPA_vect) {
+	milisegundos_totales++;
+
+	if (id_estado_actual == ESTADO_ACTIVO) {
+		cont_led_ms++;
+		if (cont_led_ms >= 200) { cont_led_ms = 0; flag_tarea_led = true; }
+
+		cont_lcd_ms++;
+		if (cont_lcd_ms >= 500) { cont_lcd_ms = 0; flag_tarea_lcd = true; }
+
+		cont_temp_ms++;
+		if (cont_temp_ms >= 2000) { cont_temp_ms = 0; flag_tarea_temp = true; }
+	}
+}
+
+ISR(TIMER1_COMPA_vect) {
+	if (id_estado_actual == ESTADO_ACTIVO && (ADCSRA & (1 << ADEN))) {
+		ADCSRA |= (1 << ADSC);
+	}
+}
+
+ISR(ADC_vect) {
+	valor_adc = ADC;
+}
+
+ISR(INT0_vect) {
+	static uint32_t ultima_int0 = 0;
+	if (milisegundos_totales - ultima_int0 > 150 || milisegundos_totales < ultima_int0) {
+		flag_evento_boton = true;
+		ultimo_evento_usuario = milisegundos_totales;
+		ultima_int0 = milisegundos_totales;
+	}
+}
+
+ISR(INT1_vect) {
+	static uint32_t ultima_int1 = 0;
+	if (milisegundos_totales - ultima_int1 > 150 || milisegundos_totales < ultima_int1) {
+		flag_evento_emergencia = true;
+		ultimo_evento_usuario = milisegundos_totales;
+		ultima_int1 = milisegundos_totales;
+	}
+}
+
+ISR(WDT_vect) {
+	flag_wdt_despertar = true;
+	wdt_eventos++;
+	PORTB |= (1 << WDT_TEST_PIN);
+	_delay_ms(100);
+	PORTB &= ~(1 << WDT_TEST_PIN);
+	// Solo re-habilitar WDIE en ESTADO_APAGADO
+	if (id_estado_actual == ESTADO_APAGADO) {
+		WDTCSR |= (1 << WDIE);
+	}
+}
+
