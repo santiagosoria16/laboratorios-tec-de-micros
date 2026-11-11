@@ -97,3 +97,19 @@ void get_mcusr(void) {
 	wdt_disable(); // Deshabilitación inmediata
 }
 
+// --- DRIVER BÚFER CIRCULAR UART POR INTERRUPCIÓN ---
+void USART_Init(unsigned int ubrr) {
+	UBRR0H = (unsigned char)(ubrr >> 8);
+	UBRR0L = (unsigned char)ubrr;
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+}
+
+ISR(USART_RX_vect) {
+	char dato = UDR0;
+	uint8_t next_head = (rx_head + 1) % UART_BUFFER_SIZE;
+	if (next_head != rx_tail) {
+		rx_buffer[rx_head] = dato;
+		rx_head = next_head;
+	}
+}
