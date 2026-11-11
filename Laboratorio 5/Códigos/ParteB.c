@@ -478,3 +478,152 @@ void Tarea_LCD_Update(void) {
 	LCD_Print(buffer);
 }
 
+// --- PARSER Y PROCESAMIENTO DE TRAMAS BLUETOOTH ---
+uint8_t ascii_to_hex(char c) {
+	if (c >= '0' && c <= '9') return c - '0';
+	if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+	if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+	return 0;
+}
+
+void Procesar_Comando_Bluetooth(char cmd, const char* data) {
+	char response[32];
+	
+	ultimo_evento_usuario = milisegundos_totales;
+
+	if (cmd == 'S') {
+		const char* estados_str[] = {"ACTIVO", "STANDBY", "APAGADO", "EMERGENCIA"};
+		snprintf(response, sizeof(response), "$S:%s\n", estados_str[id_estado_actual]);
+		USART_Send_String(response);
+	}
+	else if (cmd == 'T') {
+		snprintf(response, sizeof(response), "$T:T%02dH%02dA%04d\n", dht_temp, dht_hum, valor_adc);
+		USART_Send_String(response);
+	}
+	else if (cmd == 'M') {
+		if (id_estado_actual == ESTADO_EMERGENCIA) {
+			USART_Send_String("$ERROR:EMERGENCIA_ACTIVA\n");
+			return;
+		}
+		if (data[1] == '0') {
+			id_estado_actual = ESTADO_ACTIVO;
+			Perifericos_Reanudar();
+			LCD_BacklightOn();
+			LCD_Clear();
+			USART_Send_String("$OK:MODO_ACTIVO\n");
+			} else if (data[1] == '1') {
+			id_estado_actual = ESTADO_STANDBY;
+			PRR_Config_Standby();
+			LCD_Clear();
+			LCD_SetCursor(0, 0);
+			LCD_Print("Esperando...");
+			USART_Send_String("$OK:MODO_STANDBY\n");
+			} else if (data[1] == '2') {
+			id_estado_actual = ESTADO_APAGADO;
+			PORTB &= ~(1 << LED_PIN);
+			LCD_Clear();
+			LCD_BacklightOff();
+			USART_Send_String("$OK:MODO_APAGADO\n");
+			USART_Flush();
+			PRR_Config_Apagado();
+			WDT_Init_Interrupt_8s();
+		}
+	}
+	else if (cmd == 'A') {
+		if (data[0] == 'L' && data[1] == '1') {
+			PORTB |= (1 << LED_PIN);
+			USART_Send_String("$OK:LED_ON\n");
+			} else if (data[0] == 'L' && data[1] == '0') {
+			PORTB &= ~(1 << LED_PIN);
+			USART_Send_String("$OK:LED_OFF\n");
+			} else if (data[0] == 'B' && data[1] == '1') {
+			Buzzer_Beep();
+			USART_Send_String("$OK:BEEP\n");
+		}
+	}
+	else if (cmd == 'E') { // Transición manual por Bluetooth
+		id_estado_actual = ESTADO_EMERGENCIA;
+		Perifericos_Reanudar();
+		LCD_BacklightOn();
+		Buzzer_Alarm();
+		LCD_Clear();
+		LCD_SetCursor(0, 0);
+		LCD_Print("! EMERGENCIA !  ");
+		LCD_SetCursor(1, 0);
+		LCD_Print("Estado Seguro   ");
+		USART_Send_String("$OK:EMERGENCIA_ACTIVADA\n");
+	}
+	else if (cmd == 'R') {
+		if (id_estado_actual == ESTADO_EMERGENCIA) {
+			if (!(PIND & (1 << HANG_PIN))) {
+				USART_Send_String("$ERROR:DESCONECTE_PIN4\n");
+				return;
+			}
+			id_estado_actual = ESTADO_ACTIVO;
+			Buzzer_Beep();
+			LCD_Clear();
+			USART_Send_String("$OK:EMERGENCIA_RESUELTA\n");
+		}
+	}
+	else {
+		USART_Send_String("$ERROR:COMANDO_DESCONOCIDO\n");
+	}
+}
+
+void Tarea_Bluetooth_Parse(void) {
+	static char frame_buf[16];
+	static uint8_t idx = 0;
+	static bool recibiendo = false;
+
+	while (USART_Available()) {
+		char c = USART_Read();
+
+		if (c == '$') {
+			recibiendo = true;
+			idx = 0;
+			frame_buf[idx++] = c;
+		}
+		else if (recibiendo) {
+			if (c == '\n' || c == '\r') {
+				frame_buf[idx] = '\0';
+				recibiendo = false;
+
+				if (idx == 6) {
+					char cmd = frame_buf[1];
+					char data[3] = { frame_buf[2], frame_buf[3], '\0' };
+					uint8_t chk_recibido = (ascii_to_hex(frame_buf[4]) << 4) | ascii_to_hex(frame_buf[5]);
+					
+					uint8_t chk_calculado = (uint8_t)cmd ^ (uint8_t)data[0] ^ (uint8_t)data[1];
+
+					if (chk_recibido == chk_calculado) {
+						Procesar_Comando_Bluetooth(cmd, data);
+						} else {
+						USART_Send_String("$ERROR:CHECKSUM_INVALIDO\n");
+					}
+					} else {
+					USART_Send_String("$ERROR:TRAMA_INCOMPLETA\n");
+				}
+				idx = 0;
+			}
+			else {
+				if (idx < sizeof(frame_buf) - 1) {
+					frame_buf[idx++] = c;
+					} else {
+					recibiendo = false;
+					idx = 0;
+				}
+			}
+		}
+	}
+}
+
+void Entrar_Estado_Seguro(void) {
+	id_estado_actual = ESTADO_EMERGENCIA;
+	LCD_BacklightOn();
+	LCD_Clear();
+	LCD_SetCursor(0, 0);
+	LCD_Print("! EMERGENCIA !  ");
+	LCD_SetCursor(1, 0);
+	LCD_Print("Estado Seguro   ");
+}
+
