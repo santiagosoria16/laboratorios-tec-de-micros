@@ -82,3 +82,18 @@ volatile EstadoSistema id_estado_actual = ESTADO_ACTIVO;
 uint8_t causa_reset_mcusr = 0;
 volatile uint8_t lcd_backlight_mask = 0x08;
 
+// --- DETECCIÓN ROBUSTA DE RESET POR WDT ---
+uint8_t mcusr_mirror __attribute__((section(".noinit")));
+uint32_t wdt_signature __attribute__((section(".noinit")));
+#define WDT_MAGIC_KEY 0xDEADBEEF // detectar WDT reset tras bootloader
+
+void get_mcusr(void) __attribute__((naked)) __attribute__((used)) __attribute__((section(".init3")));
+void get_mcusr(void) {
+	uint8_t mcusr_val = MCUSR;
+	uint8_t r2_val;
+	__asm__ __volatile__ ("mov %0, r2 \n" : "=r" (r2_val));
+	mcusr_mirror = mcusr_val | r2_val;
+	MCUSR = 0;
+	wdt_disable(); // Deshabilitación inmediata
+}
+
