@@ -23,3 +23,15 @@
 // Pines para las pruebas del WDT
 #define WDT_TEST_PIN         PB1   // Pin 9 Arduino: conmuta de nivel en cada interrupción WDT
 #define HANG_PIN             PD4   // Pin 4 Arduino (pull-up): a GND simula el bloqueo
+
+// --- MAPEO Y REGISTROS DEL SENSOR DHT11 ---
+#define DHT_PORT        PORTB
+#define DHT_DDR         DDRB
+#define DHT_PIN         PINB
+#define DHT_BIT         PB4   // Pin 12 Arduino
+
+// --- CONFIGURACIÓN DEL DISPLAY LCD I2C (EXPANSOR PCF8574) ---
+#define I2C_ADDR        0x27
+#define LCD_ENABLE      0x04
+#define LCD_RS          0x01
+
