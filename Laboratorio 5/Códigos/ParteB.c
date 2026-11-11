@@ -133,3 +133,20 @@ char USART_Read(void) {
 	rx_tail = (rx_tail + 1) % UART_BUFFER_SIZE;
 	return dato;
 }
+
+// --- GESTIÓN DEL REGISTRO POWER REDUCTION (PRR) ---
+static void ADC_Apagar(void) {
+	if (!(PRR & (1 << PRADC))) {
+		while (ADCSRA & (1 << ADSC));
+		ADCSRA &= ~(1 << ADEN);
+	}
+}
+
+void PRR_Config_Activo(void) {
+	PRR = (1 << PRSPI) | (1 << PRTIM2);
+}
+
+void PRR_Config_Standby(void) {
+	ADC_Apagar();
+	PRR = (1 << PRADC) | (1 << PRTIM1) | (1 << PRSPI) | (1 << PRTIM2);
+}
