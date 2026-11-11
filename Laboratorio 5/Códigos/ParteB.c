@@ -113,3 +113,23 @@ ISR(USART_RX_vect) {
 		rx_head = next_head;
 	}
 }
+
+ISR(USART_UDRE_vect) {
+	if (tx_head != tx_tail) {
+		UDR0 = tx_buffer[tx_tail];
+		tx_tail = (tx_tail + 1) % UART_BUFFER_SIZE;
+		} else {
+		UCSR0B &= ~(1 << UDRIE0);
+	}
+}
+
+bool USART_Available(void) {
+	return (rx_head != rx_tail);
+}
+
+char USART_Read(void) {
+	if (rx_head == rx_tail) return 0;
+	char dato = rx_buffer[rx_tail];
+	rx_tail = (rx_tail + 1) % UART_BUFFER_SIZE;
+	return dato;
+}
