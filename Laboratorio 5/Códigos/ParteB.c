@@ -150,3 +150,29 @@ void PRR_Config_Standby(void) {
 	ADC_Apagar();
 	PRR = (1 << PRADC) | (1 << PRTIM1) | (1 << PRSPI) | (1 << PRTIM2);
 }
+
+
+void PRR_Config_Apagado(void) {
+	ADC_Apagar();
+	PRR = (1 << PRADC) | (1 << PRUSART0) | (1 << PRSPI) | (1 << PRTIM1) | (1 << PRTIM0) | (1 << PRTIM2) | (1 << PRTWI);
+}
+
+// --- GENERADOR DE TONOS PARA BUZZER ---
+void Buzzer_Beep(void) { // Pitido corto de interacción normal
+	for (uint16_t i = 0; i < 100; i++) {
+		PORTB |= (1 << BUZZER_PIN);
+		_delay_us(500);
+		PORTB &= ~(1 << BUZZER_PIN);
+		_delay_us(500);
+	}
+}
+
+void Buzzer_Alarm(void) { // Alarma ruidosa para estado de emergencia
+	for (uint16_t i = 0; i < 300; i++) {
+		PORTB |= (1 << BUZZER_PIN);
+		_delay_us(250);
+		PORTB &= ~(1 << BUZZER_PIN);
+		_delay_us(250);
+	}
+}
+
