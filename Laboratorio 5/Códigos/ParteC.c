@@ -53,3 +53,25 @@ static void ADC_init(void) {
 	_delay_ms(10);                              // estabilizar la referencia
 	(void)ADC_read_once();                      // descartar la primera conversión
 }
+
+// Suma de OVERSAMPLE lecturas consecutivas
+static uint16_t ADC_read_sum(void) {
+	uint16_t suma = 0;
+	for (uint8_t i = 0; i < OVERSAMPLE; i++) {
+		suma += ADC_read_once();
+	}
+	return suma;
+}
+
+// ---------------- Timer1: tick de 10 ms ----------------
+static void Timer1_init(void) {
+	TCCR1A = 0;
+	TCCR1B = (1 << WGM12) | (1 << CS11) | (1 << CS10);  // CTC, prescaler 64
+	OCR1A  = 2499;                                      // 16 MHz / (64 * 2500) = 100 Hz
+	TIMSK1 = (1 << OCIE1A);
+}
+
+ISR(TIMER1_COMPA_vect) {
+	ms_contador += 10;
+	flag_muestreo = 1;
+}
