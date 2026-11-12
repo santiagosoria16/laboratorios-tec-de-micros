@@ -46,3 +46,39 @@ COLORES = {"ACTIVO": "#ffd9d9", "STANDBY": "#fff2cc", "APAGADO": "#d9e8ff"}
 
 VENTANA_FILTRO = 9            # muestras (a 100 Hz -> 90 ms)
 VCC = 5.0                     # para la potencia
+
+# FUNCIONES
+
+def capturar(duracion_s):
+    """Devuelve lista de (t_ms, suma_adc) leída del puerto serie."""
+    muestras = []
+    with serial.Serial(PUERTO_SERIE, BAUD_RATE, timeout=1) as ser:
+        time.sleep(2)               # el Arduino se resetea al abrir el puerto
+        ser.reset_input_buffer()
+        ser.readline()              # descarta una línea posiblemente incompleta
+        t0 = time.time()
+        while (time.time() - t0) < duracion_s:
+            linea = ser.readline().decode('ascii', errors='ignore').strip()
+            partes = linea.split(',')
+            if len(partes) != 2:
+                continue
+            try:
+                t_ms = int(partes[0])
+                suma = int(partes[1])
+            except ValueError:
+                continue
+            if not (0 <= suma <= ADC_MAX * OVERSAMPLE):
+                continue            # trama corrupta
+            muestras.append((t_ms, suma))
+    return muestras
+
+
+def suma_a_voltaje(suma):
+    cuentas = np.asarray(suma, dtype=float) / OVERSAMPLE
+    return cuentas / ADC_MAX * VREF
+
+
+def integrar(y, x):
+    if hasattr(np, 'trapezoid'):
+        return np.trapezoid(y, x)
+    return np.trapz(y, x)
