@@ -82,3 +82,15 @@ def integrar(y, x):
     if hasattr(np, 'trapezoid'):
         return np.trapezoid(y, x)
     return np.trapz(y, x)
+
+# MODO CALIBRACIÓN
+
+if MODO_CALIBRACION:
+    print(f"Calibrando offset durante {DURACION_CALIBRACION_S} s (shunt en corto / sin carga)...")
+    m = capturar(DURACION_CALIBRACION_S)
+    if not m:
+        raise SystemExit("No llegaron datos. Revisá puerto y baudios.")
+    v = suma_a_voltaje([s for _, s in m])
+    print(f"Muestras: {len(v)}")
+    print(f"V_OFFSET_SALIDA = {np.mean(v):.4f} V   (desvío: {np.std(v)*1000:.2f} mV)")
+    raise SystemExit
