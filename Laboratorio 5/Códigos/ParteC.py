@@ -94,3 +94,18 @@ if MODO_CALIBRACION:
     print(f"Muestras: {len(v)}")
     print(f"V_OFFSET_SALIDA = {np.mean(v):.4f} V   (desvío: {np.std(v)*1000:.2f} mV)")
     raise SystemExit
+
+# CAPTURA
+
+print(f"Capturando {DURACION_MEDICION_S} s en {PUERTO_SERIE} a {BAUD_RATE} baudios...")
+print(f"R_shunt = {R_SHUNT} Ω | Av = {GANANCIA_AV:.1f} | Offset = {V_OFFSET_SALIDA} V | VREF = {VREF} V")
+
+muestras = capturar(DURACION_MEDICION_S)
+if len(muestras) < 10:
+    raise SystemExit("Muy pocas muestras. Revisá conexión, baudios y firmware.")
+
+with open(ARCHIVO_SALIDA, 'w', newline='') as f:
+    w = csv.writer(f)
+    w.writerow(["t_ms", "suma_adc"])
+    w.writerows(muestras)
+print(f"Muestras recibidas: {len(muestras)}  ->  '{ARCHIVO_SALIDA}'")
