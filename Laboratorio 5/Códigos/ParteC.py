@@ -109,3 +109,54 @@ with open(ARCHIVO_SALIDA, 'w', newline='') as f:
     w.writerow(["t_ms", "suma_adc"])
     w.writerows(muestras)
 print(f"Muestras recibidas: {len(muestras)}  ->  '{ARCHIVO_SALIDA}'")
+
+# PROCESAMIENTO
+
+df = pd.read_csv(ARCHIVO_SALIDA).sort_values("t_ms").reset_index(drop=True)
+
+df["Tiempo(s)"] = (df["t_ms"] - df["t_ms"].iloc[0]) / 1000.0
+df["Cuentas_ADC"] = df["suma_adc"] / OVERSAMPLE
+df["Tension_ADC(V)"] = suma_a_voltaje(df["suma_adc"])
+df["Tension_Shunt(V)"] = (df["Tension_ADC(V)"] - V_OFFSET_SALIDA) / GANANCIA_AV   # sin recortar a 0
+df["Corriente(mA)"] = df["Tension_Shunt(V)"] / R_SHUNT * 1000.0
+df["Corriente_Filtrada(mA)"] = df["Corriente(mA)"].rolling(
+    window=VENTANA_FILTRO, min_periods=1, center=True).mean()
+
+df = df[(df["Tiempo(s)"] >= 0) & (df["Tiempo(s)"] <= DURACION_MEDICION_S)]
+
+t = df["Tiempo(s)"].to_numpy()
+i_raw = df["Corriente(mA)"].to_numpy()
+i_f = df["Corriente_Filtrada(mA)"].to_numpy()
+
+def estado_de(ts):
+    for ini, fin, nombre in ESTADOS:
+        if ini <= ts < fin:
+            return nombre
+    return ESTADOS[-1][2]
+
+df["Estado"] = df["Tiempo(s)"].apply(estado_de)
+df.to_csv(ARCHIVO_SALIDA.replace(".csv", "_procesado.csv"), index=False)
+
+# Resultados globales
+Q_mAh = integrar(i_f, t / 3600.0)
+t_total_h = (t[-1] - t[0]) / 3600.0
+I_prom = Q_mAh / t_total_h
+P_prom = VCC * I_prom
+
+print("\n================ RESULTADOS ================")
+print(f"Resolución por cuenta (sin sobremuestreo): {VREF/ADC_MAX/GANANCIA_AV/R_SHUNT*1000:.4f} mA")
+print(f"Cuentas ADC (mín / máx):  {df['Cuentas_ADC'].min():.1f} / {df['Cuentas_ADC'].max():.1f}")
+print(f"Corriente mínima:   {np.min(i_f):.3f} mA")
+print(f"Corriente máxima:   {np.max(i_f):.3f} mA")
+print(f"Corriente promedio: {I_prom:.3f} mA")
+print(f"Carga total (Q):    {Q_mAh:.5f} mAh")
+print(f"Potencia media:     {P_prom:.3f} mW")
+print("--------------- Por estado ---------------")
+for ini, fin, nombre in ESTADOS:
+    m = (t >= ini) & (t < fin)
+    if m.sum() < 2:
+        continue
+    q = integrar(i_f[m], t[m] / 3600.0)
+    dur_h = (t[m][-1] - t[m][0]) / 3600.0
+    print(f"{nombre:8s} [{ini:4.1f}-{fin:4.1f} s]  I_prom = {q/dur_h:8.3f} mA   Q = {q:.5f} mAh")
+print("============================================\n")
