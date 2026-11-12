@@ -75,3 +75,30 @@ ISR(TIMER1_COMPA_vect) {
 	ms_contador += 10;
 	flag_muestreo = 1;
 }
+
+// ---------------- Main ----------------
+int main(void) {
+	char buffer[24];
+
+	USART_init();
+	ADC_init();
+	Timer1_init();
+	sei();
+
+	while (1) {
+		if (flag_muestreo) {
+			// Copia atómica del contador de 32 bits
+			cli();
+			uint32_t t_ms = ms_contador;
+			flag_muestreo = 0;
+			sei();
+
+			uint16_t suma = ADC_read_sum();
+
+			// Trama: "t_ms,suma16\n"  (~12 caracteres -> ~1 ms a 115200)
+			snprintf(buffer, sizeof(buffer), "%lu,%u\n", t_ms, suma);
+			USART_send_string(buffer);
+		}
+	}
+	return 0;
+}
