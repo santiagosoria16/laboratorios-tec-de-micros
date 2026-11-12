@@ -160,3 +160,26 @@ for ini, fin, nombre in ESTADOS:
     dur_h = (t[m][-1] - t[m][0]) / 3600.0
     print(f"{nombre:8s} [{ini:4.1f}-{fin:4.1f} s]  I_prom = {q/dur_h:8.3f} mA   Q = {q:.5f} mAh")
 print("============================================\n")
+
+# GRÁFICA
+
+fig, ax = plt.subplots(figsize=(12, 6))
+
+for ini, fin, nombre in ESTADOS:
+    ax.axvspan(ini, fin, color=COLORES.get(nombre, "#eeeeee"), alpha=0.6, label=nombre)
+
+ax.plot(t, i_raw, color='lightblue', alpha=0.5, linewidth=0.7, label="Corriente (cruda)")
+ax.plot(t, i_f, color='blue', linewidth=1.6, label="Corriente (filtrada)")
+ax.axhline(I_prom, color='red', linestyle='--', label=f"I_promedio ({I_prom:.3f} mA)")
+
+ax.set_title(f"Caracterización energética I(t)  [R_shunt = {R_SHUNT} Ω, Av = {GANANCIA_AV:.0f}, "
+             f"offset = {V_OFFSET_SALIDA*1000:.0f} mV]", fontsize=13)
+ax.set_xlabel("Tiempo (s)", fontsize=12)
+ax.set_ylabel("Corriente (mA)", fontsize=12)
+ax.set_xlim(0, DURACION_MEDICION_S)
+ax.grid(True, linestyle='--', alpha=0.6)
+ax.legend(loc='upper right')
+fig.tight_layout()
+
+fig.savefig("grafica_corriente_tiempo_4_7ohm.png", dpi=150)
+plt.show()
