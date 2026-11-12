@@ -34,3 +34,22 @@ static void USART_send_string(const char *str) {
 	while (*str) USART_transmit(*str++);
 }
 
+// ---------------- ADC ----------------
+static uint16_t ADC_read_once(void) {
+	ADCSRA |= (1 << ADSC);
+	while (ADCSRA & (1 << ADSC));
+	return ADC;
+}
+
+static void ADC_init(void) {
+#if USAR_REF_INTERNA
+	ADMUX = (1 << REFS1) | (1 << REFS0);        // 1.1 V interna, canal 0 (A0)
+#else
+	ADMUX = (1 << REFS0);                       // AVCC, canal 0 (A0)
+#endif
+	// Prescaler 128 -> 125 kHz
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+
+	_delay_ms(10);                              // estabilizar la referencia
+	(void)ADC_read_once();                      // descartar la primera conversión
+}
