@@ -12,7 +12,6 @@
 -     S       Stop (frena y deja el joystick en 0)
 -     E       Emergencia: frena y bloquea todo hasta recibir R
 -     R       Rearmar (sale de emergencia)
--     (formato viejo "x,y" de la APK anterior tambien se acepta)
 -   Robot -> App (cada 500 ms)
 -     T,garra,obstaculo
 -        garra     = 1 cerrada, 2 guardada, 0 abierta/en movimiento
@@ -418,15 +417,6 @@ static void procesar_linea(const char *s)
         if (!p) return;
         set_mando(a, b);
     }
-#if ACEPTAR_FORMATO_VIEJO
-    else if (c == '-' || (c >= '0' && c <= '9')) {             // Formato antiguo: "x,y"
-        p = leer_entero(s, &a);
-        if (!p || *p != ',') return;
-        p = leer_entero(p + 1, &b);
-        if (!p) return;
-        set_mando(b, a);                                       // Invierte orden: y=avance, x=giro
-    }
-#endif
     else {
         switch (c) {
             case 'O': if (!emergencia) pinza_ir_a(SERVO_MIN_OCR, SERVO2_ABIERTO_OCR);     break; // Abrir
