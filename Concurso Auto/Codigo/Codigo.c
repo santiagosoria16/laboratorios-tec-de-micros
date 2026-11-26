@@ -37,10 +37,10 @@
 #define MY_UBRR (F_CPU / 16 / BAUD - 1)       // Valor del registro baud rate (103 para 9600 @ 16MHz)
 
 /* Limites PWM de los servos (Timer1 con prescaler 8: 2000 cuentas = 1 ms) */
-#define SERVO_MIN_OCR      2500  // Pulso para servo 1 abierto (~1.25 ms)
-#define SERVO_MAX_OCR      2100  // Pulso para servo 1 cerrado (~1.05 ms)
-#define SERVO2_ABIERTO_OCR 1999  // Pulso para servo 2 abierto (~1.00 ms, montado en espejo)
-#define SERVO2_CERRADO_OCR 2500  // Pulso para servo 2 cerrado (~1.25 ms)
+#define SERVO_MIN_OCR      2500  // Pulso para servo 1 abierto 
+#define SERVO_MAX_OCR      2100  // Pulso para servo 1 cerrado 
+#define SERVO2_ABIERTO_OCR 1999  // Pulso para servo 2 abierto 
+#define SERVO2_CERRADO_OCR 2500  // Pulso para servo 2 cerrado 
 #define SERVO_PASO    40         // Velocidad de movimiento: 40 cuentas cada 10 ms (~0.5 s total)
 
 /* Angulos de posicion de guardado/transporte */
